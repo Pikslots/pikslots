@@ -42,7 +42,7 @@
     "test": "bunx nx run-many -t test --no-tui",
     "test-e2e": "bunx nx run-many -t test-e2e --no-tui",
     "prepare": "husky || true",
-    "docker:run": "docker compose --env-file .env -f docker/postgres.yml -f docker/redis.yml -f docker/mailpit.yml up -d",
+    "docker:up": "docker compose --env-file .env -f docker/postgres.yml -f docker/redis.yml -f docker/mailpit.yml up -d",
     "docker:down": "docker compose --env-file .env -f docker/postgres.yml -f docker/redis.yml -f docker/mailpit.yml down ",
     "docker:test-run": "docker compose --env-file .test.env -f docker/postgres.yml -f docker/redis.yml -f docker/mailpit.yml up -d "
   },

@@ -227,7 +227,6 @@ export class GetFreeSlotsForUserUseCaseImpl implements GetFreeSlotsForUser {
 
       current += durationMs + bufferMs;
     }
-
     return slots;
   }
 }

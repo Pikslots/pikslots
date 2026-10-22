@@ -65,6 +65,7 @@
 	let customLabelValue = $state('');
 	let labelError = $state(false);
 
+	/** Selects a predefined booking label and resets custom label input state. */
 	function selectPredefinedLabel(label: string) {
 		selectedLabel = label;
 		showCustomLabelInput = false;
@@ -72,10 +73,12 @@
 		labelError = false;
 	}
 
+	/** Opens the inline input for entering a custom booking label. */
 	function openCustomLabelInput() {
 		showCustomLabelInput = true;
 	}
 
+	/** Confirms the typed custom label, trims whitespace, and applies it. */
 	function confirmCustomLabel() {
 		const trimmed = customLabelValue.trim();
 		if (trimmed) {
@@ -86,6 +89,7 @@
 		}
 	}
 
+	/** Clears the currently selected label and resets label UI state. */
 	function clearLabel() {
 		selectedLabel = '';
 		showCustomLabelInput = false;
@@ -146,6 +150,7 @@
 		return () => clearTimeout(timer);
 	});
 
+	/** Applies the chosen customer from search results to the booking form. */
 	function selectCustomer(id: string, name: string) {
 		$form.customerId = id;
 		selectedCustomerName = name;
@@ -153,6 +158,7 @@
 		debouncedCustomerSearch = '';
 	}
 
+	/** Clears the selected customer and resets the customer search state. */
 	function clearCustomer() {
 		$form.customerId = '';
 		selectedCustomerName = '';
@@ -160,6 +166,7 @@
 		debouncedCustomerSearch = '';
 	}
 
+	/** Clears a previously selected customer so the user can search again. */
 	function onCustomerSearchFocus() {
 		if ($form.customerId) {
 			$form.customerId = '';
@@ -272,6 +279,7 @@
 
 	const freeSlots = $derived(freeSlotsQuery.data ?? []);
 
+	/** Resets all form fields, overrides, label, and customer state to defaults. */
 	function resetForm() {
 		bookingDate = today(getLocalTimeZone());
 		bookingType = 'service';
@@ -296,6 +304,7 @@
 		});
 	}
 
+	/** Formats a DateValue into a human-readable date string (e.g. "12 Oct 2026"). */
 	function formatDate(value: DateValue) {
 		return value.toDate(getLocalTimeZone()).toLocaleDateString('en-GB', {
 			day: 'numeric',
@@ -304,11 +313,13 @@
 		});
 	}
 
+	/** Checks whether a given date falls on Saturday or Sunday. */
 	function isWeekend(date: DateValue) {
 		const day = date.toDate(getLocalTimeZone()).getDay();
 		return day === 0 || day === 6;
 	}
 
+	/** Formats an ISO timestamp into a localized time string in the business timezone. */
 	function formatSlotTime(iso: string): string {
 		if (!iso) return '';
 		const d = new Date(iso);
@@ -328,6 +339,7 @@
 		freeSlots.map((s) => ({ iso: s.endTime, label: formatSlotTime(s.endTime) }))
 	);
 
+	/** Handles start time selection — snaps both start and end to the matching free slot. */
 	function onStartChange(value: string) {
 		const slot = freeSlots.find((s) => s.startTime === value);
 		if (slot) {
@@ -336,6 +348,7 @@
 		}
 	}
 
+	/** Handles end time selection — snaps both start and end to the matching free slot. */
 	function onEndChange(value: string) {
 		const slot = freeSlots.find((s) => s.endTime === value);
 		if (slot) {

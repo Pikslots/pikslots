@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import {
   Booking,
   BookingConflictError,
@@ -8,10 +8,12 @@ import {
   type CustomerNotFoundError,
   type CustomerRepository,
   err,
+  IBusinessRepository,
   IBookingRepository,
   ICustomerRepository,
   IServiceRepository,
   IUserRepository,
+  type BusinessRepository,
   type InfrastructureError,
   type RegisterPublicBookingCommand,
   type RegisterPublicBookingError,
@@ -23,7 +25,9 @@ import {
   type UnauthorizedError,
   type UserRepository,
 } from '@pikslots/domain';
+import { formatIsoInTimezone } from '@pikslots/datetime';
 import { v7 as uuidv7 } from 'uuid';
+import { PikslotEmailService } from 'src/shared/email/pikslot.email.service';
 
 const EMPTY_SOCIAL_LINKS = {
   Website: '',
@@ -37,6 +41,10 @@ const EMPTY_SOCIAL_LINKS = {
 
 @Injectable()
 export class RegisterPublicBookingUseCaseImpl implements RegisterPublicBookingUseCase {
+  private readonly logger: Logger = new Logger(
+    RegisterPublicBookingUseCaseImpl.name,
+  );
+
   constructor(
     @Inject(IBookingRepository)
     private readonly bookingRepository: BookingRepository,
@@ -46,6 +54,9 @@ export class RegisterPublicBookingUseCaseImpl implements RegisterPublicBookingUs
     private readonly serviceRepository: ServiceRepository,
     @Inject(IUserRepository)
     private readonly userRepository: UserRepository,
+    @Inject(IBusinessRepository)
+    private readonly businessRepository: BusinessRepository,
+    private readonly emailService: PikslotEmailService,
   ) {}
 
   async execute(
@@ -128,8 +139,66 @@ export class RegisterPublicBookingUseCaseImpl implements RegisterPublicBookingUs
       notes: null,
     });
 
+    const businessResult = await this.businessRepository.findById(
+      command.businessId,
+    );
+    if (!businessResult.ok)
+      return err(businessResult.error as InfrastructureError);
+    if (!businessResult.value)
+      return err({
+        kind: 'infrastructure',
+        message: 'something went wrong!!',
+        cause: 'business not found',
+        timestamp: new Date(),
+      });
+
+    const business = businessResult.value;
+
     const saved = await this.bookingRepository.save(booking);
     if (!saved.ok) return err(saved.error);
+
+    // await this.sendBookingConfirmations(booking, command, service, user);
+
+    const shared = {
+      businessName: business.name,
+      serviceName: service.title,
+      bookingRef: booking.bookingId,
+      bookingDate: command.bookingDate,
+      startTime: formatIsoInTimezone(
+        booking.bookingStartTime,
+        business.locationDetails.timeZone,
+        'h:mm a',
+      ),
+      endTime: formatIsoInTimezone(
+        booking.bookingEndTime,
+        business.locationDetails.timeZone,
+        'h:mm a',
+      ),
+      teamMemberName: `${user.name.firstName} ${user.name.lastName}`.trim(),
+      guestFullName:
+        `${command.contact.firstName} ${command.contact.lastName}`.trim(),
+      price: booking.serviceSnapshot.cost / 100,
+      currency: business.locationDetails.currency,
+    };
+
+    const customerEmail = command.contact.email;
+    if (customerEmail) {
+      const result = await this.emailService.sendEmail({
+        to: customerEmail,
+        subject: `Your booking is confirmed — ${booking.bookingId}`,
+        template: 'booking-confirmation',
+        context: {
+          firstName: command.contact.firstName,
+          ...shared,
+        },
+      });
+
+      if (!result.ok) {
+        this.logger.warn(`
+        failed email to sent ${shared.guestFullName} with booking id ${booking.bookingId} 
+        `);
+      }
+    }
 
     return ok(booking);
   }

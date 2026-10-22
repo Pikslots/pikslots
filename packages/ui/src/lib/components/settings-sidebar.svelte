@@ -109,33 +109,33 @@
 					]
 				},
 				// { label: 'Your branded app', icon: DeviceMobile, href: '#' },
-				{
-					label: 'Payments',
-					icon: Cash,
-					activePrefix: '/home/settings/payments',
-					roles: privilegedRoles,
-					children: [
-						{
-							label: 'Payment integrations',
-							href: resolve('/home/settings/payments/payment-integrations')
-						},
-						{
-							label: 'Booking Page payments',
-							href: resolve('/home/settings/payments/booking-page-payments')
-						},
-						{
-							label: 'Payments history',
-							href: resolve('/home/settings/payments/payments-history')
-						}
-					]
-				},
-				{
-					label: 'Reports',
-					icon: ChartBar,
-					href: resolve('/home/settings/reports'),
-					roles: privilegedRoles
-				},
-				{ label: 'Billing', icon: CreditCard, href: '#', roles: privilegedRoles },
+				// {
+				// 	label: 'Payments',
+				// 	icon: Cash,
+				// 	activePrefix: '/home/settings/payments',
+				// 	roles: privilegedRoles,
+				// 	children: [
+				// 		{
+				// 			label: 'Payment integrations',
+				// 			href: resolve('/home/settings/payments/payment-integrations')
+				// 		},
+				// 		{
+				// 			label: 'Booking Page payments',
+				// 			href: resolve('/home/settings/payments/booking-page-payments')
+				// 		},
+				// 		{
+				// 			label: 'Payments history',
+				// 			href: resolve('/home/settings/payments/payments-history')
+				// 		}
+				// 	]
+				// },
+				// {
+				// 	label: 'Reports',
+				// 	icon: ChartBar,
+				// 	href: resolve('/home/settings/reports'),
+				// 	roles: privilegedRoles
+				// },
+				// { label: 'Billing', icon: CreditCard, href: '#', roles: privilegedRoles },
 				{
 					label: 'Notifications',
 					icon: Bell,
@@ -161,19 +161,19 @@
 							href: resolve('/home/settings/notifications/customization')
 						}
 					]
-				},
-				{
-					label: 'Reviews',
-					icon: Star,
-					href: resolve('/home/settings/reviews'),
-					roles: privilegedRoles
-				},
-				{
-					label: 'Security',
-					icon: Lock,
-					href: resolve('/home/settings/security'),
-					roles: privilegedRoles
 				}
+				// {
+				// 	label: 'Reviews',
+				// 	icon: Star,
+				// 	href: resolve('/home/settings/reviews'),
+				// 	roles: privilegedRoles
+				// },
+				// {
+				// 	label: 'Security',
+				// 	icon: Lock,
+				// 	href: resolve('/home/settings/security'),
+				// 	roles: privilegedRoles
+				// }
 			]
 		}
 	]);

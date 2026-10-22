@@ -5,12 +5,19 @@ import { IPublicBookingPageRepository } from '@pikslots/domain';
 import { PublicBookingPageUseCaseFactory } from './factory/public.booking.page.usecases.factory';
 import { PUBLIC_BOOKING_PAGE_USECASES } from './usecase';
 import { BookingModule } from '../booking/booking.module';
+import { BusinessModule } from '../business/business.module';
 import { CustomerModule } from '../customer/customer.module';
 import { ServiceModule } from '../service/service.module';
 import { UserModule } from '../user/user.module';
 
 @Module({
-  imports: [BookingModule, CustomerModule, ServiceModule, UserModule],
+  imports: [
+    BookingModule,
+    BusinessModule,
+    CustomerModule,
+    ServiceModule,
+    UserModule,
+  ],
   controllers: [PublicBookingPageController],
   providers: [
     {

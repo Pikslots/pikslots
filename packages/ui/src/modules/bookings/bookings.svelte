@@ -6,10 +6,11 @@
 	import interactionPlugin from '@fullcalendar/interaction';
 	import Plus from '@tabler/icons-svelte/icons/plus';
 	import * as Avatar from '$lib/components/ui/avatar/index.js';
-	import { createQuery, useQueryClient } from '@tanstack/svelte-query';
+	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
+	import { createQuery } from '@tanstack/svelte-query';
 	import { getUsersInsideBusinessQueryOptions } from '../api/user/get.users.inside.business.query';
 	import { getCustomersByBusinessQueryOptions } from '../api/customer/get.customers.by.business.query';
-	import { getBookingsByBusinessForUserQueryOptions } from '../api/booking/get.bookings.by.business.for.user.query';
+	import { getBookingsByBusinessForUser } from '../api/booking/get.bookings.by.business.for.user.query';
 	import { businessStore } from '$stores/business.svelte';
 	import { authStore } from '$stores/auth.svelte';
 	import ViewBookingDialog from './dialogs/view.booking.svelte';
@@ -22,6 +23,7 @@
 	import { type DateValue, parseDate } from '@internationalized/date';
 	import { untrack } from 'svelte';
 	import { formatIsoInTimezone } from '@pikslots/datetime';
+	import { SvelteSet } from 'svelte/reactivity';
 
 	// ── State ───────────────────────────────────────────────────────────────────
 
@@ -29,8 +31,6 @@
 	let fullCalendar: Calendar | null = null;
 
 	const jwtPayload = $derived(authStore.getPayloadData());
-	const queryClient = useQueryClient();
-
 	// ── user Query ──────────────────────────────────────────────────────────────────
 
 	const usersQuery = createQuery(() => ({
@@ -45,41 +45,77 @@
 		currentUserRole !== 'Standard' ? users.filter((u) => u.id !== jwtPayload?.userId) : []
 	);
 
-	// ── Selected calendar owner ─────────────────────────────────────────────────
+	// ── Multi-user selection ──────────────────────────────────────────────────
 
-	let selectedUserId = $state<string>('');
-	let selectedUserRole = $state<string>('');
-	const effectiveUserId = $derived(selectedUserId || jwtPayload?.userId || '');
-	const effectiveUserRole = $derived(selectedUserRole || jwtPayload?.role);
+	let enabledUserIds: SvelteSet<string> = new SvelteSet();
+	let usersInitialized = $state(false);
+
+	$effect(() => {
+		if (!usersInitialized && users.length > 0) {
+			enabledUserIds.clear();
+			for (const u of users) {
+				enabledUserIds.add(u.id);
+			}
+			usersInitialized = true;
+		}
+	});
+
+	const canToggleTeam = $derived(
+		currentUserRole === 'Business Owner' ||
+			currentUserRole === 'Admin' ||
+			currentUserRole === 'Platform Owner' ||
+			currentUserRole === 'Enhanced'
+	);
+
+	const getUserRole = (userId: string) => users.find((u) => u.id === userId)?.role ?? '';
 
 	const businessTimezone = $derived(
 		businessStore.selectedBusiness?.locationDetails.timeZone ||
 			Intl.DateTimeFormat().resolvedOptions().timeZone
 	);
 
-	// ── Bookings Query ───────────────────────────────────────────────────────────
+	// ── Bookings (manual parallel fetch per enabled user) ───────────────────────
 
 	let calendarStartDateTime = $state<string>('');
 	let calendarEndDateTime = $state<string>('');
+	let bookingData = $state<BookingItemResponse[]>([]);
 
-	const bookingsQuery = createQuery(() => ({
-		...getBookingsByBusinessForUserQueryOptions(
-			businessStore.selectedBusiness?.id ?? '',
-			effectiveUserId,
-			calendarStartDateTime,
-			calendarEndDateTime,
-			businessTimezone
-		),
-		enabled:
-			!!businessStore.selectedBusiness?.id &&
-			!!effectiveUserId &&
-			!!calendarStartDateTime &&
-			!!calendarEndDateTime
-	}));
+	$effect(() => {
+		const businessId = businessStore.selectedBusiness?.id ?? '';
+		const start = calendarStartDateTime;
+		const end = calendarEndDateTime;
+		const tz = businessTimezone;
+		const enabledUsers = users.filter((u) => enabledUserIds.has(u.id));
+
+		if (!businessId || !start || !end || enabledUsers.length === 0) {
+			bookingData = [];
+			return;
+		}
+
+		let cancelled = false;
+
+		Promise.all(
+			enabledUsers.map((user) => getBookingsByBusinessForUser(businessId, user.id, start, end, tz))
+		)
+			.then((results) => {
+				if (!cancelled) {
+					bookingData = results.flat();
+				}
+			})
+			.catch(() => {
+				if (!cancelled) {
+					bookingData = [];
+				}
+			});
+
+		return () => {
+			cancelled = true;
+		};
+	});
+
+	const hasBookings = $derived(bookingData.length > 0);
 
 	// ── Customers Query  ──────────────────────────────────────────────────────────
-
-	const hasBookings = $derived((bookingsQuery.data?.length ?? 0) > 0);
 
 	const customersQuery = createQuery(() => ({
 		...getCustomersByBusinessQueryOptions(businessStore.selectedBusiness?.id ?? ''),
@@ -89,7 +125,6 @@
 	const customers = $derived(customersQuery.data ?? []);
 
 	// ── Events transformation ────────────────────────────────────────────────────
-	const bookingData = $derived(bookingsQuery.data ?? []);
 
 	const bookingEvents = $derived(
 		bookingData.map((booking: BookingItemResponse) => {
@@ -266,30 +301,19 @@
 			goto(resolve('/home/bookings'), { replaceState: true, keepFocus: true });
 		}
 	});
-
-	// ___ helpers_________________
-
-	function handleSelectedUserChange(userId: string, role: string) {
-		if (!userId) return;
-		selectedUserId = userId;
-		selectedUserRole = role;
-		queryClient.invalidateQueries({
-			queryKey: ['bookings-by-business-for-user']
-		});
-	}
 </script>
 
 <ViewBookingDialog
 	bind:open={dialogOpen}
 	booking={selectedBooking}
-	selectedUserRole={effectiveUserRole as string}
-	selectedUserId={effectiveUserId}
+	selectedUserRole={selectedBooking ? getUserRole(selectedBooking.userId) : ''}
+	selectedUserId={selectedBooking?.userId ?? ''}
 />
 <CreateBookingDialog
 	bind:open={createDialogOpen}
 	{initialBookingDate}
-	selectedUserRole={effectiveUserRole as string}
-	selectedUserId={effectiveUserId}
+	selectedUserRole={(currentUserRole ?? '') as string}
+	selectedUserId={jwtPayload?.userId ?? ''}
 />
 
 <div class="flex h-full min-h-0 flex-1">
@@ -313,14 +337,24 @@
 				>Your calendars</span
 			>
 			{#if currentUser}
-				<button
-					type="button"
-					onclick={() => handleSelectedUserChange(currentUser.id, currentUser.role)}
-					class="flex w-full cursor-pointer items-center gap-2.5 rounded-md px-2 py-1.5 text-left {effectiveUserId ===
-					currentUser.id
-						? 'bg-accent '
+				<div
+					class="flex w-full items-center gap-2.5 rounded-md px-2 py-1.5 text-left {enabledUserIds.has(
+						currentUser.id
+					)
+						? 'bg-accent'
 						: 'hover:bg-accent'}"
 				>
+					<Checkbox
+						checked={enabledUserIds.has(currentUser.id)}
+						disabled={!canToggleTeam}
+						onCheckedChange={(checked) => {
+							if (checked) {
+								enabledUserIds.add(currentUser.id);
+							} else {
+								enabledUserIds.delete(currentUser.id);
+							}
+						}}
+					/>
 					<Avatar.Root class="size-6 text-[10px]">
 						{#if currentUser.avatarUrl}
 							<Avatar.Image
@@ -335,7 +369,7 @@
 					<span class="truncate text-sm"
 						>{currentUser.name.firstName} {currentUser.name.lastName}</span
 					>
-				</button>
+				</div>
 			{/if}
 			<button
 				type="button"
@@ -353,14 +387,24 @@
 					>Team</span
 				>
 				{#each teamMembers as user (user.id)}
-					<button
-						type="button"
-						onclick={() => handleSelectedUserChange(user.id, user.role)}
-						class="flex w-full cursor-pointer items-center gap-2.5 rounded-md px-2 py-1.5 text-left {effectiveUserId ===
-						user.id
+					<div
+						class="flex w-full items-center gap-2.5 rounded-md px-2 py-1.5 text-left {enabledUserIds.has(
+							user.id
+						)
 							? 'bg-accent'
 							: 'hover:bg-accent'}"
 					>
+						<Checkbox
+							checked={enabledUserIds.has(user.id)}
+							disabled={!canToggleTeam}
+							onCheckedChange={(checked) => {
+								if (checked) {
+									enabledUserIds.add(user.id);
+								} else {
+									enabledUserIds.delete(user.id);
+								}
+							}}
+						/>
 						<Avatar.Root class="size-6 text-[10px]">
 							{#if user.avatarUrl}
 								<Avatar.Image
@@ -376,7 +420,7 @@
 							<span class="truncate text-sm">{user.name.firstName} {user.name.lastName}</span>
 							<span class="truncate text-xs text-muted-foreground">{user.role}</span>
 						</div>
-					</button>
+					</div>
 				{/each}
 			</div>
 		{/if}

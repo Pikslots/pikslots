@@ -97,11 +97,6 @@
 		}
 	}
 
-	$effect(() => {
-		console.log('selected team member', flow.selectedTeamMember);
-		console.log('selected service ', flow.selectedService);
-	});
-
 	/** parse user (team member) services */
 	function handleTeamMemberServices(
 		serviceIds: string[],

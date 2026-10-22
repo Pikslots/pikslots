@@ -76,6 +76,7 @@
 	}));
 
 	const slots = $derived(getFreeSlots.data ?? []);
+
 	// ________
 
 	const brandColor = $derived(business.brandApperanceDetails.brandColor);
@@ -96,6 +97,7 @@
 		return !businessHours[weekday]?.enabled;
 	}
 
+	// format time slots
 	function formatSlotTime(iso: string): string {
 		return new Intl.DateTimeFormat('en-US', {
 			hour: 'numeric',
