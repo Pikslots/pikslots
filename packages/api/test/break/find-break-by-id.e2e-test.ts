@@ -72,7 +72,11 @@ describe(`GET ${BREAK_ENDPOINTS.FIND_BY_ID}`, () => {
 
     const response = await request(ctx.app.getHttpServer())
       .get(findByIdPath(created.id))
-      .set(authHeader(await tokenForRole(ctx, 'Standard', businessId, otherUserId)))
+      .set(
+        authHeader(
+          await tokenForRole(ctx, 'Standard', businessId, otherUserId),
+        ),
+      )
       .expect(401);
 
     expect(errorBody(response).statusCode).toBe(401);

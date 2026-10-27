@@ -89,7 +89,11 @@ describe(`GET ${BREAK_ENDPOINTS.FIND_ALL_BY_USER}`, () => {
 
     const response = await request(ctx.app.getHttpServer())
       .get(findAllByUserPath(userId, businessId))
-      .set(authHeader(await tokenForRole(ctx, 'Standard', businessId, otherUserId)))
+      .set(
+        authHeader(
+          await tokenForRole(ctx, 'Standard', businessId, otherUserId),
+        ),
+      )
       .expect(401);
 
     expect(errorBody(response).statusCode).toBe(401);
@@ -103,7 +107,9 @@ describe(`GET ${BREAK_ENDPOINTS.FIND_ALL_BY_USER}`, () => {
     const response = await request(ctx.app.getHttpServer())
       .get(findAllByUserPath(userId, businessId))
       .set(
-        authHeader(await tokenForRole(ctx, 'Admin', otherBusinessId, randomUUID())),
+        authHeader(
+          await tokenForRole(ctx, 'Admin', otherBusinessId, randomUUID()),
+        ),
       )
       .expect(401);
 

@@ -93,7 +93,12 @@ describe('business/role user queries', () => {
 
     it('lets a Business Owner query Admins, but not other Business Owners', async () => {
       const { id: businessId, ownerId } = await createBusiness(ctx);
-      const token = await tokenForRole(ctx, 'Business Owner', businessId, ownerId);
+      const token = await tokenForRole(
+        ctx,
+        'Business Owner',
+        businessId,
+        ownerId,
+      );
 
       const allowed = await getUsersByRole(ctx, 'Admin', token);
       expect(allowed.status).toBe(200);

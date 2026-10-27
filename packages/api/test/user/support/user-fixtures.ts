@@ -445,7 +445,9 @@ export async function registerServiceForBusiness(
   const { id: memberId } = await createStaffUser(ctx, businessId, 'Standard');
   await request(ctx.app.getHttpServer())
     .post(SERVICE_ENDPOINTS.REGISTER)
-    .set(authHeader(await tokenFor(ctx.sessionCacheService, 'Admin', businessId)))
+    .set(
+      authHeader(await tokenFor(ctx.sessionCacheService, 'Admin', businessId)),
+    )
     .send({
       title,
       description: 'An e2e test service',
@@ -477,7 +479,9 @@ export async function registerCustomerForBusiness(
   const suffix = unique('customer');
   await request(ctx.app.getHttpServer())
     .post(CUSTOMER_ENDPOINTS.REGISTER)
-    .set(authHeader(await tokenFor(ctx.sessionCacheService, 'Admin', businessId)))
+    .set(
+      authHeader(await tokenFor(ctx.sessionCacheService, 'Admin', businessId)),
+    )
     .send({
       firstName: 'E2E',
       lastName: 'Customer',

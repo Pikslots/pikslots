@@ -180,7 +180,12 @@ describe(`POST ${BOOKING_ENDPOINTS.REGISTER}`, () => {
       const response = await registerBooking(
         ctx,
         registerBookingPayload(businessId, serviceId, standard.id, customerId),
-        await tokenForRole(ctx, 'Business Owner', otherBusinessId, randomUUID()),
+        await tokenForRole(
+          ctx,
+          'Business Owner',
+          otherBusinessId,
+          randomUUID(),
+        ),
       );
 
       expect(response.status).toBe(401);

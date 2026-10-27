@@ -109,7 +109,9 @@ export async function registerServiceGroup(
 
   await request(ctx.app.getHttpServer())
     .post(SERVICE_GROUP_ENDPOINTS.REGISTER)
-    .set(authHeader(await tokenFor(ctx.sessionCacheService, 'Admin', businessId)))
+    .set(
+      authHeader(await tokenFor(ctx.sessionCacheService, 'Admin', businessId)),
+    )
     .send({
       name,
       businessId,

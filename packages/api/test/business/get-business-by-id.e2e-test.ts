@@ -21,7 +21,9 @@ describe(`GET ${BUSINESS_ENDPOINTS.GET_BY_ID}`, () => {
   it('returns 404 for an unknown business id', async () => {
     await request(ctx.app.getHttpServer())
       .get(endpointFor(BUSINESS_ENDPOINTS.GET_BY_ID, randomUUID()))
-      .set(authHeader(await tokenFor(ctx.sessionCacheService, 'Platform Owner')))
+      .set(
+        authHeader(await tokenFor(ctx.sessionCacheService, 'Platform Owner')),
+      )
       .expect(404);
   });
 
@@ -50,7 +52,9 @@ describe(`GET ${BUSINESS_ENDPOINTS.GET_BY_ID}`, () => {
 
     await request(ctx.app.getHttpServer())
       .get(endpointFor(BUSINESS_ENDPOINTS.GET_BY_ID, business.id))
-      .set(authHeader(await tokenFor(ctx.sessionCacheService, 'Platform Owner')))
+      .set(
+        authHeader(await tokenFor(ctx.sessionCacheService, 'Platform Owner')),
+      )
       .expect(403);
   });
 
@@ -64,7 +68,9 @@ describe(`GET ${BUSINESS_ENDPOINTS.GET_BY_ID}`, () => {
 
     await request(ctx.app.getHttpServer())
       .get(endpointFor(BUSINESS_ENDPOINTS.GET_BY_ID, business.id))
-      .set(authHeader(await tokenFor(ctx.sessionCacheService, 'Platform Owner')))
+      .set(
+        authHeader(await tokenFor(ctx.sessionCacheService, 'Platform Owner')),
+      )
       .expect(403);
   });
 });

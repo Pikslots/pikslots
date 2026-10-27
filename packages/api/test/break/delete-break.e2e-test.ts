@@ -106,7 +106,11 @@ describe(`DELETE ${BREAK_ENDPOINTS.DELETE}`, () => {
 
     const response = await request(ctx.app.getHttpServer())
       .delete(deletePath(created.id))
-      .set(authHeader(await tokenForRole(ctx, 'Standard', businessId, otherUserId)))
+      .set(
+        authHeader(
+          await tokenForRole(ctx, 'Standard', businessId, otherUserId),
+        ),
+      )
       .expect(401);
 
     expect(errorBody(response).statusCode).toBe(401);

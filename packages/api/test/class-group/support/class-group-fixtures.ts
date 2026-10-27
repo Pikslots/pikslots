@@ -56,7 +56,11 @@ export async function createClassGroup(
 
   await request(ctx.app.getHttpServer())
     .post(CLASS_GROUP_ENDPOINTS.REGISTER)
-    .set(authHeader(await tokenFor(ctx.sessionCacheService, role, actingBusinessId)))
+    .set(
+      authHeader(
+        await tokenFor(ctx.sessionCacheService, role, actingBusinessId),
+      ),
+    )
     .send(payload)
     .expect(201);
 
@@ -91,7 +95,11 @@ export async function editClassGroup(
   };
   return request(ctx.app.getHttpServer())
     .patch(endpointFor(CLASS_GROUP_ENDPOINTS.EDIT, { classGroupId }))
-    .set(authHeader(await tokenFor(ctx.sessionCacheService, role, actingBusinessId)))
+    .set(
+      authHeader(
+        await tokenFor(ctx.sessionCacheService, role, actingBusinessId),
+      ),
+    )
     .send(payload);
 }
 
@@ -103,7 +111,11 @@ export async function deleteClassGroup(
 ): Promise<SupertestResponse> {
   return request(ctx.app.getHttpServer())
     .delete(endpointFor(CLASS_GROUP_ENDPOINTS.DELETE, { classGroupId }))
-    .set(authHeader(await tokenFor(ctx.sessionCacheService, role, actingBusinessId)));
+    .set(
+      authHeader(
+        await tokenFor(ctx.sessionCacheService, role, actingBusinessId),
+      ),
+    );
 }
 
 export async function findAllClassGroupsByBusiness(
@@ -116,7 +128,11 @@ export async function findAllClassGroupsByBusiness(
     .get(
       endpointFor(CLASS_GROUP_ENDPOINTS.FIND_ALL_BY_BUSINESS, { businessId }),
     )
-    .set(authHeader(await tokenFor(ctx.sessionCacheService, role, actingBusinessId)));
+    .set(
+      authHeader(
+        await tokenFor(ctx.sessionCacheService, role, actingBusinessId),
+      ),
+    );
 }
 
 export { successBody, errorBody };

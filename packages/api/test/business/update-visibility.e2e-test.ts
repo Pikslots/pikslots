@@ -19,7 +19,9 @@ describe(`PATCH ${BUSINESS_ENDPOINTS.UPDATE_VISIBILITY}`, () => {
   it('updates visibility for an authorized role', async () => {
     await request(ctx.app.getHttpServer())
       .patch(endpointFor(BUSINESS_ENDPOINTS.UPDATE_VISIBILITY, businessId))
-      .set(authHeader(await tokenFor(ctx.sessionCacheService, 'Business Owner')))
+      .set(
+        authHeader(await tokenFor(ctx.sessionCacheService, 'Business Owner')),
+      )
       .send({ appearInSearchResults: true })
       .expect(200);
 

@@ -18,7 +18,9 @@ describe(`DELETE ${SERVICE_ENDPOINTS.DELETE}`, () => {
     const response = await request(ctx.app.getHttpServer())
       .delete(url)
       .set(
-        authHeader(await tokenFor(ctx.sessionCacheService, 'Business Owner', businessId)),
+        authHeader(
+          await tokenFor(ctx.sessionCacheService, 'Business Owner', businessId),
+        ),
       )
       .expect(200);
 
@@ -40,7 +42,9 @@ describe(`DELETE ${SERVICE_ENDPOINTS.DELETE}`, () => {
     await request(ctx.app.getHttpServer())
       .delete(url)
       .set(
-        authHeader(await tokenFor(ctx.sessionCacheService, 'Business Owner', businessId)),
+        authHeader(
+          await tokenFor(ctx.sessionCacheService, 'Business Owner', businessId),
+        ),
       )
       .expect(404);
   });
@@ -62,7 +66,11 @@ describe(`DELETE ${SERVICE_ENDPOINTS.DELETE}`, () => {
 
     await request(ctx.app.getHttpServer())
       .delete(url)
-      .set(authHeader(await tokenFor(ctx.sessionCacheService, 'Enhanced', businessId)))
+      .set(
+        authHeader(
+          await tokenFor(ctx.sessionCacheService, 'Enhanced', businessId),
+        ),
+      )
       .expect(403);
   });
 });

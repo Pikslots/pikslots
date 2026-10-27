@@ -150,7 +150,11 @@ export async function editCustomer(
   const payload = registerCustomerPayload(businessId, overrides);
   return request(ctx.app.getHttpServer())
     .patch(endpointFor(CUSTOMER_ENDPOINTS.EDIT, { customerId }))
-    .set(authHeader(await tokenFor(ctx.sessionCacheService, role, actingBusinessId)))
+    .set(
+      authHeader(
+        await tokenFor(ctx.sessionCacheService, role, actingBusinessId),
+      ),
+    )
     .send(payload);
 }
 
@@ -173,7 +177,11 @@ export async function findAllCustomersByBusiness(
 ): Promise<SupertestResponse> {
   return request(ctx.app.getHttpServer())
     .get(endpointFor(CUSTOMER_ENDPOINTS.FIND_ALL_BY_BUSINESS, { businessId }))
-    .set(authHeader(await tokenFor(ctx.sessionCacheService, role, actingBusinessId)));
+    .set(
+      authHeader(
+        await tokenFor(ctx.sessionCacheService, role, actingBusinessId),
+      ),
+    );
 }
 
 export async function updateCustomerProfileImage(

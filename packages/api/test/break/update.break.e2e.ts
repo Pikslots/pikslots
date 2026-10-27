@@ -155,7 +155,11 @@ describe(`PATCH ${BREAK_ENDPOINTS.UPDATE}`, () => {
 
     const response = await request(ctx.app.getHttpServer())
       .patch(updatePath(created.id))
-      .set(authHeader(await tokenForRole(ctx, 'Standard', businessId, otherUserId)))
+      .set(
+        authHeader(
+          await tokenForRole(ctx, 'Standard', businessId, otherUserId),
+        ),
+      )
       .send({ day: 'monday', startTime: '15:00', endTime: '15:30' })
       .expect(401);
 

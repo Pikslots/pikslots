@@ -87,7 +87,11 @@ describe(`POST ${CLASS_ENDPOINTS.REGISTER}`, () => {
 
     await request(ctx.app.getHttpServer())
       .post(CLASS_ENDPOINTS.REGISTER)
-      .set(authHeader(await tokenFor(ctx.sessionCacheService, 'Enhanced', businessId)))
+      .set(
+        authHeader(
+          await tokenFor(ctx.sessionCacheService, 'Enhanced', businessId),
+        ),
+      )
       .send(payload)
       .expect(403);
   });
@@ -99,7 +103,11 @@ describe(`POST ${CLASS_ENDPOINTS.REGISTER}`, () => {
 
     await request(ctx.app.getHttpServer())
       .post(CLASS_ENDPOINTS.REGISTER)
-      .set(authHeader(await tokenFor(ctx.sessionCacheService, 'Standard', businessId)))
+      .set(
+        authHeader(
+          await tokenFor(ctx.sessionCacheService, 'Standard', businessId),
+        ),
+      )
       .send(payload)
       .expect(403);
   });
@@ -107,7 +115,11 @@ describe(`POST ${CLASS_ENDPOINTS.REGISTER}`, () => {
   it('returns 400 for an invalid payload', async () => {
     const response = await request(ctx.app.getHttpServer())
       .post(CLASS_ENDPOINTS.REGISTER)
-      .set(authHeader(await tokenFor(ctx.sessionCacheService, 'Admin', businessId)))
+      .set(
+        authHeader(
+          await tokenFor(ctx.sessionCacheService, 'Admin', businessId),
+        ),
+      )
       .send({})
       .expect(400);
 

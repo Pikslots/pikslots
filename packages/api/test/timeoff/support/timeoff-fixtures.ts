@@ -147,7 +147,12 @@ export async function createTimeoff(
     .post(TIMEOFF_ENDPOINTS.REGISTER)
     .set(
       authHeader(
-        await tokenFor(ctx.sessionCacheService, role, actingBusinessId, actingUserId),
+        await tokenFor(
+          ctx.sessionCacheService,
+          role,
+          actingBusinessId,
+          actingUserId,
+        ),
       ),
     )
     .send(payload)
@@ -180,7 +185,12 @@ export async function getTimeoffById(
       .get(endpointFor(TIMEOFF_ENDPOINTS.FIND, { findById: timeoffId }))
       .set(
         authHeader(
-          await tokenFor(ctx.sessionCacheService, role, actingBusinessId, actingUserId),
+          await tokenFor(
+            ctx.sessionCacheService,
+            role,
+            actingBusinessId,
+            actingUserId,
+          ),
         ),
       )
   );
@@ -198,7 +208,12 @@ export async function findAllTimeoffsByUser(
     .get(endpointFor(TIMEOFF_ENDPOINTS.FINDALL, { userId, businessId }))
     .set(
       authHeader(
-        await tokenFor(ctx.sessionCacheService, role, actingBusinessId, actingUserId),
+        await tokenFor(
+          ctx.sessionCacheService,
+          role,
+          actingBusinessId,
+          actingUserId,
+        ),
       ),
     );
 }
@@ -235,7 +250,12 @@ export async function editTimeoff(
     .patch(endpointFor(TIMEOFF_ENDPOINTS.UPDATE, { id: timeoffId }))
     .set(
       authHeader(
-        await tokenFor(ctx.sessionCacheService, role, actingBusinessId, actingUserId),
+        await tokenFor(
+          ctx.sessionCacheService,
+          role,
+          actingBusinessId,
+          actingUserId,
+        ),
       ),
     )
     .send(payload);
@@ -252,7 +272,12 @@ export async function deleteTimeoff(
     .delete(endpointFor(TIMEOFF_ENDPOINTS.DELETE, { id: timeoffId }))
     .set(
       authHeader(
-        await tokenFor(ctx.sessionCacheService, role, actingBusinessId, actingUserId),
+        await tokenFor(
+          ctx.sessionCacheService,
+          role,
+          actingBusinessId,
+          actingUserId,
+        ),
       ),
     );
 }

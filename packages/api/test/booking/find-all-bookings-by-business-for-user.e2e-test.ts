@@ -28,7 +28,12 @@ describe(`GET ${BOOKING_ENDPOINTS.FIND_ALL_BY_BUSINESS_FOR_USER}`, () => {
     const customerId = await createCustomerForBusiness(ctx, businessId);
     const serviceId = await createServiceForBusiness(ctx, businessId);
     const token = await tokenForRole(ctx, 'Standard', businessId, userId);
-    const otherToken = await tokenForRole(ctx, 'Standard', businessId, otherUserId);
+    const otherToken = await tokenForRole(
+      ctx,
+      'Standard',
+      businessId,
+      otherUserId,
+    );
 
     await createBooking(
       ctx,
