@@ -5,11 +5,12 @@ import {
   HttpStatus,
   Param,
   Post,
+  Req,
   Res,
   UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import type { Response } from 'express';
+import type { Request, Response } from 'express';
 import {
   DeleteSessionResponse,
   GetSessionResponse,
@@ -23,6 +24,7 @@ import { RolesGuard } from 'src/shared/security/guards/roles.guard';
 import { Roles } from 'src/shared/security/guards/roles.decorator';
 import {
   DeleteSessionDocs,
+  GetCurrentSessionDocs,
   GetSessionDocs,
   RegisterSessionDocs,
 } from './docs/session.controller.docs';
@@ -64,6 +66,41 @@ export class SessionController {
     return new PikslotsBaseResponse<RegisterSessionResponse>(
       SessionResponseMapper.toResponse(result.value),
       HttpStatus.CREATED,
+    );
+  }
+
+  @GetCurrentSessionDocs()
+  @Get(SESSION_ENDPOINTS.ME)
+  async findCurrent(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<
+    PikslotsBaseErrorResponse | PikslotsBaseResponse<GetSessionResponse>
+  > {
+    const jidCookie: unknown = req.cookies?.jid;
+    const sessionId = typeof jidCookie === 'string' ? jidCookie : undefined;
+
+    if (!sessionId) {
+      res.status(HttpStatus.UNAUTHORIZED);
+      return new PikslotsBaseErrorResponse(
+        'Missing session cookie',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    const result =
+      await this.sessionUsecasesFactory.getSessionUsecase.execute(sessionId);
+
+    if (!result.ok) {
+      const errorResponse = mapSessionError(result.error);
+      res.status(errorResponse.statusCode);
+      return errorResponse;
+    }
+
+    res.status(HttpStatus.OK);
+    return new PikslotsBaseResponse<GetSessionResponse>(
+      SessionResponseMapper.toResponse(result.value),
+      HttpStatus.OK,
     );
   }
 

@@ -9,7 +9,7 @@ import {
   IGetUserProfileUseCase,
   IInviteUserUseCase,
   ILoginUserUseCase,
-  IRefreshUserSessionUseCase,
+  ILogoutUserUseCase,
   IRequestInviteOtpUseCase,
   IUpdateUserWorkingHoursUseCase,
   IUpdateUserAvatarUseCase,
@@ -26,7 +26,7 @@ import type {
   GetUserProfileUseCase,
   InviteUserUseCase,
   LoginUserUseCase,
-  RefreshUserSessionUseCase,
+  LogoutUserUseCase,
   RequestInviteOtpUseCase,
   UpdateUserWorkingHoursUseCase,
   UpdateUserAvatarUseCase,
@@ -54,8 +54,8 @@ export class UserUsecasesFactory {
   @Inject(ILoginUserUseCase)
   public readonly loginUserUseCase: LoginUserUseCase;
 
-  @Inject(IRefreshUserSessionUseCase)
-  public readonly refreshUserSessionUseCase: RefreshUserSessionUseCase;
+  @Inject(ILogoutUserUseCase)
+  public readonly logoutUserUseCase: LogoutUserUseCase;
 
   @Inject(IUpdateUserWorkingHoursUseCase)
   public readonly updateUserWorkingHoursUseCase: UpdateUserWorkingHoursUseCase;

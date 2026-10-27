@@ -11,7 +11,7 @@ import {
 } from '@pikslots/domain';
 import type { SessionRepository } from '@pikslots/domain';
 import { v7 as uuidv7 } from 'uuid';
-import { SessionCacheService } from 'src/shared/cache/otp/session.cache.service';
+import { SessionCacheService } from 'src/shared/cache/session/session.cache.service';
 
 const SESSION_TTL_SECONDS = 604800;
 

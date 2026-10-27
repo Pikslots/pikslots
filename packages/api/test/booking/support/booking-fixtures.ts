@@ -119,13 +119,13 @@ export async function createServiceForBusiness(
   });
 }
 
-export function tokenForRole(
+export async function tokenForRole(
   ctx: BookingTestContext,
   role: UserRole,
   businessId: string | null = null,
   userId?: string | null,
-): string {
-  return tokenFor(ctx.jwtLoginService, role, businessId, userId);
+): Promise<string> {
+  return tokenFor(ctx.sessionCacheService, role, businessId, userId);
 }
 
 // ── Booking payload / register / lookups ────────────────────────────────────

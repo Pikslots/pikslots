@@ -1,11 +1,16 @@
 import { randomUUID } from 'node:crypto';
 import type { UserRole } from '@pikslots/domain';
-import type { LoginJwtPayload } from '@pikslots/shared';
-import type { JwtLoginService } from '../../src/shared/security/jwt/jwt.login.service';
+import { Session } from '@pikslots/domain';
+import type { SessionCacheService } from '../../src/shared/cache/session/session.cache.service';
+
+const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
 /**
- * Signs a real access token via the real JwtLoginService, for role-gated
- * real-infra tests.
+ * Mints a real cache-backed session via the real SessionCacheService, for
+ * role-gated real-infra tests. The app's global SessionVerifcationMiddleware
+ * resolves the caller's security context from the `jid` cookie by looking
+ * the session up in this same cache, so writing it here is what makes the
+ * synthetic actor pass as "authenticated" on the next request.
  *
  * `userId` defaults to a fresh random uuid (unchanged behavior for every
  * existing Business/Customer call site that only passes 2-3 args). The
@@ -14,25 +19,32 @@ import type { JwtLoginService } from '../../src/shared/security/jwt/jwt.login.se
  * check), which the Business/Customer suites never needed since neither of
  * their domains authorize based on caller identity, only role + business.
  */
-export function tokenFor(
-  jwtLoginService: JwtLoginService,
+export async function tokenFor(
+  sessionCacheService: SessionCacheService,
   role: UserRole,
   businessId: string | null = null,
   userId?: string | null,
-): string {
-  const payload: LoginJwtPayload = {
+): Promise<string> {
+  const issuedAt = new Date();
+  const session = Session.create({
+    id: randomUUID(),
     // Several usecases persist securityContext.userId as a real
     // audit_fields.updated_by uuid column, so this must be a real uuid.
     userId: userId ?? randomUUID(),
     role,
     businessId,
-  };
-  return jwtLoginService.signAccessToken(payload);
+    issuedAt,
+    expiresAt: new Date(issuedAt.getTime() + SESSION_TTL_MS),
+  });
+
+  await sessionCacheService.save(session);
+
+  return session.id;
 }
 
-/** Signs a real access token via the real JwtLoginService, for role-gated real-infra tests. */
-export function tokenForBreak(
-  jwtLoginService: JwtLoginService,
+/** Mints a real cache-backed session via the real SessionCacheService, for role-gated real-infra tests. */
+export async function tokenForBreak(
+  sessionCacheService: SessionCacheService,
   role: UserRole,
   businessId: string | null = null,
   // Some use cases (e.g. Break's canCreateBreak/canUpdateBreak/...) grant
@@ -40,20 +52,10 @@ export function tokenForBreak(
   // userId — rather than just role/business. Passing a specific userId lets
   // tests sign a token *as* an existing row's owner to exercise that path.
   userId: string = randomUUID(),
-): string {
-  const payload: LoginJwtPayload = {
-    // Several usecases persist securityContext.userId as a real
-    // audit_fields.updated_by uuid column, so this must be a real uuid.
-    userId,
-    role,
-    businessId,
-  };
-  return jwtLoginService.signAccessToken(payload);
-}
-export function authHeader(token: string): Record<string, string> {
-  return { Authorization: `Bearer ${token}` };
+): Promise<string> {
+  return tokenFor(sessionCacheService, role, businessId, userId);
 }
 
-// export function authHeader(token: string): Record<string, string> {
-//   return { Authorization: `Bearer ${token}` };
-// }
+export function authHeader(sessionId: string): Record<string, string> {
+  return { Cookie: `jid=${sessionId}` };
+}

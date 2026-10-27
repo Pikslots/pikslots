@@ -1,28 +1,45 @@
 import { getQueueToken } from '@nestjs/bullmq';
 import { Test, TestingModule } from '@nestjs/testing';
-import { IUserRepository } from '@pikslots/domain';
+import {
+  InfrastructureError,
+  ISessionRepository,
+  IUserRepository,
+  Result,
+  Session,
+  ok,
+} from '@pikslots/domain';
 import { UserRepositoryTestImpl } from '../repository/user.repository.fake.impl';
 import { LoginUserUseCaseImpl } from './login.user.usecase.impl';
-import { JwtLoginService } from 'src/shared/security/jwt/jwt.login.service';
+import { SessionCacheService } from 'src/shared/cache/session/session.cache.service';
 import { PasswordHashingService } from 'src/shared/security/hashing/password.hashing.service';
 import { AUDIT_LOG_QUEUE } from 'src/shared/queue/jobs/pikslot.events';
+
+jest.mock('uuid', () => ({
+  v7: () => '01932b4a-5f3c-7e1d-b2a8-3c9d4e5f6a92',
+}));
 
 describe('LoginUserUseCaseImpl', () => {
   let useCase: LoginUserUseCaseImpl;
   let hash: jest.Mocked<PasswordHashingService>;
+  let sessionRepository: {
+    save: jest.Mock<Promise<Result<void, InfrastructureError>>, [Session]>;
+  };
+  let sessionCacheService: { save: jest.Mock };
 
   beforeEach(async () => {
+    sessionRepository = {
+      save: jest
+        .fn<Promise<Result<void, InfrastructureError>>, [Session]>()
+        .mockResolvedValue(ok(undefined)),
+    };
+    sessionCacheService = { save: jest.fn().mockResolvedValue(undefined) };
+
     const moduleRef: TestingModule = await Test.createTestingModule({
       providers: [
         LoginUserUseCaseImpl,
         { provide: IUserRepository, useClass: UserRepositoryTestImpl },
-        {
-          provide: JwtLoginService,
-          useValue: {
-            signAccessToken: jest.fn().mockReturnValue('a'),
-            signRefreshToken: jest.fn().mockReturnValue('r'),
-          },
-        },
+        { provide: ISessionRepository, useValue: sessionRepository },
+        { provide: SessionCacheService, useValue: sessionCacheService },
         { provide: PasswordHashingService, useValue: { compare: jest.fn() } },
         {
           provide: getQueueToken(AUDIT_LOG_QUEUE),
@@ -35,7 +52,7 @@ describe('LoginUserUseCaseImpl', () => {
     hash = moduleRef.get(PasswordHashingService);
   });
 
-  it('returns tokens when credentials are valid (by username)', async () => {
+  it('returns a session id when credentials are valid (by username)', async () => {
     (hash.compare as jest.Mock).mockResolvedValue(true);
 
     const result = await useCase.execute({
@@ -45,8 +62,24 @@ describe('LoginUserUseCaseImpl', () => {
 
     expect(result.ok).toBe(true);
     if (result.ok) {
-      expect(result.value.accessToken).toBe('a');
-      expect(result.value.refreshToken).toBe('r');
+      expect(result.value.sessionId).toBeDefined();
+    }
+  });
+
+  it('persists the session through the repository and caches it', async () => {
+    (hash.compare as jest.Mock).mockResolvedValue(true);
+
+    const result = await useCase.execute({
+      usernameOrEmail: 'admin_user_2',
+      password: 'pw',
+    });
+
+    expect(result.ok).toBe(true);
+    expect(sessionRepository.save).toHaveBeenCalledTimes(1);
+    expect(sessionCacheService.save).toHaveBeenCalledTimes(1);
+    if (result.ok) {
+      const savedSession = sessionRepository.save.mock.calls[0][0];
+      expect(savedSession.id).toBe(result.value.sessionId);
     }
   });
 

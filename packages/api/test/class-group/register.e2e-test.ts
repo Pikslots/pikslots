@@ -48,7 +48,7 @@ describe(`POST ${CLASS_GROUP_ENDPOINTS.REGISTER}`, () => {
     const payload = registerClassGroupPayload(businessId, { name });
     const response = await request(ctx.app.getHttpServer())
       .post(CLASS_GROUP_ENDPOINTS.REGISTER)
-      .set(authHeader(tokenFor(ctx.jwtLoginService, 'Admin', businessId)))
+      .set(authHeader(await tokenFor(ctx.sessionCacheService, 'Admin', businessId)))
       .send(payload)
       .expect(409);
 
@@ -69,7 +69,7 @@ describe(`POST ${CLASS_GROUP_ENDPOINTS.REGISTER}`, () => {
     });
     await request(ctx.app.getHttpServer())
       .post(CLASS_GROUP_ENDPOINTS.REGISTER)
-      .set(authHeader(tokenFor(ctx.jwtLoginService, 'Enhanced', businessId)))
+      .set(authHeader(await tokenFor(ctx.sessionCacheService, 'Enhanced', businessId)))
       .send(payload)
       .expect(403);
   });
@@ -77,7 +77,7 @@ describe(`POST ${CLASS_GROUP_ENDPOINTS.REGISTER}`, () => {
   it('returns 400 for an invalid payload', async () => {
     const response = await request(ctx.app.getHttpServer())
       .post(CLASS_GROUP_ENDPOINTS.REGISTER)
-      .set(authHeader(tokenFor(ctx.jwtLoginService, 'Admin', businessId)))
+      .set(authHeader(await tokenFor(ctx.sessionCacheService, 'Admin', businessId)))
       .send({})
       .expect(400);
 
@@ -102,7 +102,7 @@ describe(`POST ${CLASS_GROUP_ENDPOINTS.REGISTER}`, () => {
 
     const response = await request(ctx.app.getHttpServer())
       .post(CLASS_GROUP_ENDPOINTS.REGISTER)
-      .set(authHeader(tokenFor(ctx.jwtLoginService, 'Admin', businessId)))
+      .set(authHeader(await tokenFor(ctx.sessionCacheService, 'Admin', businessId)))
       .send(payload)
       .expect(500);
 

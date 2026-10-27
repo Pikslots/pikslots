@@ -19,7 +19,7 @@ describe(`GET ${SERVICE_ENDPOINTS.FIND_ALL_BY_BUSINESS}`, () => {
     const body = await request(ctx.app.getHttpServer())
       .get(endpointFor(SERVICE_ENDPOINTS.FIND_ALL_BY_BUSINESS, { businessId }))
       .set(
-        authHeader(tokenFor(ctx.jwtLoginService, 'Platform Owner', businessId)),
+        authHeader(await tokenFor(ctx.sessionCacheService, 'Platform Owner', businessId)),
       )
       .expect(200);
 
@@ -40,7 +40,7 @@ describe(`GET ${SERVICE_ENDPOINTS.FIND_ALL_BY_BUSINESS}`, () => {
         )
         .set(
           authHeader(
-            tokenFor(ctx.jwtLoginService, 'Platform Owner', businessId),
+            await tokenFor(ctx.sessionCacheService, 'Platform Owner', businessId),
           ),
         ),
     );

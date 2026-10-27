@@ -125,7 +125,7 @@ export async function getBusiness(
 ): Promise<SuccessEnvelope<Record<string, unknown>>> {
   const response = await request(ctx.app.getHttpServer())
     .get(endpointFor(BUSINESS_ENDPOINTS.GET_BY_ID, id))
-    .set(authHeader(tokenFor(ctx.jwtLoginService, role)))
+    .set(authHeader(await tokenFor(ctx.sessionCacheService, role)))
     .expect(200);
   return successBody<Record<string, unknown>>(response);
 }

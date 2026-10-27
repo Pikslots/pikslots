@@ -16,5 +16,11 @@ import { SESSION_USECASES } from './usecases';
       useClass: SessionRepositoryImpl,
     },
   ],
+  exports: [
+    {
+      provide: ISessionRepository,
+      useClass: SessionRepositoryImpl,
+    },
+  ],
 })
 export class SessionModule {}

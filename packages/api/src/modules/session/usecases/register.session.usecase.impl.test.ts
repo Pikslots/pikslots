@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ISessionRepository, Session } from '@pikslots/domain';
-import { SessionCacheService } from 'src/shared/cache/otp/session.cache.service';
+import { SessionCacheService } from 'src/shared/cache/session/session.cache.service';
 import { SessionRepositoryTestImpl } from '../repository/session.repository.fake.impl';
 import { SESSION_TEST_DATA } from '../repository/session.test.data';
 import { RegisterSessionUseCaseImpl } from './register.session.usecase.impl';

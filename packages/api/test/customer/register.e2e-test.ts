@@ -26,7 +26,7 @@ describe(`POST ${CUSTOMER_ENDPOINTS.REGISTER}`, () => {
 
     await request(ctx.app.getHttpServer())
       .post(CUSTOMER_ENDPOINTS.REGISTER)
-      .set(authHeader(tokenFor(ctx.jwtLoginService, 'Admin', businessId)))
+      .set(authHeader(await tokenFor(ctx.sessionCacheService, 'Admin', businessId)))
       .send(payload)
       .expect(201);
 
@@ -51,8 +51,8 @@ describe(`POST ${CUSTOMER_ENDPOINTS.REGISTER}`, () => {
       .post(CUSTOMER_ENDPOINTS.REGISTER)
       .set(
         authHeader(
-          tokenFor(
-            ctx.jwtLoginService,
+          await tokenFor(
+            ctx.sessionCacheService,
             'Platform Owner',
             'some-other-business',
           ),
@@ -71,8 +71,8 @@ describe(`POST ${CUSTOMER_ENDPOINTS.REGISTER}`, () => {
       .post(CUSTOMER_ENDPOINTS.REGISTER)
       .set(
         authHeader(
-          tokenFor(
-            ctx.jwtLoginService,
+          await tokenFor(
+            ctx.sessionCacheService,
             'Business Owner',
             'a-different-business',
           ),
@@ -90,13 +90,13 @@ describe(`POST ${CUSTOMER_ENDPOINTS.REGISTER}`, () => {
 
     await request(ctx.app.getHttpServer())
       .post(CUSTOMER_ENDPOINTS.REGISTER)
-      .set(authHeader(tokenFor(ctx.jwtLoginService, 'Admin', businessId)))
+      .set(authHeader(await tokenFor(ctx.sessionCacheService, 'Admin', businessId)))
       .send(payload)
       .expect(201);
 
     const response = await request(ctx.app.getHttpServer())
       .post(CUSTOMER_ENDPOINTS.REGISTER)
-      .set(authHeader(tokenFor(ctx.jwtLoginService, 'Admin', businessId)))
+      .set(authHeader(await tokenFor(ctx.sessionCacheService, 'Admin', businessId)))
       .send(registerCustomerPayload(businessId, { email }))
       .expect(409);
 
@@ -106,7 +106,7 @@ describe(`POST ${CUSTOMER_ENDPOINTS.REGISTER}`, () => {
   it('returns 400 for an invalid payload', async () => {
     const response = await request(ctx.app.getHttpServer())
       .post(CUSTOMER_ENDPOINTS.REGISTER)
-      .set(authHeader(tokenFor(ctx.jwtLoginService, 'Admin', businessId)))
+      .set(authHeader(await tokenFor(ctx.sessionCacheService, 'Admin', businessId)))
       .send({})
       .expect(400);
 
@@ -120,13 +120,13 @@ describe(`POST ${CUSTOMER_ENDPOINTS.REGISTER}`, () => {
 
     await request(ctx.app.getHttpServer())
       .post(CUSTOMER_ENDPOINTS.REGISTER)
-      .set(authHeader(tokenFor(ctx.jwtLoginService, 'Admin', businessId)))
+      .set(authHeader(await tokenFor(ctx.sessionCacheService, 'Admin', businessId)))
       .send(registerCustomerPayload(businessId, { email }))
       .expect(201);
 
     await request(ctx.app.getHttpServer())
       .post(CUSTOMER_ENDPOINTS.REGISTER)
-      .set(authHeader(tokenFor(ctx.jwtLoginService, 'Admin', otherBusinessId)))
+      .set(authHeader(await tokenFor(ctx.sessionCacheService, 'Admin', otherBusinessId)))
       .send(registerCustomerPayload(otherBusinessId, { email }))
       .expect(201);
   });

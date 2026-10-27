@@ -48,21 +48,21 @@ export class SessionCacheService {
     }
   }
 
-  async remove(id: string): Promise<void> {
+  async remove(sessionId: string): Promise<void> {
     try {
-      await this.cache.delete(this.cacheKey(id));
+      await this.cache.delete(this.cacheKey(sessionId));
     } catch (cause) {
       this.logger.warn(
-        `Failed to delete cached session ${id}`,
+        `Failed to delete cached session ${sessionId}`,
         cause instanceof Error ? cause.stack : String(cause),
       );
     }
   }
 
-  async get(id: string): Promise<Session | null> {
+  async get(sessionId: string): Promise<Session | null> {
     try {
       const record = await this.cache.get<SessionCacheRecord>(
-        this.cacheKey(id),
+        this.cacheKey(sessionId),
       );
 
       if (!record) return null;
@@ -77,14 +77,14 @@ export class SessionCacheService {
       });
 
       if (session.isExpired()) {
-        await this.remove(id);
+        await this.remove(sessionId);
         return null;
       }
 
       return session;
     } catch (cause) {
       this.logger.warn(
-        `Failed to read session ${id} from cache`,
+        `Failed to read session ${sessionId} from cache`,
         cause instanceof Error ? cause.stack : String(cause),
       );
       return null;

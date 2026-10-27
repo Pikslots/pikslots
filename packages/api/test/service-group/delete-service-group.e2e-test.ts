@@ -21,7 +21,7 @@ describe(`DELETE ${SERVICE_GROUP_ENDPOINTS.DELETE}`, () => {
 
     await request(ctx.app.getHttpServer())
       .delete(deleteServiceGroupPath(id))
-      .set(authHeader(tokenForRole(ctx, 'Admin', businessId)))
+      .set(authHeader(await tokenForRole(ctx, 'Admin', businessId)))
       .expect(200);
 
     const row = await ctx.db
@@ -38,12 +38,12 @@ describe(`DELETE ${SERVICE_GROUP_ENDPOINTS.DELETE}`, () => {
 
     await request(ctx.app.getHttpServer())
       .delete(deleteServiceGroupPath(id))
-      .set(authHeader(tokenForRole(ctx, 'Admin', businessId)))
+      .set(authHeader(await tokenForRole(ctx, 'Admin', businessId)))
       .expect(200);
 
     await request(ctx.app.getHttpServer())
       .post(SERVICE_GROUP_ENDPOINTS.REGISTER)
-      .set(authHeader(tokenForRole(ctx, 'Admin', businessId)))
+      .set(authHeader(await tokenForRole(ctx, 'Admin', businessId)))
       .send({ name, businessId, associatedServices: [] })
       .expect(201);
   });
@@ -53,7 +53,7 @@ describe(`DELETE ${SERVICE_GROUP_ENDPOINTS.DELETE}`, () => {
 
     const response = await request(ctx.app.getHttpServer())
       .delete(deleteServiceGroupPath(randomUUID()))
-      .set(authHeader(tokenForRole(ctx, 'Admin', businessId)))
+      .set(authHeader(await tokenForRole(ctx, 'Admin', businessId)))
       .expect(404);
 
     expect(errorBody(response).statusCode).toBe(404);
@@ -62,7 +62,7 @@ describe(`DELETE ${SERVICE_GROUP_ENDPOINTS.DELETE}`, () => {
   it('returns 404 when deleting a group that was already deleted', async () => {
     const { id: businessId } = await createBusiness(ctx);
     const { id } = await registerServiceGroup(ctx, businessId);
-    const token = tokenForRole(ctx, 'Admin', businessId);
+    const token = await tokenForRole(ctx, 'Admin', businessId);
 
     await request(ctx.app.getHttpServer())
       .delete(deleteServiceGroupPath(id))
@@ -83,7 +83,7 @@ describe(`DELETE ${SERVICE_GROUP_ENDPOINTS.DELETE}`, () => {
 
     const response = await request(ctx.app.getHttpServer())
       .delete(deleteServiceGroupPath(id))
-      .set(authHeader(tokenForRole(ctx, 'Standard', businessId)))
+      .set(authHeader(await tokenForRole(ctx, 'Standard', businessId)))
       .expect(403);
 
     expect(errorBody(response).statusCode).toBe(403);
@@ -106,7 +106,7 @@ describe(`DELETE ${SERVICE_GROUP_ENDPOINTS.DELETE}`, () => {
 
   //   const response = await request(ctx.app.getHttpServer())
   //     .delete(deleteServiceGroupPath(id))
-  //     .set(authHeader(tokenForRole(ctx, 'Admin', otherBusinessId)))
+  //     .set(authHeader(await tokenForRole(ctx, 'Admin', otherBusinessId)))
   //     .expect(404); // secure expectation: should not find/act on another business's group
 
   //   expect(errorBody(response).statusCode).toBe(404);

@@ -18,7 +18,7 @@ describe(`PATCH ${BUSINESS_ENDPOINTS.UPDATE_BOOKING_SETUP}`, () => {
   it('updates booking setup and persists it for real', async () => {
     await request(ctx.app.getHttpServer())
       .patch(endpointFor(BUSINESS_ENDPOINTS.UPDATE_BOOKING_SETUP, businessId))
-      .set(authHeader(tokenFor(ctx.jwtLoginService, 'Admin')))
+      .set(authHeader(await tokenFor(ctx.sessionCacheService, 'Admin')))
       .send({
         bookAppointmentSectionVisible: true,
         bookClassSectionVisible: true,

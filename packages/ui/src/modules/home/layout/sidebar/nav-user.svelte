@@ -28,7 +28,7 @@
 	const logOut = async () => {
 		const result = await logoutUser();
 		if (result.message === 'success') {
-			authStore.clearAccessToken();
+			authStore.clearSession();
 			goto(resolve('/login'));
 		}
 		goto(resolve('/login'));

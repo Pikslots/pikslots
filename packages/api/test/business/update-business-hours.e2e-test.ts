@@ -20,7 +20,7 @@ describe(`PATCH ${BUSINESS_ENDPOINTS.UPDATE_BUSINESS_HOURS}`, () => {
 
     await request(ctx.app.getHttpServer())
       .patch(endpointFor(BUSINESS_ENDPOINTS.UPDATE_BUSINESS_HOURS, businessId))
-      .set(authHeader(tokenFor(ctx.jwtLoginService, 'Admin')))
+      .set(authHeader(await tokenFor(ctx.sessionCacheService, 'Admin')))
       .send({
         monday: day,
         tuesday: day,

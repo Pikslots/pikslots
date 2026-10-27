@@ -18,7 +18,7 @@ describe(`PATCH ${BUSINESS_ENDPOINTS.UPDATE_APPEARANCE}`, () => {
   it('updates appearance and persists it for real', async () => {
     await request(ctx.app.getHttpServer())
       .patch(endpointFor(BUSINESS_ENDPOINTS.UPDATE_APPEARANCE, businessId))
-      .set(authHeader(tokenFor(ctx.jwtLoginService, 'Admin')))
+      .set(authHeader(await tokenFor(ctx.sessionCacheService, 'Admin')))
       .send({
         brandColor: '#336699',
         brandButtonShape: 'pill',

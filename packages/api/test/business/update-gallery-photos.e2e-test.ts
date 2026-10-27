@@ -24,13 +24,13 @@ describe(`PATCH ${BUSINESS_ENDPOINTS.UPDATE_GALLERY_PHOTOS}`, () => {
 
     await request(ctx.app.getHttpServer())
       .patch(endpointFor(BUSINESS_ENDPOINTS.UPDATE_GALLERY_PHOTOS, business.id))
-      .set(authHeader(tokenFor(ctx.jwtLoginService, 'Admin')))
+      .set(authHeader(await tokenFor(ctx.sessionCacheService, 'Admin')))
       .send({ galleryPhotosKeys: [keptKey, removedKey] })
       .expect(200);
 
     await request(ctx.app.getHttpServer())
       .patch(endpointFor(BUSINESS_ENDPOINTS.UPDATE_GALLERY_PHOTOS, business.id))
-      .set(authHeader(tokenFor(ctx.jwtLoginService, 'Admin')))
+      .set(authHeader(await tokenFor(ctx.sessionCacheService, 'Admin')))
       .send({ galleryPhotosKeys: [keptKey] })
       .expect(200);
 

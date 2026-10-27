@@ -34,7 +34,7 @@ describe(`GET ${CLASS_GROUP_ASSIGNMENT_ENDPOINTS.FIND_BY_GROUP}`, () => {
           classGroupId,
         }),
       )
-      .set(authHeader(tokenForRole(ctx, 'Admin', businessId)))
+      .set(authHeader(await tokenForRole(ctx, 'Admin', businessId)))
       .expect(200);
 
     expect(successBody(response).data).toEqual([{ id: classId, name: title }]);
@@ -50,7 +50,7 @@ describe(`GET ${CLASS_GROUP_ASSIGNMENT_ENDPOINTS.FIND_BY_GROUP}`, () => {
           classGroupId,
         }),
       )
-      .set(authHeader(tokenForRole(ctx, 'Admin', businessId)))
+      .set(authHeader(await tokenForRole(ctx, 'Admin', businessId)))
       .expect(200);
 
     expect(successBody(response).data).toEqual([]);
@@ -74,7 +74,7 @@ describe(`GET ${CLASS_GROUP_ASSIGNMENT_ENDPOINTS.FIND_BY_GROUP}`, () => {
           classGroupId,
         }),
       )
-      .set(authHeader(tokenForRole(ctx, 'Admin', businessId)))
+      .set(authHeader(await tokenForRole(ctx, 'Admin', businessId)))
       .expect(200);
 
     expect(successBody(response).data).toEqual(
@@ -111,7 +111,7 @@ describe(`GET ${CLASS_GROUP_ASSIGNMENT_ENDPOINTS.FIND_BY_GROUP}`, () => {
           classGroupId,
         }),
       )
-      .set(authHeader(tokenForRole(ctx, 'Admin', businessId)))
+      .set(authHeader(await tokenForRole(ctx, 'Admin', businessId)))
       .expect(200);
 
     expect(successBody(response).data).toEqual([]);

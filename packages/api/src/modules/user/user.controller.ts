@@ -11,7 +11,6 @@ import {
   Query,
   Req,
   Res,
-  UnauthorizedException,
   HttpCode,
   UseGuards,
 } from '@nestjs/common';
@@ -36,7 +35,6 @@ import {
   GetUserProfileDocs,
   InviteUserDocs,
   LoginUserDocs,
-  RefreshUserSessionDocs,
   LogoutUserDocs,
   UpdateUserWorkingHoursDocs,
   GetFreeSlotsForUserDocs,
@@ -53,7 +51,6 @@ import type {
   InviteUserResponse,
   LoginUserResponse,
   LogoutUserResponse,
-  RefreshUserSessionResponse,
   RequestInviteOtpResponse,
   UpdateUserAvatarResponse,
   UpdateUserProfileResponse,
@@ -281,53 +278,17 @@ export class UserController {
       return errorResponse;
     }
 
-    res.cookie('jid', result.value.refreshToken, {
+    res.cookie('jid', result.value.sessionId, {
       httpOnly: true,
       secure: this.configService.get('NODE_ENV') === 'production',
       sameSite: 'strict',
-      path: USER_ENDPOINTS.REFRESH,
+      path: '/',
     });
 
     res.status(HttpStatus.OK);
+
     return new PikslotsBaseResponse<LoginUserResponse>(
-      { accessToken: result.value.accessToken },
-      HttpStatus.OK,
-    );
-  }
-
-  @RefreshUserSessionDocs()
-  @Post(USER_ENDPOINTS.REFRESH)
-  async refreshUserSession(
-    @Req() req: Request,
-    @Res({ passthrough: true }) res: Response,
-  ): Promise<
-    PikslotsBaseErrorResponse | PikslotsBaseResponse<RefreshUserSessionResponse>
-  > {
-    const jidCookie: unknown = req.cookies?.jid;
-    const currentRefreshToken =
-      typeof jidCookie === 'string' ? jidCookie : undefined;
-    if (!currentRefreshToken) throw new UnauthorizedException();
-    const result =
-      await this.userUseCaseFactory.refreshUserSessionUseCase.execute({
-        currentRefreshToken,
-      });
-
-    if (!result.ok) {
-      const errorResponse = mapUserError(result.error);
-      res.status(errorResponse.statusCode);
-      return errorResponse;
-    }
-
-    res.cookie('jid', result.value.refreshToken, {
-      httpOnly: true,
-      secure: this.configService.get('NODE_ENV') === 'production',
-      sameSite: 'strict',
-      path: USER_ENDPOINTS.REFRESH,
-    });
-
-    res.status(HttpStatus.OK);
-    return new PikslotsBaseResponse<RefreshUserSessionResponse>(
-      { accessToken: result.value.accessToken },
+      { message: 'success' },
       HttpStatus.OK,
     );
   }
@@ -518,6 +479,7 @@ export class UserController {
     }
 
     res.status(HttpStatus.OK);
+
     return new PikslotsBaseResponse<GetAvailableDatesForBookingResponse>(
       result.value,
       HttpStatus.OK,
@@ -528,9 +490,17 @@ export class UserController {
   @HttpCode(HttpStatus.OK)
   @Post(USER_ENDPOINTS.LOGOUT)
   async logout(
+    @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ): Promise<PikslotsBaseResponse<LogoutUserResponse>> {
-    res.clearCookie('jid', { path: USER_ENDPOINTS.REFRESH });
+    const jidCookie: unknown = req.cookies?.jid;
+    const sessionId = typeof jidCookie === 'string' ? jidCookie : undefined;
+
+    if (sessionId) {
+      await this.userUseCaseFactory.logoutUserUseCase.execute({ sessionId });
+    }
+
+    res.clearCookie('jid', { path: '/' });
 
     await this.logUserLogoutAudit();
 

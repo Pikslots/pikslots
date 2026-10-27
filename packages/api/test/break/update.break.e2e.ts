@@ -20,7 +20,7 @@ describe(`PATCH ${BREAK_ENDPOINTS.UPDATE}`, () => {
   it('updates a break to a completely different, non-overlapping time', async () => {
     const { id: businessId } = await createBusiness(ctx);
     const userId = await createUser(ctx, businessId, 'Standard');
-    const token = tokenForRole(ctx, 'Standard', businessId, userId);
+    const token = await tokenForRole(ctx, 'Standard', businessId, userId);
     const created = await createBreak(
       ctx,
       breakPayload({
@@ -59,7 +59,7 @@ describe(`PATCH ${BREAK_ENDPOINTS.UPDATE}`, () => {
   it('updates a break to a slightly adjusted time that still overlaps its own previous slot', async () => {
     const { id: businessId } = await createBusiness(ctx);
     const userId = await createUser(ctx, businessId, 'Standard');
-    const token = tokenForRole(ctx, 'Standard', businessId, userId);
+    const token = await tokenForRole(ctx, 'Standard', businessId, userId);
     const created = await createBreak(
       ctx,
       breakPayload({
@@ -82,7 +82,7 @@ describe(`PATCH ${BREAK_ENDPOINTS.UPDATE}`, () => {
   it('returns 409 when updating into a slot that conflicts with a different break', async () => {
     const { id: businessId } = await createBusiness(ctx);
     const userId = await createUser(ctx, businessId, 'Standard');
-    const token = tokenForRole(ctx, 'Standard', businessId, userId);
+    const token = await tokenForRole(ctx, 'Standard', businessId, userId);
     const moving = await createBreak(
       ctx,
       breakPayload({
@@ -127,12 +127,12 @@ describe(`PATCH ${BREAK_ENDPOINTS.UPDATE}`, () => {
         startTime: '09:00',
         endTime: '09:30',
       }),
-      tokenForRole(ctx, 'Standard', businessId, userId),
+      await tokenForRole(ctx, 'Standard', businessId, userId),
     );
 
     await request(ctx.app.getHttpServer())
       .patch(updatePath(created.id))
-      .set(authHeader(tokenForRole(ctx, 'Admin', businessId)))
+      .set(authHeader(await tokenForRole(ctx, 'Admin', businessId)))
       .send({ day: 'monday', startTime: '15:00', endTime: '15:30' })
       .expect(200);
   });
@@ -150,12 +150,12 @@ describe(`PATCH ${BREAK_ENDPOINTS.UPDATE}`, () => {
         startTime: '09:00',
         endTime: '09:30',
       }),
-      tokenForRole(ctx, 'Standard', businessId, userId),
+      await tokenForRole(ctx, 'Standard', businessId, userId),
     );
 
     const response = await request(ctx.app.getHttpServer())
       .patch(updatePath(created.id))
-      .set(authHeader(tokenForRole(ctx, 'Standard', businessId, otherUserId)))
+      .set(authHeader(await tokenForRole(ctx, 'Standard', businessId, otherUserId)))
       .send({ day: 'monday', startTime: '15:00', endTime: '15:30' })
       .expect(401);
 
@@ -167,7 +167,7 @@ describe(`PATCH ${BREAK_ENDPOINTS.UPDATE}`, () => {
 
     const response = await request(ctx.app.getHttpServer())
       .patch(updatePath(randomUUID()))
-      .set(authHeader(tokenForRole(ctx, 'Admin', businessId)))
+      .set(authHeader(await tokenForRole(ctx, 'Admin', businessId)))
       .send({ day: 'monday', startTime: '09:00', endTime: '09:30' })
       .expect(404);
 

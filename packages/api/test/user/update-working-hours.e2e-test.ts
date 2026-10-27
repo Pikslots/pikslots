@@ -26,7 +26,7 @@ describe(`PATCH ${USER_ENDPOINTS.UPDATE_WORKING_HOURS}`, () => {
       ctx,
       userId,
       NEW_HOURS,
-      tokenForRole(ctx, 'Standard', businessId, userId),
+      await tokenForRole(ctx, 'Standard', businessId, userId),
     );
 
     expect(response.status).toBe(200);
@@ -48,7 +48,7 @@ describe(`PATCH ${USER_ENDPOINTS.UPDATE_WORKING_HOURS}`, () => {
       ctx,
       userId,
       NEW_HOURS,
-      tokenForRole(ctx, 'Admin', businessId, admin.id),
+      await tokenForRole(ctx, 'Admin', businessId, admin.id),
     );
 
     expect(response.status).toBe(200);
@@ -63,7 +63,7 @@ describe(`PATCH ${USER_ENDPOINTS.UPDATE_WORKING_HOURS}`, () => {
       ctx,
       userId,
       NEW_HOURS,
-      tokenForRole(ctx, 'Standard', businessId, otherStandard.id),
+      await tokenForRole(ctx, 'Standard', businessId, otherStandard.id),
     );
 
     expect(response.status).toBe(403);
@@ -78,7 +78,7 @@ describe(`PATCH ${USER_ENDPOINTS.UPDATE_WORKING_HOURS}`, () => {
       ctx,
       userId,
       NEW_HOURS,
-      tokenForRole(ctx, 'Admin', otherBusinessId, randomUUID()),
+      await tokenForRole(ctx, 'Admin', otherBusinessId, randomUUID()),
     );
 
     expect(response.status).toBe(403);
@@ -92,7 +92,7 @@ describe(`PATCH ${USER_ENDPOINTS.UPDATE_WORKING_HOURS}`, () => {
       ctx,
       randomUUID(),
       NEW_HOURS,
-      tokenForRole(ctx, 'Admin', businessId, admin.id),
+      await tokenForRole(ctx, 'Admin', businessId, admin.id),
     );
 
     expect(response.status).toBe(404);

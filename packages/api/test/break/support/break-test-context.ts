@@ -4,6 +4,7 @@ import type { Kysely } from 'kysely';
 
 import type { PikSlotsDatabase } from '../../../src/shared/database/schema';
 import type { JwtLoginService } from '../../../src/shared/security/jwt/jwt.login.service';
+import type { SessionCacheService } from '../../../src/shared/cache/session/session.cache.service';
 import {
   createRealInfraTestApp,
   closeRealInfraTestApp,
@@ -13,6 +14,7 @@ export interface BreakTestContext {
   app: INestApplication<App>;
   db: Kysely<PikSlotsDatabase>;
   jwtLoginService: JwtLoginService;
+  sessionCacheService: SessionCacheService;
   sentEmails: jest.Mock;
   /** breaks cascade-delete off both users.id and businesses.id, so tracking these two is enough for cleanup. */
   createdBusinessIds: string[];
@@ -37,6 +39,7 @@ export function setupBreakTestContext(): BreakTestContext {
     ctx.app = infra.app;
     ctx.db = infra.db;
     ctx.jwtLoginService = infra.jwtLoginService;
+    ctx.sessionCacheService = infra.sessionCacheService;
     ctx.sentEmails = infra.sentEmails;
   });
 

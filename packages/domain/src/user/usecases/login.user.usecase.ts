@@ -18,7 +18,7 @@ export interface LoginUserUseCase {
     command: LoginUserCommand,
   ): Promise<
     Result<
-      { accessToken: string; refreshToken: string },
+      { sessionId: string },
       | UnauthorizedError
       | UserSuspendedError
       | UserInactiveError

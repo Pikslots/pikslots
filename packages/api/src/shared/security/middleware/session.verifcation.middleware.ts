@@ -1,5 +1,8 @@
-import { NestMiddleware } from '@nestjs/common';
+import { HttpStatus, Injectable, NestMiddleware } from '@nestjs/common';
 import { NextFunction, Request, Response } from 'express';
+import { SecurityContext } from '../context/security.context';
+import { SessionCacheService } from 'src/shared/cache/session/session.cache.service';
+import { PikslotsBaseErrorResponse } from 'src/shared/types/base.error.response';
 
 // Supports exact paths ('/users/register') and wildcards ('/users/*', '/foo/*/bar').
 const PUBLIC_ROUTES: string[] = [
@@ -38,8 +41,58 @@ function isPublicRoute(originalUrl: string): boolean {
   });
 }
 
+@Injectable()
 export class SessionVerifcationMiddleware implements NestMiddleware {
-  use(req: Request, res: Response, next: NextFunction) {
-    if (!isPublicRoute(req.originalUrl)) return next();
+  constructor(
+    private readonly sessionCacheService: SessionCacheService,
+    private readonly securityContext: SecurityContext,
+  ) {}
+
+  async use(req: Request, res: Response, next: NextFunction) {
+    if (isPublicRoute(req.originalUrl)) return next();
+
+    const jidCookie: unknown = req.cookies?.jid;
+    const sessionId = typeof jidCookie === 'string' ? jidCookie : undefined;
+
+    if (!sessionId) {
+      return res
+        .status(HttpStatus.UNAUTHORIZED)
+        .json(
+          new PikslotsBaseErrorResponse(
+            'Missing session cookie',
+            HttpStatus.UNAUTHORIZED,
+          ),
+        );
+    }
+
+    try {
+      const session = await this.sessionCacheService.get(sessionId);
+
+      if (!session) {
+        return res
+          .status(HttpStatus.UNAUTHORIZED)
+          .json(
+            new PikslotsBaseErrorResponse(
+              'Invalid or expired session',
+              HttpStatus.UNAUTHORIZED,
+            ),
+          );
+      }
+
+      this.securityContext.userId = session.userId;
+      this.securityContext.role = session.role;
+      this.securityContext.businessId = session.businessId;
+
+      next();
+    } catch {
+      return res
+        .status(HttpStatus.UNAUTHORIZED)
+        .json(
+          new PikslotsBaseErrorResponse(
+            'Invalid or expired session',
+            HttpStatus.UNAUTHORIZED,
+          ),
+        );
+    }
   }
 }

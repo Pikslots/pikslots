@@ -18,7 +18,7 @@ describe(`PATCH ${BUSINESS_ENDPOINTS.UPDATE_BUSINESS_LINKS}`, () => {
   it('updates business links and persists them for real', async () => {
     await request(ctx.app.getHttpServer())
       .patch(endpointFor(BUSINESS_ENDPOINTS.UPDATE_BUSINESS_LINKS, businessId))
-      .set(authHeader(tokenFor(ctx.jwtLoginService, 'Admin')))
+      .set(authHeader(await tokenFor(ctx.sessionCacheService, 'Admin')))
       .send({
         Website: 'https://example.com',
         Instagram: 'https://instagram.com/e2e',

@@ -20,7 +20,7 @@ describe(`PATCH ${BUSINESS_ENDPOINTS.UPDATE_TEAM_NOTIFICATIONS}`, () => {
       .patch(
         endpointFor(BUSINESS_ENDPOINTS.UPDATE_TEAM_NOTIFICATIONS, businessId),
       )
-      .set(authHeader(tokenFor(ctx.jwtLoginService, 'Admin')))
+      .set(authHeader(await tokenFor(ctx.sessionCacheService, 'Admin')))
       .send({
         notifyBookingConfirmation: true,
         notifyBookingChanges: true,

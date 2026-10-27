@@ -29,7 +29,7 @@ describe(`POST ${TIMEOFF_ENDPOINTS.REGISTER}`, () => {
 
     await request(ctx.app.getHttpServer())
       .post(TIMEOFF_ENDPOINTS.REGISTER)
-      .set(authHeader(tokenFor(ctx.jwtLoginService, 'Admin', businessId)))
+      .set(authHeader(await tokenFor(ctx.sessionCacheService, 'Admin', businessId)))
       .send(payload)
       .expect(201);
 
@@ -54,7 +54,7 @@ describe(`POST ${TIMEOFF_ENDPOINTS.REGISTER}`, () => {
     await request(ctx.app.getHttpServer())
       .post(TIMEOFF_ENDPOINTS.REGISTER)
       .set(
-        authHeader(tokenFor(ctx.jwtLoginService, 'Business Owner', businessId)),
+        authHeader(await tokenFor(ctx.sessionCacheService, 'Business Owner', businessId)),
       )
       .send(payload)
       .expect(201);
@@ -77,8 +77,8 @@ describe(`POST ${TIMEOFF_ENDPOINTS.REGISTER}`, () => {
       .post(TIMEOFF_ENDPOINTS.REGISTER)
       .set(
         authHeader(
-          tokenFor(
-            ctx.jwtLoginService,
+          await tokenFor(
+            ctx.sessionCacheService,
             'Business Owner',
             'a-different-business',
           ),
@@ -99,7 +99,7 @@ describe(`POST ${TIMEOFF_ENDPOINTS.REGISTER}`, () => {
       .post(TIMEOFF_ENDPOINTS.REGISTER)
       .set(
         authHeader(
-          tokenFor(ctx.jwtLoginService, 'Standard', businessId, standardUserId),
+          await tokenFor(ctx.sessionCacheService, 'Standard', businessId, standardUserId),
         ),
       )
       .send(payload)
@@ -123,7 +123,7 @@ describe(`POST ${TIMEOFF_ENDPOINTS.REGISTER}`, () => {
       .post(TIMEOFF_ENDPOINTS.REGISTER)
       .set(
         authHeader(
-          tokenFor(ctx.jwtLoginService, 'Standard', businessId, standardUserId),
+          await tokenFor(ctx.sessionCacheService, 'Standard', businessId, standardUserId),
         ),
       )
       .send(payload)
@@ -135,7 +135,7 @@ describe(`POST ${TIMEOFF_ENDPOINTS.REGISTER}`, () => {
   it('returns 400 for an invalid payload', async () => {
     const response = await request(ctx.app.getHttpServer())
       .post(TIMEOFF_ENDPOINTS.REGISTER)
-      .set(authHeader(tokenFor(ctx.jwtLoginService, 'Admin', businessId)))
+      .set(authHeader(await tokenFor(ctx.sessionCacheService, 'Admin', businessId)))
       .send({})
       .expect(400);
 
@@ -150,7 +150,7 @@ describe(`POST ${TIMEOFF_ENDPOINTS.REGISTER}`, () => {
 
     const response = await request(ctx.app.getHttpServer())
       .post(TIMEOFF_ENDPOINTS.REGISTER)
-      .set(authHeader(tokenFor(ctx.jwtLoginService, 'Admin', businessId)))
+      .set(authHeader(await tokenFor(ctx.sessionCacheService, 'Admin', businessId)))
       .send({ ...payload, userId: '11111111-1111-4111-8111-111111111111' }) // v4, not v7
       .expect(400);
 

@@ -22,7 +22,7 @@ describe(`PATCH ${SERVICE_GROUP_ENDPOINTS.EDIT}`, () => {
 
     await request(ctx.app.getHttpServer())
       .patch(editServiceGroupPath(id))
-      .set(authHeader(tokenForRole(ctx, 'Admin', businessId)))
+      .set(authHeader(await tokenForRole(ctx, 'Admin', businessId)))
       .send({ name: newName, businessId, serviceIds: [] })
       .expect(200);
 
@@ -40,7 +40,7 @@ describe(`PATCH ${SERVICE_GROUP_ENDPOINTS.EDIT}`, () => {
 
     await request(ctx.app.getHttpServer())
       .patch(editServiceGroupPath(id))
-      .set(authHeader(tokenForRole(ctx, 'Admin', businessId)))
+      .set(authHeader(await tokenForRole(ctx, 'Admin', businessId)))
       .send({ name, businessId, serviceIds: [] })
       .expect(200);
   });
@@ -52,7 +52,7 @@ describe(`PATCH ${SERVICE_GROUP_ENDPOINTS.EDIT}`, () => {
 
     const response = await request(ctx.app.getHttpServer())
       .patch(editServiceGroupPath(groupAId))
-      .set(authHeader(tokenForRole(ctx, 'Admin', businessId)))
+      .set(authHeader(await tokenForRole(ctx, 'Admin', businessId)))
       .send({ name: groupBName, businessId, serviceIds: [] })
       .expect(409);
 
@@ -64,7 +64,7 @@ describe(`PATCH ${SERVICE_GROUP_ENDPOINTS.EDIT}`, () => {
 
     const response = await request(ctx.app.getHttpServer())
       .patch(editServiceGroupPath(randomUUID()))
-      .set(authHeader(tokenForRole(ctx, 'Admin', businessId)))
+      .set(authHeader(await tokenForRole(ctx, 'Admin', businessId)))
       .send({ name: 'Whatever', businessId, serviceIds: [] })
       .expect(404);
 
@@ -77,7 +77,7 @@ describe(`PATCH ${SERVICE_GROUP_ENDPOINTS.EDIT}`, () => {
 
     const response = await request(ctx.app.getHttpServer())
       .patch(editServiceGroupPath(id))
-      .set(authHeader(tokenForRole(ctx, 'Standard', businessId)))
+      .set(authHeader(await tokenForRole(ctx, 'Standard', businessId)))
       .send({ name, businessId, serviceIds: [] })
       .expect(403);
 
@@ -90,7 +90,7 @@ describe(`PATCH ${SERVICE_GROUP_ENDPOINTS.EDIT}`, () => {
 
     const response = await request(ctx.app.getHttpServer())
       .patch(editServiceGroupPath(id))
-      .set(authHeader(tokenForRole(ctx, 'Admin', businessId)))
+      .set(authHeader(await tokenForRole(ctx, 'Admin', businessId)))
       .send({ name, businessId, serviceIds: ['not-a-uuid'] })
       .expect(400);
 

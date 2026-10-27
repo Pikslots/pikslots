@@ -23,7 +23,7 @@ describe(`GET ${USER_ENDPOINTS.ME}`, () => {
 
     const response = await getUserProfile(
       ctx,
-      tokenForRole(ctx, 'Admin', businessId, userId),
+      await tokenForRole(ctx, 'Admin', businessId, userId),
     );
 
     expect(response.status).toBe(200);

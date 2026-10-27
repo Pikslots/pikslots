@@ -22,7 +22,7 @@ describe(`GET ${SERVICE_GROUP_ENDPOINTS.FIND_ALL_BY_BUSINESS}`, () => {
 
     const response = await request(ctx.app.getHttpServer())
       .get(findAllByBusinessPath(businessId))
-      .set(authHeader(tokenForRole(ctx, 'Standard', businessId)))
+      .set(authHeader(await tokenForRole(ctx, 'Standard', businessId)))
       .expect(200);
 
     expect(successBody(response).data).toEqual(
@@ -39,7 +39,7 @@ describe(`GET ${SERVICE_GROUP_ENDPOINTS.FIND_ALL_BY_BUSINESS}`, () => {
 
     const response = await request(ctx.app.getHttpServer())
       .get(findAllByBusinessPath(businessId))
-      .set(authHeader(tokenForRole(ctx, 'Standard', businessId)))
+      .set(authHeader(await tokenForRole(ctx, 'Standard', businessId)))
       .expect(200);
 
     expect(successBody(response).data).toEqual([]);
@@ -51,12 +51,12 @@ describe(`GET ${SERVICE_GROUP_ENDPOINTS.FIND_ALL_BY_BUSINESS}`, () => {
 
     await request(ctx.app.getHttpServer())
       .delete(deleteServiceGroupPath(id))
-      .set(authHeader(tokenForRole(ctx, 'Admin', businessId)))
+      .set(authHeader(await tokenForRole(ctx, 'Admin', businessId)))
       .expect(200);
 
     const response = await request(ctx.app.getHttpServer())
       .get(findAllByBusinessPath(businessId))
-      .set(authHeader(tokenForRole(ctx, 'Standard', businessId)))
+      .set(authHeader(await tokenForRole(ctx, 'Standard', businessId)))
       .expect(200);
 
     expect(successBody(response).data).toEqual([]);
@@ -85,7 +85,7 @@ describe(`GET ${SERVICE_GROUP_ENDPOINTS.FIND_ALL_BY_BUSINESS}`, () => {
 
     await request(ctx.app.getHttpServer())
       .get(findAllByBusinessPath(businessId))
-      .set(authHeader(tokenForRole(ctx, 'Standard', otherBusinessId)))
+      .set(authHeader(await tokenForRole(ctx, 'Standard', otherBusinessId)))
       .expect(200);
   });
 });

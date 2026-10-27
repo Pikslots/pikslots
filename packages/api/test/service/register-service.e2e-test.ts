@@ -18,7 +18,7 @@ describe(`POST ${SERVICE_ENDPOINTS.REGISTER}`, () => {
     const response = await request(ctx.app.getHttpServer())
       .post(SERVICE_ENDPOINTS.REGISTER)
       .set(
-        authHeader(tokenFor(ctx.jwtLoginService, 'Business Owner', businessId)),
+        authHeader(await tokenFor(ctx.sessionCacheService, 'Business Owner', businessId)),
       )
       .send(payload)
       .expect(201);
@@ -54,7 +54,7 @@ describe(`POST ${SERVICE_ENDPOINTS.REGISTER}`, () => {
 
     await request(ctx.app.getHttpServer())
       .post(SERVICE_ENDPOINTS.REGISTER)
-      .set(authHeader(tokenFor(ctx.jwtLoginService, 'Platform Owner')))
+      .set(authHeader(await tokenFor(ctx.sessionCacheService, 'Platform Owner')))
       .send(payload)
       .expect(201);
   });
@@ -69,7 +69,7 @@ describe(`POST ${SERVICE_ENDPOINTS.REGISTER}`, () => {
     const response = await request(ctx.app.getHttpServer())
       .post(SERVICE_ENDPOINTS.REGISTER)
       .set(
-        authHeader(tokenFor(ctx.jwtLoginService, 'Business Owner', businessId)),
+        authHeader(await tokenFor(ctx.sessionCacheService, 'Business Owner', businessId)),
       )
       .send(payload)
       .expect(400);
@@ -93,7 +93,7 @@ describe(`POST ${SERVICE_ENDPOINTS.REGISTER}`, () => {
     const response = await request(ctx.app.getHttpServer())
       .post(SERVICE_ENDPOINTS.REGISTER)
       .set(
-        authHeader(tokenFor(ctx.jwtLoginService, 'Business Owner', businessId)),
+        authHeader(await tokenFor(ctx.sessionCacheService, 'Business Owner', businessId)),
       )
       .send({})
       .expect(400);
@@ -118,7 +118,7 @@ describe(`POST ${SERVICE_ENDPOINTS.REGISTER}`, () => {
 
     await request(ctx.app.getHttpServer())
       .post(SERVICE_ENDPOINTS.REGISTER)
-      .set(authHeader(tokenFor(ctx.jwtLoginService, 'Enhanced', businessId)))
+      .set(authHeader(await tokenFor(ctx.sessionCacheService, 'Enhanced', businessId)))
       .send(payload)
       .expect(403);
   });
@@ -132,7 +132,7 @@ describe(`POST ${SERVICE_ENDPOINTS.REGISTER}`, () => {
       .post(SERVICE_ENDPOINTS.REGISTER)
       .set(
         authHeader(
-          tokenFor(ctx.jwtLoginService, 'Business Owner', otherBusinessId),
+          await tokenFor(ctx.sessionCacheService, 'Business Owner', otherBusinessId),
         ),
       )
       .send(payload)

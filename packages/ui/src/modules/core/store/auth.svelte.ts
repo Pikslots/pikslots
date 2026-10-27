@@ -1,16 +1,16 @@
 import type { LoginJwtPayload } from '@pikslots/shared';
-import { jwtDecode } from 'jwt-decode';
+import type { SessionModel } from '../../api/session/models/session-model';
 
 function createAuthStore() {
-	let accessToken = $state<string | null>(null);
+	let session = $state<SessionModel | null>(null);
 	let isInitializing = $state(true);
 
-	function setAccessToken(token: string) {
-		accessToken = token;
+	function setSession(value: SessionModel) {
+		session = value;
 	}
 
-	function clearAccessToken() {
-		accessToken = null;
+	function clearSession() {
+		session = null;
 	}
 
 	function setInitialized() {
@@ -18,22 +18,22 @@ function createAuthStore() {
 	}
 
 	function getPayloadData(): LoginJwtPayload | null {
-		if (accessToken) return jwtDecode<LoginJwtPayload>(accessToken);
-		return null;
+		if (!session) return null;
+		return { userId: session.userId, role: session.role, businessId: session.businessId };
 	}
 
 	return {
-		get accessToken() {
-			return accessToken;
+		get session() {
+			return session;
 		},
 		get isAuthenticated() {
-			return accessToken !== null;
+			return session !== null;
 		},
 		get isInitializing() {
 			return isInitializing;
 		},
-		setAccessToken,
-		clearAccessToken,
+		setSession,
+		clearSession,
 		getPayloadData,
 		setInitialized
 	};

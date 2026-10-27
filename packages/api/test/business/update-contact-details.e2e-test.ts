@@ -18,7 +18,7 @@ describe(`PATCH ${BUSINESS_ENDPOINTS.UPDATE_CONTACT_DETAILS}`, () => {
   it('updates contact details and persists them for real', async () => {
     await request(ctx.app.getHttpServer())
       .patch(endpointFor(BUSINESS_ENDPOINTS.UPDATE_CONTACT_DETAILS, businessId))
-      .set(authHeader(tokenFor(ctx.jwtLoginService, 'Admin')))
+      .set(authHeader(await tokenFor(ctx.sessionCacheService, 'Admin')))
       .send({
         primaryEmail: 'contact@example.com',
         primaryPhone: { countryCode: '+1', number: '5551234567' },

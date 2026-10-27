@@ -22,7 +22,7 @@ describe(`PATCH ${USER_ENDPOINTS.UPDATE_AVATAR}`, () => {
       ctx,
       userId,
       avatarKey,
-      tokenForRole(ctx, 'Standard', businessId, userId),
+      await tokenForRole(ctx, 'Standard', businessId, userId),
     );
 
     expect(response.status).toBe(200);
@@ -38,7 +38,7 @@ describe(`PATCH ${USER_ENDPOINTS.UPDATE_AVATAR}`, () => {
   it('replaces a previously-set avatar key without erroring (old key delete is best-effort)', async () => {
     const { id: businessId } = await createBusiness(ctx);
     const { id: userId } = await createStaffUser(ctx, businessId, 'Standard');
-    const token = tokenForRole(ctx, 'Standard', businessId, userId);
+    const token = await tokenForRole(ctx, 'Standard', businessId, userId);
     const firstKey = `${unique('e2e-biz')}/users/${userId}/avatar/first.png`;
     const secondKey = `${unique('e2e-biz')}/users/${userId}/avatar/second.png`;
 
@@ -67,7 +67,7 @@ describe(`PATCH ${USER_ENDPOINTS.UPDATE_AVATAR}`, () => {
       ctx,
       userId,
       avatarKey,
-      tokenForRole(ctx, 'Admin', businessId, admin.id),
+      await tokenForRole(ctx, 'Admin', businessId, admin.id),
     );
 
     expect(response.status).toBe(200);
@@ -83,7 +83,7 @@ describe(`PATCH ${USER_ENDPOINTS.UPDATE_AVATAR}`, () => {
       ctx,
       userId,
       avatarKey,
-      tokenForRole(ctx, 'Standard', businessId, otherStandard.id),
+      await tokenForRole(ctx, 'Standard', businessId, otherStandard.id),
     );
 
     expect(response.status).toBe(401);
@@ -97,7 +97,7 @@ describe(`PATCH ${USER_ENDPOINTS.UPDATE_AVATAR}`, () => {
       ctx,
       randomUUID(),
       'some/key.png',
-      tokenForRole(ctx, 'Admin', businessId, admin.id),
+      await tokenForRole(ctx, 'Admin', businessId, admin.id),
     );
 
     expect(response.status).toBe(404);
@@ -111,7 +111,7 @@ describe(`PATCH ${USER_ENDPOINTS.UPDATE_AVATAR}`, () => {
       ctx,
       userId,
       '',
-      tokenForRole(ctx, 'Standard', businessId, userId),
+      await tokenForRole(ctx, 'Standard', businessId, userId),
     );
 
     expect(response.status).toBe(400);

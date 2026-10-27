@@ -37,6 +37,46 @@ export const RegisterSessionDocs = () =>
     }),
   );
 
+export const GetCurrentSessionDocs = () =>
+  applyDecorators(
+    ApiOperation({
+      summary: "Get the caller's own session, resolved from the jid cookie",
+    }),
+    ApiResponse({
+      status: HttpStatus.OK,
+      description: 'Session retrieved successfully',
+      schema: {
+        example: {
+          data: {
+            id: '01932b4a-5f3c-7e1d-b2a8-3c9d4e5f6a7b',
+            userId: '01932b4a-5f3c-7e1d-b2a8-3c9d4e5f6a7c',
+            role: 'Admin',
+            businessId: '01932b4a-5f3c-7e1d-b2a8-3c9d4e5f6a7d',
+            issuedAt: '2026-10-27T12:00:00.000Z',
+            expiresAt: '2026-11-03T12:00:00.000Z',
+          },
+          statusCode: 200,
+          timestamp: '2026-10-27T12:00:00.000Z',
+        },
+      },
+    }),
+    ApiResponse({
+      status: HttpStatus.UNAUTHORIZED,
+      description: 'Missing session cookie',
+      type: PikslotsBaseErrorResponse,
+    }),
+    ApiResponse({
+      status: HttpStatus.NOT_FOUND,
+      description: 'Session not found or expired',
+      type: PikslotsBaseErrorResponse,
+    }),
+    ApiResponse({
+      status: HttpStatus.INTERNAL_SERVER_ERROR,
+      description: 'Infrastructure failure',
+      type: PikslotsBaseErrorResponse,
+    }),
+  );
+
 export const GetSessionDocs = () =>
   applyDecorators(
     ApiOperation({ summary: 'Get a session by ID' }),

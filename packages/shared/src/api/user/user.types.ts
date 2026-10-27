@@ -28,10 +28,6 @@ export interface LoginUserInput {
   password: string;
 }
 
-export interface RefreshUserSessionInput {
-  currentRefreshToken: string;
-}
-
 // --- Responses ---
 
 export interface InviteUserResponse {
@@ -43,11 +39,7 @@ export interface LogoutUserResponse {
 }
 
 export interface LoginUserResponse {
-  accessToken: string;
-}
-
-export interface RefreshUserSessionResponse {
-  accessToken: string;
+  message: 'success';
 }
 
 export type UserStatus = 'invited' | 'active' | 'inactive' | 'suspended';

@@ -109,7 +109,7 @@ export async function registerServiceGroup(
 
   await request(ctx.app.getHttpServer())
     .post(SERVICE_GROUP_ENDPOINTS.REGISTER)
-    .set(authHeader(tokenFor(ctx.jwtLoginService, 'Admin', businessId)))
+    .set(authHeader(await tokenFor(ctx.sessionCacheService, 'Admin', businessId)))
     .send({
       name,
       businessId,
@@ -149,10 +149,10 @@ export function findAllByBusinessPath(businessId: string): string {
   });
 }
 
-export function tokenForRole(
+export async function tokenForRole(
   ctx: ServiceGroupTestContext,
   role: UserRole,
   businessId: string | null = null,
-): string {
-  return tokenFor(ctx.jwtLoginService, role, businessId);
+): Promise<string> {
+  return tokenFor(ctx.sessionCacheService, role, businessId);
 }

@@ -4,7 +4,7 @@ import { createKeyv } from '@keyv/redis';
 import { ConfigService } from '@nestjs/config';
 import { Env } from '../config/env';
 import { OtpService } from './otp/otp.service';
-import { SessionCacheService } from './otp/session.cache.service';
+import { SessionCacheService } from './session/session.cache.service';
 import { CACHE } from './cache.tokens';
 
 @Global()

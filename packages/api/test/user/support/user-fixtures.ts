@@ -151,13 +151,13 @@ export async function setUserStatus(
     .execute();
 }
 
-export function tokenForRole(
+export async function tokenForRole(
   ctx: UserTestContext,
   role: UserRole,
   businessId: string | null = null,
   userId?: string,
-): string {
-  return tokenFor(ctx.jwtLoginService, role, businessId, userId);
+): Promise<string> {
+  return tokenFor(ctx.sessionCacheService, role, businessId, userId);
 }
 
 // ── Invite / OTP / accept-invite (real HTTP + real captured emails) ─────────
@@ -330,7 +330,7 @@ export async function inviteAndAcceptRealUser(
   };
 }
 
-// ── Login / refresh / logout ─────────────────────────────────────────────
+// ── Login / logout ────────────────────────────────────────────────────────
 
 export async function login(
   ctx: UserTestContext,
@@ -343,32 +343,23 @@ export async function login(
 }
 
 /** Pulls just the `jid=...` cookie value out of a Set-Cookie response header, for forwarding on the next request. */
-export function extractRefreshCookie(response: SupertestResponse): string {
+export function extractSessionCookie(response: SupertestResponse): string {
   const raw = response.headers['set-cookie'] as unknown as string[] | undefined;
   const jidCookie = raw?.find((c) => c.startsWith('jid='));
   if (!jidCookie) {
     throw new Error(
-      `extractRefreshCookie: no 'jid' cookie in Set-Cookie header: ${JSON.stringify(raw)}`,
+      `extractSessionCookie: no 'jid' cookie in Set-Cookie header: ${JSON.stringify(raw)}`,
     );
   }
   return jidCookie.split(';')[0]; // strip attributes (Path=, HttpOnly, ...), keep "jid=<value>"
 }
 
-export async function refreshSession(
-  ctx: UserTestContext,
-  cookie?: string,
-): Promise<SupertestResponse> {
-  const req = request(ctx.app.getHttpServer()).post(USER_ENDPOINTS.REFRESH);
-  if (cookie) req.set('Cookie', cookie);
-  return req;
-}
-
 export async function logout(
   ctx: UserTestContext,
-  actorToken?: string,
+  sessionCookie?: string,
 ): Promise<SupertestResponse> {
   const req = request(ctx.app.getHttpServer()).post(USER_ENDPOINTS.LOGOUT);
-  if (actorToken) req.set(authHeader(actorToken));
+  if (sessionCookie) req.set('Cookie', sessionCookie);
   return req;
 }
 
@@ -454,7 +445,7 @@ export async function registerServiceForBusiness(
   const { id: memberId } = await createStaffUser(ctx, businessId, 'Standard');
   await request(ctx.app.getHttpServer())
     .post(SERVICE_ENDPOINTS.REGISTER)
-    .set(authHeader(tokenFor(ctx.jwtLoginService, 'Admin', businessId)))
+    .set(authHeader(await tokenFor(ctx.sessionCacheService, 'Admin', businessId)))
     .send({
       title,
       description: 'An e2e test service',
@@ -486,7 +477,7 @@ export async function registerCustomerForBusiness(
   const suffix = unique('customer');
   await request(ctx.app.getHttpServer())
     .post(CUSTOMER_ENDPOINTS.REGISTER)
-    .set(authHeader(tokenFor(ctx.jwtLoginService, 'Admin', businessId)))
+    .set(authHeader(await tokenFor(ctx.sessionCacheService, 'Admin', businessId)))
     .send({
       firstName: 'E2E',
       lastName: 'Customer',

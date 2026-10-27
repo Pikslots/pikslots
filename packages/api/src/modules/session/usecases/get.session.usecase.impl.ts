@@ -10,7 +10,7 @@ import {
   SessionNotFound,
 } from '@pikslots/domain';
 import type { SessionRepository } from '@pikslots/domain';
-import { SessionCacheService } from 'src/shared/cache/otp/session.cache.service';
+import { SessionCacheService } from 'src/shared/cache/session/session.cache.service';
 
 const SESSION_NOT_FOUND = (id: string): SessionNotFound => ({
   kind: 'session_not_found',

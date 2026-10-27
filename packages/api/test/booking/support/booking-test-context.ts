@@ -5,6 +5,7 @@ import type { S3Client } from '@aws-sdk/client-s3';
 
 import type { PikSlotsDatabase } from '../../../src/shared/database/schema';
 import type { JwtLoginService } from '../../../src/shared/security/jwt/jwt.login.service';
+import type { SessionCacheService } from '../../../src/shared/cache/session/session.cache.service';
 import {
   createRealInfraTestApp,
   closeRealInfraTestApp,
@@ -19,6 +20,7 @@ export interface BookingTestContext {
   app: INestApplication<App>;
   db: Kysely<PikSlotsDatabase>;
   jwtLoginService: JwtLoginService;
+  sessionCacheService: SessionCacheService;
   s3Client: S3Client;
   s3Bucket: string;
   sentEmails: jest.Mock;
@@ -75,6 +77,7 @@ export function setupBookingTestContext(): BookingTestContext {
     ctx.app = infra.app;
     ctx.db = infra.db;
     ctx.jwtLoginService = infra.jwtLoginService;
+    ctx.sessionCacheService = infra.sessionCacheService;
     ctx.sentEmails = infra.sentEmails;
 
     const { client, bucket } = createTestS3Client(infra.configService);

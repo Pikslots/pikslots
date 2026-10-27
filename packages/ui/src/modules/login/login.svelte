@@ -13,6 +13,7 @@
 	import loginImage from '$lib/assets/login-image.jpg';
 	import { createMutation } from '@tanstack/svelte-query';
 	import { loginUser } from '../api/user/login.user.mutation';
+	import { getCurrentSession } from '../api/session/get.current.session.query';
 	import type { BaseErrorResponse, LoginUserInput, LoginUserResponse } from '@pikslots/shared';
 	import type { AxiosError } from 'axios';
 	import { toast } from 'svelte-sonner';
@@ -52,8 +53,14 @@
 		if (authStore.isAuthenticated) goto(resolve('/home'));
 
 		if (loginMutation.data) {
-			authStore.setAccessToken(loginMutation.data.accessToken);
-			goto(resolve('/home'));
+			getCurrentSession()
+				.then((session) => {
+					authStore.setSession(session);
+					goto(resolve('/home'));
+				})
+				.catch(() => {
+					toast.error('Something went wrong. Please try again.');
+				});
 		}
 		if (loginMutation.isError) {
 			console.log(loginMutation.error.response?.data.message);

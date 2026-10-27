@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ISessionRepository, Session, SessionNotFound } from '@pikslots/domain';
-import { SessionCacheService } from 'src/shared/cache/otp/session.cache.service';
+import { SessionCacheService } from 'src/shared/cache/session/session.cache.service';
 import { SessionRepositoryTestImpl } from '../repository/session.repository.fake.impl';
 import {
   EXPIRED_SESSION,

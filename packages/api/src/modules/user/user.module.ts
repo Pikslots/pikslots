@@ -5,8 +5,10 @@ import { UserController } from './user.controller';
 import { USER_USECASES } from './usecases';
 import { UserUsecasesFactory } from './factory/user.usecases.factory';
 import { USER_EVENTS } from './events';
+import { SessionModule } from '../session/session.module';
+
 @Module({
-  imports: [],
+  imports: [SessionModule],
   controllers: [UserController],
   providers: [
     { useClass: UserRepositoryImpl, provide: IUserRepository },

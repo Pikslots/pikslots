@@ -26,7 +26,7 @@ describe(`POST ${USER_ENDPOINTS.INVITE} -> ${USER_ENDPOINTS.REQUEST_INVITE_OTP} 
       ctx,
       businessId,
       'E2E Business',
-      tokenForRole(ctx, 'Business Owner', businessId, ownerId),
+      await tokenForRole(ctx, 'Business Owner', businessId, ownerId),
     );
 
     const loginResponse = await login(
@@ -36,9 +36,9 @@ describe(`POST ${USER_ENDPOINTS.INVITE} -> ${USER_ENDPOINTS.REQUEST_INVITE_OTP} 
     );
 
     expect(loginResponse.status).toBe(200);
-    expect(
-      successBody<{ accessToken: string }>(loginResponse).data,
-    ).toHaveProperty('accessToken');
+    expect(successBody<{ message: string }>(loginResponse).data.message).toBe(
+      'success',
+    );
   });
 
   it('returns 409 when inviting an email that already exists', async () => {
@@ -48,7 +48,7 @@ describe(`POST ${USER_ENDPOINTS.INVITE} -> ${USER_ENDPOINTS.REQUEST_INVITE_OTP} 
     const response = await inviteUser(
       ctx,
       inviteUserPayload({ email, businessId, businessName: 'E2E Business' }),
-      tokenForRole(ctx, 'Business Owner', businessId, ownerId),
+      await tokenForRole(ctx, 'Business Owner', businessId, ownerId),
     );
 
     expect(response.status).toBe(409);
@@ -66,7 +66,7 @@ describe(`POST ${USER_ENDPOINTS.INVITE} -> ${USER_ENDPOINTS.REQUEST_INVITE_OTP} 
         businessId,
         businessName: 'E2E Business',
       }),
-      tokenForRole(ctx, 'Business Owner', businessId, ownerId),
+      await tokenForRole(ctx, 'Business Owner', businessId, ownerId),
     );
 
     expect(response.status).toBe(409);
@@ -82,7 +82,7 @@ describe(`POST ${USER_ENDPOINTS.INVITE} -> ${USER_ENDPOINTS.REQUEST_INVITE_OTP} 
     await inviteUser(
       ctx,
       payload,
-      tokenForRole(ctx, 'Business Owner', businessId, ownerId),
+      await tokenForRole(ctx, 'Business Owner', businessId, ownerId),
     ).then((res) => expect(res.status).toBe(201));
     const token = extractInviteToken(ctx, payload.email);
     await requestInviteOtp(ctx, token).then((res) =>
@@ -107,7 +107,7 @@ describe(`POST ${USER_ENDPOINTS.INVITE} -> ${USER_ENDPOINTS.REQUEST_INVITE_OTP} 
     await inviteUser(
       ctx,
       payload,
-      tokenForRole(ctx, 'Business Owner', businessId, ownerId),
+      await tokenForRole(ctx, 'Business Owner', businessId, ownerId),
     ).then((res) => expect(res.status).toBe(201));
     const token = extractInviteToken(ctx, payload.email);
     await requestInviteOtp(ctx, token).then((res) =>
@@ -140,7 +140,7 @@ describe(`POST ${USER_ENDPOINTS.INVITE} -> ${USER_ENDPOINTS.REQUEST_INVITE_OTP} 
       const response = await inviteUser(
         ctx,
         inviteUserPayload({ role: 'Business Owner' }),
-        tokenForRole(ctx, 'Platform Owner'),
+        await tokenForRole(ctx, 'Platform Owner'),
       );
 
       expect(response.status).toBe(201);
@@ -156,7 +156,7 @@ describe(`POST ${USER_ENDPOINTS.INVITE} -> ${USER_ENDPOINTS.REQUEST_INVITE_OTP} 
           businessId,
           businessName: 'E2E Business',
         }),
-        tokenForRole(ctx, 'Business Owner', businessId, ownerId),
+        await tokenForRole(ctx, 'Business Owner', businessId, ownerId),
       );
 
       expect(response.status).toBe(403);
@@ -173,7 +173,7 @@ describe(`POST ${USER_ENDPOINTS.INVITE} -> ${USER_ENDPOINTS.REQUEST_INVITE_OTP} 
           businessId,
           businessName: 'E2E Business',
         }),
-        tokenForRole(ctx, 'Admin', businessId, admin.id),
+        await tokenForRole(ctx, 'Admin', businessId, admin.id),
       );
 
       expect(response.status).toBe(403);
@@ -190,7 +190,7 @@ describe(`POST ${USER_ENDPOINTS.INVITE} -> ${USER_ENDPOINTS.REQUEST_INVITE_OTP} 
           businessId,
           businessName: 'E2E Business',
         }),
-        tokenForRole(ctx, 'Admin', businessId, admin.id),
+        await tokenForRole(ctx, 'Admin', businessId, admin.id),
       );
 
       expect(response.status).toBe(201);
@@ -207,7 +207,7 @@ describe(`POST ${USER_ENDPOINTS.INVITE} -> ${USER_ENDPOINTS.REQUEST_INVITE_OTP} 
           businessId,
           businessName: 'E2E Business',
         }),
-        tokenForRole(ctx, 'Standard', businessId, standard.id),
+        await tokenForRole(ctx, 'Standard', businessId, standard.id),
       );
 
       expect(response.status).toBe(403);

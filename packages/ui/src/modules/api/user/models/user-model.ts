@@ -5,7 +5,6 @@ import type {
 	LoginUserInput,
 	LoginUserResponse,
 	LogoutUserResponse,
-	RefreshUserSessionResponse,
 	UpdateUserAvatarInput,
 	UpdateUserAvatarResponse,
 	UpdateUserProfileInput,
@@ -21,7 +20,6 @@ export type UserInviteResult = InviteUserResponse;
 export type UserLoginInput = LoginUserInput;
 export type UserLoginResult = LoginUserResponse;
 export type UserLogoutResult = LogoutUserResponse;
-export type UserRefreshSessionResult = RefreshUserSessionResponse;
 export type UserByRoleInput = GetUsersByRoleInput;
 export type UserByRoleResult = UserSummary[];
 export type UserModel = UserSummary;

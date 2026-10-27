@@ -3,14 +3,17 @@ import { Inject, Injectable } from '@nestjs/common';
 import {
   err,
   InfrastructureError,
+  ISessionRepository,
   IUserRepository,
   LoginUserUseCase,
   ok,
   Result,
+  Session,
 } from '@pikslots/domain';
 import type {
   AuditLogJobDataShape,
   LoginUserCommand,
+  SessionRepository,
   UnauthorizedError,
   User,
   UserInactiveError,
@@ -19,15 +22,17 @@ import type {
   UserRepository,
   UserSuspendedError,
 } from '@pikslots/domain';
-import { LoginJwtPayload } from '@pikslots/shared';
 import { Queue } from 'bullmq';
+import { v7 as uuidv7 } from 'uuid';
 import { PasswordHashingService } from 'src/shared/security/hashing/password.hashing.service';
-import { JwtLoginService } from 'src/shared/security/jwt/jwt.login.service';
+import { SessionCacheService } from 'src/shared/cache/session/session.cache.service';
 import {
   AUDIT_LOG_QUEUE,
   PIKSLOT_EVENTS,
 } from 'src/shared/queue/jobs/pikslot.events';
 import type { AuditLogJobName } from 'src/shared/queue/jobs';
+
+const SESSION_TTL_SECONDS = 604800;
 
 type LoginError =
   | UnauthorizedError
@@ -37,10 +42,7 @@ type LoginError =
   | UserInvitedError
   | UserNoAccessError;
 
-type LoginResult = Result<
-  { accessToken: string; refreshToken: string },
-  LoginError
->;
+type LoginResult = Result<{ sessionId: string }, LoginError>;
 
 const ACCESS_DENIED = (): UnauthorizedError => ({
   kind: 'unauthorized',
@@ -80,7 +82,9 @@ const USER_INVITED_ERROR = (): UserInvitedError => ({
 export class LoginUserUseCaseImpl implements LoginUserUseCase {
   constructor(
     @Inject(IUserRepository) private readonly userRepository: UserRepository,
-    private readonly jwtLoginService: JwtLoginService,
+    @Inject(ISessionRepository)
+    private readonly sessionRepository: SessionRepository,
+    private readonly sessionCacheService: SessionCacheService,
     private readonly passwordHashingService: PasswordHashingService,
     @InjectQueue(AUDIT_LOG_QUEUE)
     private readonly auditLogQueue: Queue<
@@ -106,11 +110,36 @@ export class LoginUserUseCaseImpl implements LoginUserUseCase {
     if (user.value.status === 'suspended' && user.value.suspendedReason)
       return err(USER_SUSPENDED(user.value.suspendedReason));
 
-    const result = this.issueTokens(user.value);
+    const session = await this.createSession(user.value);
+
+    if (!session.ok) return session;
 
     await this.logUserLoginAudit(user.value);
 
-    return result;
+    return ok({ sessionId: session.value.id });
+  }
+
+  private async createSession(
+    user: User,
+  ): Promise<Result<Session, InfrastructureError>> {
+    const issuedAt = new Date();
+    const expiresAt = new Date(issuedAt.getTime() + SESSION_TTL_SECONDS * 1000);
+
+    const session = Session.create({
+      id: uuidv7(),
+      userId: user.id,
+      role: user.role,
+      businessId: user.businessId,
+      issuedAt,
+      expiresAt,
+    });
+
+    const saved = await this.sessionRepository.save(session);
+    if (!saved.ok) return err(saved.error);
+
+    await this.sessionCacheService.save(session);
+
+    return ok(session);
   }
 
   private async logUserLoginAudit(user: User): Promise<void> {
@@ -142,18 +171,5 @@ export class LoginUserUseCaseImpl implements LoginUserUseCase {
     if (!result.value) return err(ACCESS_DENIED());
 
     return ok(result.value);
-  }
-
-  private issueTokens(user: User): LoginResult {
-    const payload: LoginJwtPayload = {
-      userId: user.id,
-      role: user.role,
-      businessId: user.businessId,
-    };
-
-    return ok({
-      accessToken: this.jwtLoginService.signAccessToken(payload),
-      refreshToken: this.jwtLoginService.signRefreshToken(payload),
-    });
   }
 }
