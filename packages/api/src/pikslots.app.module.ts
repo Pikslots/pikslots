@@ -24,6 +24,7 @@ import { PublicBookingPage } from './modules/public-booking-page/public.booking.
 import { OnboardingModule } from './modules/onboarding/onboarding.module';
 import { HealtController } from './health.controller';
 import { AuditLogModule } from './modules/audit-log/audit.log.module';
+import { SessionModule } from './modules/session/session.module';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { AuditLogModule } from './modules/audit-log/audit.log.module';
     PublicBookingPage,
     OnboardingModule,
     AuditLogModule,
+    SessionModule,
   ],
   controllers: [HealtController],
   providers: [],

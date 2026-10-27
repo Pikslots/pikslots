@@ -4,6 +4,7 @@ import { createKeyv } from '@keyv/redis';
 import { ConfigService } from '@nestjs/config';
 import { Env } from '../config/env';
 import { OtpService } from './otp/otp.service';
+import { SessionCacheService } from './otp/session.cache.service';
 import { CACHE } from './cache.tokens';
 
 @Global()
@@ -21,8 +22,9 @@ import { CACHE } from './cache.tokens';
       },
     },
     OtpService,
+    SessionCacheService,
   ],
-  exports: [CACHE, OtpService],
+  exports: [CACHE, OtpService, SessionCacheService],
 })
 export class PikslotCacheModule implements OnModuleDestroy {
   constructor(@Inject(CACHE) private readonly cache: Cacheable) {}
