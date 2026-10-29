@@ -44,6 +44,13 @@ export class SessionRepositoryTestImpl implements SessionRepository {
     return ok(found);
   }
 
+  async findAllByUserId(
+    userId: string,
+  ): Promise<Result<Session[], InfrastructureError>> {
+    await Promise.resolve('');
+    return ok(SESSION_TEST_DATA.filter((session) => session.userId === userId));
+  }
+
   async delete(
     id: string,
   ): Promise<Result<void, SessionNotFound | InfrastructureError>> {

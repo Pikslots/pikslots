@@ -339,7 +339,13 @@ export async function login(
 ): Promise<SupertestResponse> {
   return request(ctx.app.getHttpServer())
     .post(USER_ENDPOINTS.LOGIN)
-    .send({ usernameOrEmail, password });
+    .send({
+      usernameOrEmail,
+      password,
+      os: 'macOS',
+      browser: 'Chrome',
+      country: 'PK',
+    });
 }
 
 /** Pulls just the `jid=...` cookie value out of a Set-Cookie response header, for forwarding on the next request. */

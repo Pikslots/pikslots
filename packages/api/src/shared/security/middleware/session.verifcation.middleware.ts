@@ -1,5 +1,6 @@
 import { HttpStatus, Injectable, NestMiddleware } from '@nestjs/common';
 import { NextFunction, Request, Response } from 'express';
+import { SESSION_EXPIRED_MESSAGE } from '@pikslots/shared';
 import { SecurityContext } from '../context/security.context';
 import { SessionCacheService } from 'src/shared/cache/session/session.cache.service';
 import { PikslotsBaseErrorResponse } from 'src/shared/types/base.error.response';
@@ -59,7 +60,7 @@ export class SessionVerifcationMiddleware implements NestMiddleware {
         .status(HttpStatus.UNAUTHORIZED)
         .json(
           new PikslotsBaseErrorResponse(
-            'Missing session cookie',
+            SESSION_EXPIRED_MESSAGE,
             HttpStatus.UNAUTHORIZED,
           ),
         );
@@ -73,7 +74,7 @@ export class SessionVerifcationMiddleware implements NestMiddleware {
           .status(HttpStatus.UNAUTHORIZED)
           .json(
             new PikslotsBaseErrorResponse(
-              'Invalid or expired session',
+              SESSION_EXPIRED_MESSAGE,
               HttpStatus.UNAUTHORIZED,
             ),
           );
@@ -89,7 +90,7 @@ export class SessionVerifcationMiddleware implements NestMiddleware {
         .status(HttpStatus.UNAUTHORIZED)
         .json(
           new PikslotsBaseErrorResponse(
-            'Invalid or expired session',
+            SESSION_EXPIRED_MESSAGE,
             HttpStatus.UNAUTHORIZED,
           ),
         );

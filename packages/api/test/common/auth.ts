@@ -32,6 +32,9 @@ export async function tokenFor(
     // audit_fields.updated_by uuid column, so this must be a real uuid.
     userId: userId ?? randomUUID(),
     role,
+    os: 'macOS',
+    browser: 'Chrome',
+    country: 'PK',
     businessId,
     issuedAt,
     expiresAt: new Date(issuedAt.getTime() + SESSION_TTL_MS),

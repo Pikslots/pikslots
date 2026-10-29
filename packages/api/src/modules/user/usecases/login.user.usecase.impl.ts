@@ -110,7 +110,7 @@ export class LoginUserUseCaseImpl implements LoginUserUseCase {
     if (user.value.status === 'suspended' && user.value.suspendedReason)
       return err(USER_SUSPENDED(user.value.suspendedReason));
 
-    const session = await this.createSession(user.value);
+    const session = await this.createSession(user.value, command);
 
     if (!session.ok) return session;
 
@@ -121,6 +121,7 @@ export class LoginUserUseCaseImpl implements LoginUserUseCase {
 
   private async createSession(
     user: User,
+    command: LoginUserCommand,
   ): Promise<Result<Session, InfrastructureError>> {
     const issuedAt = new Date();
     const expiresAt = new Date(issuedAt.getTime() + SESSION_TTL_SECONDS * 1000);
@@ -130,6 +131,9 @@ export class LoginUserUseCaseImpl implements LoginUserUseCase {
       userId: user.id,
       role: user.role,
       businessId: user.businessId,
+      os: command.os,
+      browser: command.browser,
+      country: command.country,
       issuedAt,
       expiresAt,
     });

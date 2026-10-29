@@ -4,7 +4,6 @@ import {
   Get,
   HttpStatus,
   Param,
-  Post,
   Req,
   Res,
   UseGuards,
@@ -14,19 +13,19 @@ import type { Request, Response } from 'express';
 import {
   DeleteSessionResponse,
   GetSessionResponse,
-  RegisterSessionResponse,
+  GetSessionsByUserIdResponse,
   SESSION_ENDPOINTS,
+  SESSION_EXPIRED_MESSAGE,
 } from '@pikslots/shared';
 import { PikslotsBaseErrorResponse } from 'src/shared/types/base.error.response';
 import { PikslotsBaseResponse } from 'src/shared/types/base.response';
-import { SecurityContext } from 'src/shared/security/context/security.context';
 import { RolesGuard } from 'src/shared/security/guards/roles.guard';
 import { Roles } from 'src/shared/security/guards/roles.decorator';
 import {
   DeleteSessionDocs,
   GetCurrentSessionDocs,
   GetSessionDocs,
-  RegisterSessionDocs,
+  GetSessionsByUserIdDocs,
 } from './docs/session.controller.docs';
 import { SessionUsecasesFactory } from './factory/session.usecases.factory';
 import { mapSessionError } from './errors/session.error.map';
@@ -37,37 +36,7 @@ import { SessionResponseMapper } from './mappers/session.response.mapper';
 export class SessionController {
   constructor(
     private readonly sessionUsecasesFactory: SessionUsecasesFactory,
-    private readonly securityContext: SecurityContext,
   ) {}
-
-  @RegisterSessionDocs()
-  @UseGuards(RolesGuard)
-  @Roles('Platform Owner', 'Business Owner', 'Admin', 'Enhanced', 'Standard')
-  @Post(SESSION_ENDPOINTS.REGISTER)
-  async register(
-    @Res({ passthrough: true }) res: Response,
-  ): Promise<
-    PikslotsBaseErrorResponse | PikslotsBaseResponse<RegisterSessionResponse>
-  > {
-    const result =
-      await this.sessionUsecasesFactory.registerSessionUsecase.execute({
-        userId: this.securityContext.userId,
-        role: this.securityContext.role,
-        businessId: this.securityContext.businessId,
-      });
-
-    if (!result.ok) {
-      const errorResponse = mapSessionError(result.error);
-      res.status(errorResponse.statusCode);
-      return errorResponse;
-    }
-
-    res.status(HttpStatus.CREATED);
-    return new PikslotsBaseResponse<RegisterSessionResponse>(
-      SessionResponseMapper.toResponse(result.value),
-      HttpStatus.CREATED,
-    );
-  }
 
   @GetCurrentSessionDocs()
   @Get(SESSION_ENDPOINTS.ME)
@@ -83,7 +52,7 @@ export class SessionController {
     if (!sessionId) {
       res.status(HttpStatus.UNAUTHORIZED);
       return new PikslotsBaseErrorResponse(
-        'Missing session cookie',
+        SESSION_EXPIRED_MESSAGE,
         HttpStatus.UNAUTHORIZED,
       );
     }
@@ -92,6 +61,14 @@ export class SessionController {
       await this.sessionUsecasesFactory.getSessionUsecase.execute(sessionId);
 
     if (!result.ok) {
+      if (result.error.kind === 'session_not_found') {
+        res.status(HttpStatus.UNAUTHORIZED);
+        return new PikslotsBaseErrorResponse(
+          SESSION_EXPIRED_MESSAGE,
+          HttpStatus.UNAUTHORIZED,
+        );
+      }
+
       const errorResponse = mapSessionError(result.error);
       res.status(errorResponse.statusCode);
       return errorResponse;
@@ -126,6 +103,35 @@ export class SessionController {
     res.status(HttpStatus.OK);
     return new PikslotsBaseResponse<GetSessionResponse>(
       SessionResponseMapper.toResponse(result.value),
+      HttpStatus.OK,
+    );
+  }
+
+  @GetSessionsByUserIdDocs()
+  @UseGuards(RolesGuard)
+  @Roles('Platform Owner', 'Business Owner', 'Admin')
+  @Get(SESSION_ENDPOINTS.FIND_BY_USER)
+  async findByUserId(
+    @Res({ passthrough: true }) res: Response,
+    @Param('userId') userId: string,
+  ): Promise<
+    | PikslotsBaseErrorResponse
+    | PikslotsBaseResponse<GetSessionsByUserIdResponse>
+  > {
+    const result =
+      await this.sessionUsecasesFactory.getSessionsByUserIdUsecase.execute(
+        userId,
+      );
+
+    if (!result.ok) {
+      const errorResponse = mapSessionError(result.error);
+      res.status(errorResponse.statusCode);
+      return errorResponse;
+    }
+
+    res.status(HttpStatus.OK);
+    return new PikslotsBaseResponse<GetSessionsByUserIdResponse>(
+      result.value.map((session) => SessionResponseMapper.toResponse(session)),
       HttpStatus.OK,
     );
   }

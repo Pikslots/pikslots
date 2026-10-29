@@ -68,6 +68,28 @@ export class SessionRepositoryImpl implements SessionRepository {
     }
   }
 
+  async findAllByUserId(
+    userId: string,
+  ): Promise<Result<Session[], InfrastructureError>> {
+    try {
+      const rows = await this.db
+        .selectFrom('sessions')
+        .selectAll()
+        .where('user_id', '=', userId)
+        .orderBy('issued_at', 'desc')
+        .execute();
+
+      return ok(rows.map((row) => this.mapper.persistenceToDomain(row)));
+    } catch (cause) {
+      return err<InfrastructureError>({
+        kind: 'infrastructure',
+        message: 'Failed to get sessions by user id',
+        timestamp: new Date(),
+        cause,
+      });
+    }
+  }
+
   async delete(
     id: string,
   ): Promise<Result<void, SessionNotFound | InfrastructureError>> {

@@ -9,6 +9,9 @@ import type {
 export interface LoginUserCommand {
   usernameOrEmail: string;
   password: string;
+  country: string;
+  os: string;
+  browser: string;
 }
 
 export const ILoginUserUseCase = Symbol('ILoginUserUseCase');

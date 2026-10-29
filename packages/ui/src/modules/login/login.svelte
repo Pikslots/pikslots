@@ -23,6 +23,7 @@
 	import { superForm } from 'sveltekit-superforms';
 	import { zod4 as zod } from 'sveltekit-superforms/adapters';
 	import { LoginUserFormSchema } from './validations/schema';
+	import { getDeviceInfo } from './utils/device-info';
 
 	const loginMutation = createMutation<
 		LoginUserResponse,
@@ -40,9 +41,13 @@
 			resetForm: false,
 			onUpdate({ form }) {
 				if (form.valid) {
+					const { os, browser, country } = getDeviceInfo();
 					loginMutation.mutate({
 						usernameOrEmail: form.data.userNameOrEmail,
-						password: form.data.password
+						password: form.data.password,
+						os,
+						browser,
+						country
 					});
 				}
 			}
@@ -50,13 +55,15 @@
 	);
 
 	$effect(() => {
-		if (authStore.isAuthenticated) goto(resolve('/home'));
+		if (authStore.isAuthenticated) {
+			goto(resolve('/home'));
+			return;
+		}
 
 		if (loginMutation.data) {
 			getCurrentSession()
 				.then((session) => {
 					authStore.setSession(session);
-					goto(resolve('/home'));
 				})
 				.catch(() => {
 					toast.error('Something went wrong. Please try again.');

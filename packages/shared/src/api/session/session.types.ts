@@ -1,4 +1,5 @@
 import type { UserRole } from '../user';
+import type { SessionDeviceContext } from '../base.types';
 
 export interface SessionSecurityContext {
   userId: string;
@@ -6,20 +7,20 @@ export interface SessionSecurityContext {
   businessId: string | null;
 }
 
-// ______Requests____________________
-export interface RegisterSessionInput extends SessionSecurityContext {}
+export type { SessionDeviceContext };
 
 // --- Responses ---
 
-export interface SessionResponse extends SessionSecurityContext {
+export interface SessionResponse extends SessionSecurityContext, SessionDeviceContext {
   id: string;
   issuedAt: string;
   expiresAt: string;
+  isExpired: boolean;
 }
 
-export type RegisterSessionResponse = SessionResponse;
-
 export type GetSessionResponse = SessionResponse;
+
+export type GetSessionsByUserIdResponse = SessionResponse[];
 
 export interface DeleteSessionResponse {
   message: 'success';

@@ -1,12 +1,13 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { ISessionRepository } from '@pikslots/domain';
 import { SessionController } from './session.controller';
 import { SessionRepositoryImpl } from './repository/session.repository.impl';
 import { SessionUsecasesFactory } from './factory/session.usecases.factory';
 import { SESSION_USECASES } from './usecases';
+import { UserModule } from '../user/user.module';
 
 @Module({
-  imports: [],
+  imports: [forwardRef(() => UserModule)],
   controllers: [SessionController],
   providers: [
     SessionUsecasesFactory,

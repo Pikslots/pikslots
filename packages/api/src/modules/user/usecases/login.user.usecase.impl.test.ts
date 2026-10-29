@@ -58,6 +58,9 @@ describe('LoginUserUseCaseImpl', () => {
     const result = await useCase.execute({
       usernameOrEmail: 'admin_user_2',
       password: 'pw',
+      os: 'macOS',
+      browser: 'Chrome',
+      country: 'PK',
     });
 
     expect(result.ok).toBe(true);
@@ -72,6 +75,9 @@ describe('LoginUserUseCaseImpl', () => {
     const result = await useCase.execute({
       usernameOrEmail: 'admin_user_2',
       password: 'pw',
+      os: 'macOS',
+      browser: 'Chrome',
+      country: 'PK',
     });
 
     expect(result.ok).toBe(true);
@@ -89,6 +95,9 @@ describe('LoginUserUseCaseImpl', () => {
     const result = await useCase.execute({
       usernameOrEmail: 'admin_user',
       password: 'bad',
+      os: 'macOS',
+      browser: 'Chrome',
+      country: 'PK',
     });
 
     expect(result.ok).toBe(false);
@@ -105,6 +114,9 @@ describe('LoginUserUseCaseImpl', () => {
     const result = await useCase.execute({
       usernameOrEmail: 'no_access_user',
       password: 'pw',
+      os: 'macOS',
+      browser: 'Chrome',
+      country: 'PK',
     });
 
     expect(result.ok).toBe(false);
@@ -121,6 +133,9 @@ describe('LoginUserUseCaseImpl', () => {
     const result = await useCase.execute({
       usernameOrEmail: 'inactive_user',
       password: 'pw',
+      os: 'macOS',
+      browser: 'Chrome',
+      country: 'PK',
     });
 
     expect(result.ok).toBe(false);
@@ -136,6 +151,9 @@ describe('LoginUserUseCaseImpl', () => {
     const result = await useCase.execute({
       usernameOrEmail: 'suspended_user',
       password: 'pw',
+      os: 'macOS',
+      browser: 'Chrome',
+      country: 'PK',
     });
 
     expect(result.ok).toBe(false);
@@ -151,6 +169,9 @@ describe('LoginUserUseCaseImpl', () => {
     const result = await useCase.execute({
       usernameOrEmail: 'invited_user',
       password: 'pw',
+      os: 'macOS',
+      browser: 'Chrome',
+      country: 'PK',
     });
 
     expect(result.ok).toBe(false);

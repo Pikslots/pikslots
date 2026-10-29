@@ -10,6 +10,9 @@ interface SessionCacheRecord {
   id: string;
   userId: string;
   role: UserRole;
+  os: string;
+  browser: string;
+  country: string;
   businessId: string | null;
   issuedAt: string;
   expiresAt: string;
@@ -34,6 +37,9 @@ export class SessionCacheService {
           id: session.id,
           userId: session.userId,
           role: session.role,
+          os: session.os,
+          browser: session.browser,
+          country: session.country,
           businessId: session.businessId,
           issuedAt: session.issuedAt.toISOString(),
           expiresAt: session.expiresAt.toISOString(),
@@ -71,6 +77,9 @@ export class SessionCacheService {
         id: record.id,
         userId: record.userId,
         role: record.role,
+        os: record.os,
+        browser: record.browser,
+        country: record.country,
         businessId: record.businessId,
         issuedAt: new Date(record.issuedAt),
         expiresAt: new Date(record.expiresAt),

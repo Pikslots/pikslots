@@ -1,3 +1,5 @@
+import type { SessionDeviceContext } from '../base.types';
+
 export type UserRole =
   | 'Platform Owner'
   | 'Business Owner'
@@ -23,7 +25,7 @@ export interface InviteUserInput {
   businessName?: string;
 }
 
-export interface LoginUserInput {
+export interface LoginUserInput extends SessionDeviceContext {
   usernameOrEmail: string;
   password: string;
 }

@@ -7,9 +7,13 @@ export class SessionResponseMapper {
       id: session.id,
       userId: session.userId,
       role: session.role,
+      os: session.os,
+      browser: session.browser,
+      country: session.country,
       businessId: session.businessId,
       issuedAt: session.issuedAt.toISOString(),
       expiresAt: session.expiresAt.toISOString(),
+      isExpired: session.isExpired(),
     };
   }
 }

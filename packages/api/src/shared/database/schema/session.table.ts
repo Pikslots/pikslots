@@ -6,6 +6,9 @@ export interface SessionTable {
   user_id: string;
   business_id: string | null;
   role: UserRole;
+  os: string;
+  browser: string;
+  country: string;
   issued_at: Date;
   expires_at: Date;
 }
