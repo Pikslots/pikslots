@@ -18,7 +18,7 @@ describe(`PATCH ${BUSINESS_ENDPOINTS.UPDATE_GENERAL}`, () => {
   it('updates the general language setting and persists it for real', async () => {
     await request(ctx.app.getHttpServer())
       .patch(endpointFor(BUSINESS_ENDPOINTS.UPDATE_GENERAL, businessId))
-      .set(authHeader(tokenFor(ctx.jwtLoginService, 'Admin')))
+      .set(authHeader(await tokenFor(ctx.sessionCacheService, 'Admin')))
       .send({ language: 'fr' })
       .expect(200);
 

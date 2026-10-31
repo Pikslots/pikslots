@@ -106,7 +106,7 @@ export async function createCustomer(
 
   await request(ctx.app.getHttpServer())
     .post(CUSTOMER_ENDPOINTS.REGISTER)
-    .set(authHeader(tokenFor(ctx.jwtLoginService, role, businessId)))
+    .set(authHeader(await tokenFor(ctx.sessionCacheService, role, businessId)))
     .send(payload)
     .expect(201);
 
@@ -136,7 +136,7 @@ export async function getCustomerById(
 ): Promise<SupertestResponse> {
   return request(ctx.app.getHttpServer())
     .get(endpointFor(CUSTOMER_ENDPOINTS.FIND_BY_ID, { customerId }))
-    .set(authHeader(tokenFor(ctx.jwtLoginService, role, businessId)));
+    .set(authHeader(await tokenFor(ctx.sessionCacheService, role, businessId)));
 }
 
 export async function editCustomer(
@@ -150,7 +150,11 @@ export async function editCustomer(
   const payload = registerCustomerPayload(businessId, overrides);
   return request(ctx.app.getHttpServer())
     .patch(endpointFor(CUSTOMER_ENDPOINTS.EDIT, { customerId }))
-    .set(authHeader(tokenFor(ctx.jwtLoginService, role, actingBusinessId)))
+    .set(
+      authHeader(
+        await tokenFor(ctx.sessionCacheService, role, actingBusinessId),
+      ),
+    )
     .send(payload);
 }
 
@@ -162,7 +166,7 @@ export async function deleteCustomer(
 ): Promise<SupertestResponse> {
   return request(ctx.app.getHttpServer())
     .delete(endpointFor(CUSTOMER_ENDPOINTS.DELETE, { customerId }))
-    .set(authHeader(tokenFor(ctx.jwtLoginService, role, businessId)));
+    .set(authHeader(await tokenFor(ctx.sessionCacheService, role, businessId)));
 }
 
 export async function findAllCustomersByBusiness(
@@ -173,7 +177,11 @@ export async function findAllCustomersByBusiness(
 ): Promise<SupertestResponse> {
   return request(ctx.app.getHttpServer())
     .get(endpointFor(CUSTOMER_ENDPOINTS.FIND_ALL_BY_BUSINESS, { businessId }))
-    .set(authHeader(tokenFor(ctx.jwtLoginService, role, actingBusinessId)));
+    .set(
+      authHeader(
+        await tokenFor(ctx.sessionCacheService, role, actingBusinessId),
+      ),
+    );
 }
 
 export async function updateCustomerProfileImage(
@@ -185,7 +193,7 @@ export async function updateCustomerProfileImage(
 ): Promise<SupertestResponse> {
   return request(ctx.app.getHttpServer())
     .patch(endpointFor(CUSTOMER_ENDPOINTS.UPDATE_PROFILE_IMAGE, { customerId }))
-    .set(authHeader(tokenFor(ctx.jwtLoginService, role, businessId)))
+    .set(authHeader(await tokenFor(ctx.sessionCacheService, role, businessId)))
     .send({ profileImageKey });
 }
 

@@ -23,7 +23,7 @@ describe(`PATCH ${BUSINESS_ENDPOINTS.UPDATE_NOTIFICATION_CUSTOMIZATION}`, () => 
           businessId,
         ),
       )
-      .set(authHeader(tokenFor(ctx.jwtLoginService, 'Admin')))
+      .set(authHeader(await tokenFor(ctx.sessionCacheService, 'Admin')))
       .send({
         emailSenderName: 'E2E Sender',
         emailSignature: 'Thanks,\nE2E Team',

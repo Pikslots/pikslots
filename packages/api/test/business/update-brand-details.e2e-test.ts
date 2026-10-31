@@ -28,7 +28,9 @@ describe(`PATCH ${BUSINESS_ENDPOINTS.UPDATE_BRAND_DETAILS}`, () => {
 
     await request(ctx.app.getHttpServer())
       .patch(endpointFor(BUSINESS_ENDPOINTS.UPDATE_BRAND_DETAILS, business.id))
-      .set(authHeader(tokenFor(ctx.jwtLoginService, 'Business Owner')))
+      .set(
+        authHeader(await tokenFor(ctx.sessionCacheService, 'Business Owner')),
+      )
       .send(payload({ slug: newSlug }))
       .expect(200);
 
@@ -43,7 +45,9 @@ describe(`PATCH ${BUSINESS_ENDPOINTS.UPDATE_BRAND_DETAILS}`, () => {
 
     await request(ctx.app.getHttpServer())
       .patch(endpointFor(BUSINESS_ENDPOINTS.UPDATE_BRAND_DETAILS, business.id))
-      .set(authHeader(tokenFor(ctx.jwtLoginService, 'Business Owner')))
+      .set(
+        authHeader(await tokenFor(ctx.sessionCacheService, 'Business Owner')),
+      )
       .send(payload({ slug: takenSlug }))
       .expect(409);
   });
@@ -53,7 +57,9 @@ describe(`PATCH ${BUSINESS_ENDPOINTS.UPDATE_BRAND_DETAILS}`, () => {
 
     await request(ctx.app.getHttpServer())
       .patch(endpointFor(BUSINESS_ENDPOINTS.UPDATE_BRAND_DETAILS, business.id))
-      .set(authHeader(tokenFor(ctx.jwtLoginService, 'Business Owner')))
+      .set(
+        authHeader(await tokenFor(ctx.sessionCacheService, 'Business Owner')),
+      )
       .send(payload({ industry: 'not-a-real-industry' }))
       .expect(400);
   });

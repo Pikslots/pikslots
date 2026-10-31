@@ -5,7 +5,7 @@
 	import { authStore } from '$stores/auth.svelte.js';
 	import { QueryClient, QueryClientProvider } from '@tanstack/svelte-query';
 	import { Toaster } from 'svelte-sonner';
-	import { refreshUserToken } from '../modules/api/user/refresh.user.mutation';
+	import { getCurrentSession } from '../modules/api/session/get.current.session.query';
 	import { browser } from '$app/environment';
 
 	let { children } = $props();
@@ -26,8 +26,8 @@
 
 	$effect(() => {
 		themeStore.init();
-		refreshUserToken()
-			.then((res) => authStore.setAccessToken(res.accessToken))
+		getCurrentSession()
+			.then((session) => authStore.setSession(session))
 			.catch(() => {})
 			.finally(() => authStore.setInitialized());
 	});

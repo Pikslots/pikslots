@@ -29,7 +29,9 @@ describe(`PATCH ${SERVICE_ENDPOINTS.UPDATE}`, () => {
     const response = await request(ctx.app.getHttpServer())
       .patch(url)
       .set(
-        authHeader(tokenFor(ctx.jwtLoginService, 'Business Owner', businessId)),
+        authHeader(
+          await tokenFor(ctx.sessionCacheService, 'Business Owner', businessId),
+        ),
       )
       .send(payload)
       .expect(200);
@@ -56,7 +58,9 @@ describe(`PATCH ${SERVICE_ENDPOINTS.UPDATE}`, () => {
     await request(ctx.app.getHttpServer())
       .patch(url)
       .set(
-        authHeader(tokenFor(ctx.jwtLoginService, 'Business Owner', businessId)),
+        authHeader(
+          await tokenFor(ctx.sessionCacheService, 'Business Owner', businessId),
+        ),
       )
       .send(await editServicePayload(ctx, businessId))
       .expect(404);
@@ -82,7 +86,11 @@ describe(`PATCH ${SERVICE_ENDPOINTS.UPDATE}`, () => {
 
     await request(ctx.app.getHttpServer())
       .patch(url)
-      .set(authHeader(tokenFor(ctx.jwtLoginService, 'Enhanced', businessId)))
+      .set(
+        authHeader(
+          await tokenFor(ctx.sessionCacheService, 'Enhanced', businessId),
+        ),
+      )
       .send(await editServicePayload(ctx, businessId))
       .expect(403);
   });
@@ -98,7 +106,11 @@ describe(`PATCH ${SERVICE_ENDPOINTS.UPDATE}`, () => {
       .patch(url)
       .set(
         authHeader(
-          tokenFor(ctx.jwtLoginService, 'Business Owner', otherBusinessId),
+          await tokenFor(
+            ctx.sessionCacheService,
+            'Business Owner',
+            otherBusinessId,
+          ),
         ),
       )
       .send(await editServicePayload(ctx, ownBusinessId))
@@ -117,7 +129,9 @@ describe(`PATCH ${SERVICE_ENDPOINTS.UPDATE}`, () => {
     const response = await request(ctx.app.getHttpServer())
       .patch(url)
       .set(
-        authHeader(tokenFor(ctx.jwtLoginService, 'Business Owner', businessId)),
+        authHeader(
+          await tokenFor(ctx.sessionCacheService, 'Business Owner', businessId),
+        ),
       )
       .send(payload)
       .expect(400);
@@ -141,7 +155,9 @@ describe(`PATCH ${SERVICE_ENDPOINTS.UPDATE}`, () => {
     const response = await request(ctx.app.getHttpServer())
       .patch(url)
       .set(
-        authHeader(tokenFor(ctx.jwtLoginService, 'Business Owner', businessId)),
+        authHeader(
+          await tokenFor(ctx.sessionCacheService, 'Business Owner', businessId),
+        ),
       )
       .send({ title: 'missing required fields' })
       .expect(400);

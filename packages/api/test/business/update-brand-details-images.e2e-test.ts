@@ -34,7 +34,7 @@ describe(`PATCH ${BUSINESS_ENDPOINTS.UPDATE_BRAND_DETAILS_IMAGES}`, () => {
           business.id,
         ),
       )
-      .set(authHeader(tokenFor(ctx.jwtLoginService, 'Admin')))
+      .set(authHeader(await tokenFor(ctx.sessionCacheService, 'Admin')))
       .send({ bannerImageKey: oldBannerKey, brandLogoKey: oldLogoKey })
       .expect(200);
 
@@ -49,7 +49,7 @@ describe(`PATCH ${BUSINESS_ENDPOINTS.UPDATE_BRAND_DETAILS_IMAGES}`, () => {
           business.id,
         ),
       )
-      .set(authHeader(tokenFor(ctx.jwtLoginService, 'Admin')))
+      .set(authHeader(await tokenFor(ctx.sessionCacheService, 'Admin')))
       .send({ bannerImageKey: newBannerKey, brandLogoKey: oldLogoKey })
       .expect(200);
 

@@ -18,7 +18,7 @@ describe(`DELETE ${SERVICE_USER_ASSIGNMENT_ENDPOINTS.REMOVE_USER}`, () => {
     const { id: businessId } = await createBusiness(ctx);
     const { id: serviceId } = await registerService(ctx, businessId);
     const { id: userId } = await createStaffUser(ctx, businessId, 'Standard');
-    const token = tokenForRole(ctx, 'Admin', businessId);
+    const token = await tokenForRole(ctx, 'Admin', businessId);
     const assignment = await createAssignment(
       ctx,
       { serviceId, userId, businessId },
@@ -47,7 +47,7 @@ describe(`DELETE ${SERVICE_USER_ASSIGNMENT_ENDPOINTS.REMOVE_USER}`, () => {
       ctx,
       serviceId,
       userId,
-      tokenForRole(ctx, 'Admin', businessId),
+      await tokenForRole(ctx, 'Admin', businessId),
     );
 
     expect(response.status).toBe(404);
@@ -58,7 +58,7 @@ describe(`DELETE ${SERVICE_USER_ASSIGNMENT_ENDPOINTS.REMOVE_USER}`, () => {
     const { id: businessId } = await createBusiness(ctx);
     const { id: serviceId } = await registerService(ctx, businessId);
     const { id: userId } = await createStaffUser(ctx, businessId, 'Standard');
-    const token = tokenForRole(ctx, 'Admin', businessId);
+    const token = await tokenForRole(ctx, 'Admin', businessId);
 
     await createAssignment(ctx, { serviceId, userId, businessId }, token);
     await removeUserFromService(ctx, serviceId, userId, token).then((res) =>
@@ -78,14 +78,14 @@ describe(`DELETE ${SERVICE_USER_ASSIGNMENT_ENDPOINTS.REMOVE_USER}`, () => {
     await createAssignment(
       ctx,
       { serviceId, userId, businessId },
-      tokenForRole(ctx, 'Admin', businessId),
+      await tokenForRole(ctx, 'Admin', businessId),
     );
 
     const response = await removeUserFromService(
       ctx,
       serviceId,
       userId,
-      tokenForRole(ctx, 'Standard', businessId),
+      await tokenForRole(ctx, 'Standard', businessId),
     );
 
     expect(response.status).toBe(403);
@@ -109,14 +109,14 @@ describe(`DELETE ${SERVICE_USER_ASSIGNMENT_ENDPOINTS.REMOVE_USER}`, () => {
       await createAssignment(
         ctx,
         { serviceId: serviceIdInB, userId: userIdInB, businessId: businessB },
-        tokenForRole(ctx, 'Admin', businessB),
+        await tokenForRole(ctx, 'Admin', businessB),
       );
 
       const response = await removeUserFromService(
         ctx,
         serviceIdInB,
         userIdInB,
-        tokenForRole(ctx, 'Admin', businessA),
+        await tokenForRole(ctx, 'Admin', businessA),
       );
 
       expect(response.status).toBe(200);

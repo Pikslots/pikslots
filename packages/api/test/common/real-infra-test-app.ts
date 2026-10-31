@@ -19,6 +19,7 @@ import { PikslotsConfigModule } from '../../src/shared/config/pikslots.config.mo
 import { PIKSLOTS_DB } from '../../src/shared/database/pikslots.database.module';
 import type { PikSlotsDatabase } from '../../src/shared/database/schema';
 import { JwtLoginService } from '../../src/shared/security/jwt/jwt.login.service';
+import { SessionCacheService } from '../../src/shared/cache/session/session.cache.service';
 import { PikslotEmailService } from '../../src/shared/email/pikslot.email.service';
 import { validationExceptionFactory } from '../../src/shared/pipes/validation.exception.factory';
 import type { Env } from '../../src/shared/config/env';
@@ -28,6 +29,7 @@ export interface RealInfraTestApp {
   db: Kysely<PikSlotsDatabase>;
   configService: ConfigService<Env, true>;
   jwtLoginService: JwtLoginService;
+  sessionCacheService: SessionCacheService;
   /** Mocked PikslotEmailService.sendEmail — the real BullMQ worker still runs, but nothing hits SMTP/Mailpit. */
   sentEmails: jest.Mock;
 }
@@ -76,6 +78,7 @@ export async function createRealInfraTestApp(): Promise<RealInfraTestApp> {
     db: app.get<Kysely<PikSlotsDatabase>>(PIKSLOTS_DB),
     configService: app.get<ConfigService<Env, true>>(ConfigService),
     jwtLoginService: app.get(JwtLoginService),
+    sessionCacheService: app.get(SessionCacheService),
     sentEmails,
   };
 }

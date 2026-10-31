@@ -13,6 +13,7 @@
 	import loginImage from '$lib/assets/login-image.jpg';
 	import { createMutation } from '@tanstack/svelte-query';
 	import { loginUser } from '../api/user/login.user.mutation';
+	import { getCurrentSession } from '../api/session/get.current.session.query';
 	import type { BaseErrorResponse, LoginUserInput, LoginUserResponse } from '@pikslots/shared';
 	import type { AxiosError } from 'axios';
 	import { toast } from 'svelte-sonner';
@@ -22,6 +23,7 @@
 	import { superForm } from 'sveltekit-superforms';
 	import { zod4 as zod } from 'sveltekit-superforms/adapters';
 	import { LoginUserFormSchema } from './validations/schema';
+	import { getDeviceInfo } from './utils/device-info';
 
 	const loginMutation = createMutation<
 		LoginUserResponse,
@@ -39,9 +41,13 @@
 			resetForm: false,
 			onUpdate({ form }) {
 				if (form.valid) {
+					const { os, browser, country } = getDeviceInfo();
 					loginMutation.mutate({
 						usernameOrEmail: form.data.userNameOrEmail,
-						password: form.data.password
+						password: form.data.password,
+						os,
+						browser,
+						country
 					});
 				}
 			}
@@ -49,11 +55,19 @@
 	);
 
 	$effect(() => {
-		if (authStore.isAuthenticated) goto(resolve('/home'));
+		if (authStore.isAuthenticated) {
+			goto(resolve('/home'));
+			return;
+		}
 
 		if (loginMutation.data) {
-			authStore.setAccessToken(loginMutation.data.accessToken);
-			goto(resolve('/home'));
+			getCurrentSession()
+				.then((session) => {
+					authStore.setSession(session);
+				})
+				.catch(() => {
+					toast.error('Something went wrong. Please try again.');
+				});
 		}
 		if (loginMutation.isError) {
 			console.log(loginMutation.error.response?.data.message);

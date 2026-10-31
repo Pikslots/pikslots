@@ -23,7 +23,7 @@ describe(`PATCH ${BUSINESS_ENDPOINTS.UPDATE_BOOKING_CUSTOMIZATION}`, () => {
           businessId,
         ),
       )
-      .set(authHeader(tokenFor(ctx.jwtLoginService, 'Admin')))
+      .set(authHeader(await tokenFor(ctx.sessionCacheService, 'Admin')))
       .send({
         language: 'en',
         timeFormat: '24 hours',

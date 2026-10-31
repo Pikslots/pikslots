@@ -9,6 +9,9 @@ import type {
 export interface LoginUserCommand {
   usernameOrEmail: string;
   password: string;
+  country: string;
+  os: string;
+  browser: string;
 }
 
 export const ILoginUserUseCase = Symbol('ILoginUserUseCase');
@@ -18,7 +21,7 @@ export interface LoginUserUseCase {
     command: LoginUserCommand,
   ): Promise<
     Result<
-      { accessToken: string; refreshToken: string },
+      { sessionId: string },
       | UnauthorizedError
       | UserSuspendedError
       | UserInactiveError

@@ -27,7 +27,7 @@ describe(`GET ${SERVICE_USER_ASSIGNMENT_ENDPOINTS.FIND_BY_SERVICE}`, () => {
       associatedUsers: [memberId],
     });
     await waitForActiveAssignmentCountByService(ctx, serviceId, 1);
-    const token = tokenForRole(ctx, 'Admin', businessId);
+    const token = await tokenForRole(ctx, 'Admin', businessId);
     await createAssignment(ctx, { serviceId, userId, businessId }, token);
     await waitForActiveAssignmentCountByService(ctx, serviceId, 2);
 
@@ -61,7 +61,7 @@ describe(`GET ${SERVICE_USER_ASSIGNMENT_ENDPOINTS.FIND_BY_SERVICE}`, () => {
     const response = await findUsersByService(
       ctx,
       serviceId,
-      tokenForRole(ctx, 'Admin', businessId),
+      await tokenForRole(ctx, 'Admin', businessId),
     );
 
     expect(response.status).toBe(200);
@@ -77,7 +77,7 @@ describe(`GET ${SERVICE_USER_ASSIGNMENT_ENDPOINTS.FIND_BY_SERVICE}`, () => {
       associatedUsers: [userId],
     });
     await waitForActiveAssignmentCountByService(ctx, serviceId, 1);
-    const token = tokenForRole(ctx, 'Admin', businessId);
+    const token = await tokenForRole(ctx, 'Admin', businessId);
 
     await removeUserFromService(ctx, serviceId, userId, token).then((res) =>
       expect(res.status).toBe(200),
@@ -115,7 +115,7 @@ describe(`GET ${SERVICE_USER_ASSIGNMENT_ENDPOINTS.FIND_BY_SERVICE}`, () => {
     const response = await findUsersByService(
       ctx,
       serviceId,
-      tokenForRole(ctx, 'Admin', businessId),
+      await tokenForRole(ctx, 'Admin', businessId),
     );
 
     expect(response.status).toBe(200);
@@ -161,7 +161,7 @@ describe(`GET ${SERVICE_USER_ASSIGNMENT_ENDPOINTS.FIND_BY_SERVICE}`, () => {
       const response = await findUsersByService(
         ctx,
         serviceIdInB,
-        tokenForRole(ctx, 'Admin', businessA),
+        await tokenForRole(ctx, 'Admin', businessA),
       );
 
       expect(response.status).toBe(200);

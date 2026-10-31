@@ -27,8 +27,13 @@ describe(`GET ${BOOKING_ENDPOINTS.FIND_ALL_BY_BUSINESS_FOR_USER}`, () => {
     );
     const customerId = await createCustomerForBusiness(ctx, businessId);
     const serviceId = await createServiceForBusiness(ctx, businessId);
-    const token = tokenForRole(ctx, 'Standard', businessId, userId);
-    const otherToken = tokenForRole(ctx, 'Standard', businessId, otherUserId);
+    const token = await tokenForRole(ctx, 'Standard', businessId, userId);
+    const otherToken = await tokenForRole(
+      ctx,
+      'Standard',
+      businessId,
+      otherUserId,
+    );
 
     await createBooking(
       ctx,
@@ -83,7 +88,7 @@ describe(`GET ${BOOKING_ENDPOINTS.FIND_ALL_BY_BUSINESS_FOR_USER}`, () => {
         bookingStartTime: '2026-08-02T09:00:00.000Z',
         bookingEndTime: '2026-08-02T09:30:00.000Z',
       }),
-      tokenForRole(ctx, 'Standard', businessId, userId),
+      await tokenForRole(ctx, 'Standard', businessId, userId),
     );
     await createBooking(
       ctx,
@@ -92,14 +97,14 @@ describe(`GET ${BOOKING_ENDPOINTS.FIND_ALL_BY_BUSINESS_FOR_USER}`, () => {
         bookingStartTime: '2026-08-02T10:00:00.000Z',
         bookingEndTime: '2026-08-02T10:30:00.000Z',
       }),
-      tokenForRole(ctx, 'Standard', businessId, otherUserId),
+      await tokenForRole(ctx, 'Standard', businessId, otherUserId),
     );
 
     const response = await findAllBookingsByBusinessForUser(
       ctx,
       businessId,
       userId,
-      tokenForRole(ctx, 'Business Owner', businessId, owner.id),
+      await tokenForRole(ctx, 'Business Owner', businessId, owner.id),
       {
         startDateTime: '2026-08-01',
         endDateTime: '2026-08-31',
@@ -120,7 +125,7 @@ describe(`GET ${BOOKING_ENDPOINTS.FIND_ALL_BY_BUSINESS_FOR_USER}`, () => {
       ctx,
       businessId,
       userId,
-      tokenForRole(ctx, 'Standard', businessId, userId),
+      await tokenForRole(ctx, 'Standard', businessId, userId),
       {
         startDateTime: '2026-08-01',
         endDateTime: '2026-08-31',
@@ -141,7 +146,7 @@ describe(`GET ${BOOKING_ENDPOINTS.FIND_ALL_BY_BUSINESS_FOR_USER}`, () => {
       ctx,
       businessId,
       userId,
-      tokenForRole(ctx, 'Standard', businessId, otherUser.id),
+      await tokenForRole(ctx, 'Standard', businessId, otherUser.id),
       {
         startDateTime: '2026-08-01',
         endDateTime: '2026-08-31',
@@ -162,7 +167,7 @@ describe(`GET ${BOOKING_ENDPOINTS.FIND_ALL_BY_BUSINESS_FOR_USER}`, () => {
       ctx,
       businessId,
       userId,
-      tokenForRole(ctx, 'Admin', otherBusinessId, randomUUID()),
+      await tokenForRole(ctx, 'Admin', otherBusinessId, randomUUID()),
       {
         startDateTime: '2026-08-01',
         endDateTime: '2026-08-31',
@@ -189,7 +194,7 @@ describe(`GET ${BOOKING_ENDPOINTS.FIND_ALL_BY_BUSINESS_FOR_USER}`, () => {
       const { id: userId } = await createStaffUser(ctx, businessId, 'Standard');
       const customerId = await createCustomerForBusiness(ctx, businessId);
       const serviceId = await createServiceForBusiness(ctx, businessId);
-      const token = tokenForRole(ctx, 'Standard', businessId, userId);
+      const token = await tokenForRole(ctx, 'Standard', businessId, userId);
 
       await createBooking(
         ctx,

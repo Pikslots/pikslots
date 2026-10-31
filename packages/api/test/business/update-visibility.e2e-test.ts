@@ -19,7 +19,9 @@ describe(`PATCH ${BUSINESS_ENDPOINTS.UPDATE_VISIBILITY}`, () => {
   it('updates visibility for an authorized role', async () => {
     await request(ctx.app.getHttpServer())
       .patch(endpointFor(BUSINESS_ENDPOINTS.UPDATE_VISIBILITY, businessId))
-      .set(authHeader(tokenFor(ctx.jwtLoginService, 'Business Owner')))
+      .set(
+        authHeader(await tokenFor(ctx.sessionCacheService, 'Business Owner')),
+      )
       .send({ appearInSearchResults: true })
       .expect(200);
 
@@ -34,7 +36,7 @@ describe(`PATCH ${BUSINESS_ENDPOINTS.UPDATE_VISIBILITY}`, () => {
   it('returns 404 for an unknown business', async () => {
     await request(ctx.app.getHttpServer())
       .patch(endpointFor(BUSINESS_ENDPOINTS.UPDATE_VISIBILITY, randomUUID()))
-      .set(authHeader(tokenFor(ctx.jwtLoginService, 'Admin')))
+      .set(authHeader(await tokenFor(ctx.sessionCacheService, 'Admin')))
       .send({ appearInSearchResults: true })
       .expect(404);
   });
@@ -42,7 +44,7 @@ describe(`PATCH ${BUSINESS_ENDPOINTS.UPDATE_VISIBILITY}`, () => {
   it('returns 400 when the payload fails validation', async () => {
     await request(ctx.app.getHttpServer())
       .patch(endpointFor(BUSINESS_ENDPOINTS.UPDATE_VISIBILITY, businessId))
-      .set(authHeader(tokenFor(ctx.jwtLoginService, 'Admin')))
+      .set(authHeader(await tokenFor(ctx.sessionCacheService, 'Admin')))
       .send({ appearInSearchResults: 'not-a-boolean' })
       .expect(400);
   });
@@ -50,7 +52,7 @@ describe(`PATCH ${BUSINESS_ENDPOINTS.UPDATE_VISIBILITY}`, () => {
   it('returns 403 for a role outside the allowed list', async () => {
     await request(ctx.app.getHttpServer())
       .patch(endpointFor(BUSINESS_ENDPOINTS.UPDATE_VISIBILITY, businessId))
-      .set(authHeader(tokenFor(ctx.jwtLoginService, 'Standard')))
+      .set(authHeader(await tokenFor(ctx.sessionCacheService, 'Standard')))
       .send({ appearInSearchResults: true })
       .expect(403);
   });

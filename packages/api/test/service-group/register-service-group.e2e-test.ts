@@ -47,7 +47,7 @@ describe(`POST ${SERVICE_GROUP_ENDPOINTS.REGISTER}`, () => {
 
     const response = await request(ctx.app.getHttpServer())
       .post(SERVICE_GROUP_ENDPOINTS.REGISTER)
-      .set(authHeader(tokenForRole(ctx, 'Admin', businessId)))
+      .set(authHeader(await tokenForRole(ctx, 'Admin', businessId)))
       .send({ name, businessId, associatedServices: [] })
       .expect(409);
 
@@ -61,7 +61,7 @@ describe(`POST ${SERVICE_GROUP_ENDPOINTS.REGISTER}`, () => {
 
     await request(ctx.app.getHttpServer())
       .post(SERVICE_GROUP_ENDPOINTS.REGISTER)
-      .set(authHeader(tokenForRole(ctx, 'Admin', businessIdB)))
+      .set(authHeader(await tokenForRole(ctx, 'Admin', businessIdB)))
       .send({ name, businessId: businessIdB, associatedServices: [] })
       .expect(201);
   });
@@ -71,7 +71,7 @@ describe(`POST ${SERVICE_GROUP_ENDPOINTS.REGISTER}`, () => {
 
     const response = await request(ctx.app.getHttpServer())
       .post(SERVICE_GROUP_ENDPOINTS.REGISTER)
-      .set(authHeader(tokenForRole(ctx, 'Admin', businessId)))
+      .set(authHeader(await tokenForRole(ctx, 'Admin', businessId)))
       .send({
         name: 'Invalid Group',
         businessId,
@@ -87,7 +87,7 @@ describe(`POST ${SERVICE_GROUP_ENDPOINTS.REGISTER}`, () => {
 
     const response = await request(ctx.app.getHttpServer())
       .post(SERVICE_GROUP_ENDPOINTS.REGISTER)
-      .set(authHeader(tokenForRole(ctx, 'Standard', businessId)))
+      .set(authHeader(await tokenForRole(ctx, 'Standard', businessId)))
       .send({ name: 'Nope', businessId, associatedServices: [] })
       .expect(403);
 

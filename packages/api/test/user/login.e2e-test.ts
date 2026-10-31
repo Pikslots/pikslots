@@ -12,7 +12,7 @@ import {
 describe(`POST ${USER_ENDPOINTS.LOGIN}`, () => {
   const ctx = setupUserTestContext();
 
-  it('logs in with a valid username and password, returning an access token and setting a refresh cookie', async () => {
+  it('logs in with a valid username and password, setting a session cookie', async () => {
     const { id: businessId } = await createBusiness(ctx);
     const { username } = await createStaffUser(ctx, businessId, 'Admin', {
       password: 'CorrectHorse123!',
@@ -21,8 +21,8 @@ describe(`POST ${USER_ENDPOINTS.LOGIN}`, () => {
     const response = await login(ctx, username, 'CorrectHorse123!');
 
     expect(response.status).toBe(200);
-    expect(successBody<{ accessToken: string }>(response).data).toHaveProperty(
-      'accessToken',
+    expect(successBody<{ message: string }>(response).data.message).toBe(
+      'success',
     );
 
     const setCookie = response.headers['set-cookie'] as unknown as string[];

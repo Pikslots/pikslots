@@ -21,7 +21,7 @@ describe(`POST ${BREAK_ENDPOINTS.CREATE}`, () => {
 
     const response = await request(ctx.app.getHttpServer())
       .post(BREAK_ENDPOINTS.CREATE)
-      .set(authHeader(tokenForRole(ctx, 'Standard', businessId, userId)))
+      .set(authHeader(await tokenForRole(ctx, 'Standard', businessId, userId)))
       .send(payload)
       .expect(201);
 
@@ -47,7 +47,7 @@ describe(`POST ${BREAK_ENDPOINTS.CREATE}`, () => {
 
     await request(ctx.app.getHttpServer())
       .post(BREAK_ENDPOINTS.CREATE)
-      .set(authHeader(tokenForRole(ctx, 'Admin', businessId)))
+      .set(authHeader(await tokenForRole(ctx, 'Admin', businessId)))
       .send(payload)
       .expect(201);
   });
@@ -59,7 +59,7 @@ describe(`POST ${BREAK_ENDPOINTS.CREATE}`, () => {
 
     const response = await request(ctx.app.getHttpServer())
       .post(BREAK_ENDPOINTS.CREATE)
-      .set(authHeader(tokenForRole(ctx, 'Standard', businessId)))
+      .set(authHeader(await tokenForRole(ctx, 'Standard', businessId)))
       .send(payload)
       .expect(401);
 
@@ -74,7 +74,7 @@ describe(`POST ${BREAK_ENDPOINTS.CREATE}`, () => {
 
     const response = await request(ctx.app.getHttpServer())
       .post(BREAK_ENDPOINTS.CREATE)
-      .set(authHeader(tokenForRole(ctx, 'Admin', otherBusinessId)))
+      .set(authHeader(await tokenForRole(ctx, 'Admin', otherBusinessId)))
       .send(payload)
       .expect(401);
 
@@ -84,7 +84,7 @@ describe(`POST ${BREAK_ENDPOINTS.CREATE}`, () => {
   it('returns 409 when the new break overlaps an existing one for the same user/day', async () => {
     const { id: businessId } = await createBusiness(ctx);
     const userId = await createUser(ctx, businessId, 'Standard');
-    const token = tokenForRole(ctx, 'Standard', businessId, userId);
+    const token = await tokenForRole(ctx, 'Standard', businessId, userId);
 
     await request(ctx.app.getHttpServer())
       .post(BREAK_ENDPOINTS.CREATE)
@@ -118,7 +118,7 @@ describe(`POST ${BREAK_ENDPOINTS.CREATE}`, () => {
   it('allows a break on the same day that does not overlap', async () => {
     const { id: businessId } = await createBusiness(ctx);
     const userId = await createUser(ctx, businessId, 'Standard');
-    const token = tokenForRole(ctx, 'Standard', businessId, userId);
+    const token = await tokenForRole(ctx, 'Standard', businessId, userId);
 
     await request(ctx.app.getHttpServer())
       .post(BREAK_ENDPOINTS.CREATE)
@@ -153,7 +153,7 @@ describe(`POST ${BREAK_ENDPOINTS.CREATE}`, () => {
 
     const response = await request(ctx.app.getHttpServer())
       .post(BREAK_ENDPOINTS.CREATE)
-      .set(authHeader(tokenForRole(ctx, 'Standard', businessId, userId)))
+      .set(authHeader(await tokenForRole(ctx, 'Standard', businessId, userId)))
       .send({
         day: 'monday',
         startTime: '9am',

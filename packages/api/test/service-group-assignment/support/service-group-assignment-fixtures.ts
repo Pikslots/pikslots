@@ -137,7 +137,9 @@ export async function registerService(
 
   await request(ctx.app.getHttpServer())
     .post(SERVICE_ENDPOINTS.REGISTER)
-    .set(authHeader(tokenFor(ctx.jwtLoginService, 'Admin', businessId)))
+    .set(
+      authHeader(await tokenFor(ctx.sessionCacheService, 'Admin', businessId)),
+    )
     .send({
       title,
       description: 'An e2e test service',
@@ -177,7 +179,9 @@ export async function editService(
 ): Promise<void> {
   await request(ctx.app.getHttpServer())
     .patch(endpointForParams(SERVICE_ENDPOINTS.UPDATE, { serviceId }))
-    .set(authHeader(tokenFor(ctx.jwtLoginService, 'Admin', businessId)))
+    .set(
+      authHeader(await tokenFor(ctx.sessionCacheService, 'Admin', businessId)),
+    )
     .send({
       title: overrides.title,
       description: 'An e2e test service',
@@ -211,7 +215,9 @@ export async function registerServiceGroup(
 
   await request(ctx.app.getHttpServer())
     .post(SERVICE_GROUP_ENDPOINTS.REGISTER)
-    .set(authHeader(tokenFor(ctx.jwtLoginService, 'Admin', businessId)))
+    .set(
+      authHeader(await tokenFor(ctx.sessionCacheService, 'Admin', businessId)),
+    )
     .send({
       name,
       businessId,
@@ -247,7 +253,9 @@ export async function editServiceGroup(
         serviceGroupId,
       }),
     )
-    .set(authHeader(tokenFor(ctx.jwtLoginService, 'Admin', businessId)))
+    .set(
+      authHeader(await tokenFor(ctx.sessionCacheService, 'Admin', businessId)),
+    )
     .send({
       name: overrides.name,
       businessId,
@@ -296,10 +304,10 @@ export async function waitForActiveAssignmentCountByGroup(
   });
 }
 
-export function tokenForRole(
+export async function tokenForRole(
   ctx: ServiceGroupAssignmentTestContext,
   role: UserRole,
   businessId: string | null = null,
-): string {
-  return tokenFor(ctx.jwtLoginService, role, businessId);
+): Promise<string> {
+  return tokenFor(ctx.sessionCacheService, role, businessId);
 }

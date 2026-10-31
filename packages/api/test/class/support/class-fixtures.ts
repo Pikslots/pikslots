@@ -71,7 +71,11 @@ export async function createClass(
 
   await request(ctx.app.getHttpServer())
     .post(CLASS_ENDPOINTS.REGISTER)
-    .set(authHeader(tokenFor(ctx.jwtLoginService, role, actingBusinessId)))
+    .set(
+      authHeader(
+        await tokenFor(ctx.sessionCacheService, role, actingBusinessId),
+      ),
+    )
     .send(payload)
     .expect(201);
 
@@ -98,7 +102,11 @@ export async function editClass(
   const payload = registerClassPayload(businessId, overrides);
   return request(ctx.app.getHttpServer())
     .patch(endpointFor(CLASS_ENDPOINTS.UPDATE, { classId }))
-    .set(authHeader(tokenFor(ctx.jwtLoginService, role, actingBusinessId)))
+    .set(
+      authHeader(
+        await tokenFor(ctx.sessionCacheService, role, actingBusinessId),
+      ),
+    )
     .send(payload);
 }
 
@@ -110,7 +118,11 @@ export async function deleteClass(
 ): Promise<SupertestResponse> {
   return request(ctx.app.getHttpServer())
     .delete(endpointFor(CLASS_ENDPOINTS.DELETE, { classId }))
-    .set(authHeader(tokenFor(ctx.jwtLoginService, role, actingBusinessId)));
+    .set(
+      authHeader(
+        await tokenFor(ctx.sessionCacheService, role, actingBusinessId),
+      ),
+    );
 }
 
 export async function findAllClassesByBusiness(
@@ -121,7 +133,11 @@ export async function findAllClassesByBusiness(
 ): Promise<SupertestResponse> {
   return request(ctx.app.getHttpServer())
     .get(endpointFor(CLASS_ENDPOINTS.FIND_ALL_BY_BUSINESS, { businessId }))
-    .set(authHeader(tokenFor(ctx.jwtLoginService, role, actingBusinessId)));
+    .set(
+      authHeader(
+        await tokenFor(ctx.sessionCacheService, role, actingBusinessId),
+      ),
+    );
 }
 
 export { successBody, errorBody };

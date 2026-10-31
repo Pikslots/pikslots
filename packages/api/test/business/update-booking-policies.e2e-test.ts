@@ -20,7 +20,7 @@ describe(`PATCH ${BUSINESS_ENDPOINTS.UPDATE_BOOKING_POLICIES}`, () => {
       .patch(
         endpointFor(BUSINESS_ENDPOINTS.UPDATE_BOOKING_POLICIES, businessId),
       )
-      .set(authHeader(tokenFor(ctx.jwtLoginService, 'Admin')))
+      .set(authHeader(await tokenFor(ctx.sessionCacheService, 'Admin')))
       .send({
         leadTime: { unit: 'hours', value: 2 },
         scheduleWindow: { unit: 'days', value: 14 },

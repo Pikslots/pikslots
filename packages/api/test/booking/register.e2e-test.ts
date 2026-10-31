@@ -33,7 +33,7 @@ describe(`POST ${BOOKING_ENDPOINTS.REGISTER}`, () => {
       const response = await registerBooking(
         ctx,
         payload,
-        tokenForRole(ctx, 'Standard', businessId, userId),
+        await tokenForRole(ctx, 'Standard', businessId, userId),
       );
 
       expect(response.status).toBe(201);
@@ -73,7 +73,7 @@ describe(`POST ${BOOKING_ENDPOINTS.REGISTER}`, () => {
       await registerBooking(
         ctx,
         payload,
-        tokenForRole(ctx, 'Standard', businessId, userId),
+        await tokenForRole(ctx, 'Standard', businessId, userId),
       ).then((res) => expect(res.status).toBe(201));
 
       const row = await ctx.db
@@ -97,7 +97,7 @@ describe(`POST ${BOOKING_ENDPOINTS.REGISTER}`, () => {
       const { id: userId } = await createStaffUser(ctx, businessId, 'Standard');
       const customerId = await createCustomerForBusiness(ctx, businessId);
       const serviceId = await createServiceForBusiness(ctx, businessId);
-      const token = tokenForRole(ctx, 'Standard', businessId, userId);
+      const token = await tokenForRole(ctx, 'Standard', businessId, userId);
 
       await createBooking(
         ctx,
@@ -137,7 +137,7 @@ describe(`POST ${BOOKING_ENDPOINTS.REGISTER}`, () => {
           bookingStartTime: '2026-07-02T09:00:00.000Z',
           bookingEndTime: '2026-07-02T09:30:00.000Z',
         }),
-        tokenForRole(ctx, 'Standard', businessId1, user1.id),
+        await tokenForRole(ctx, 'Standard', businessId1, user1.id),
       );
 
       const response = await registerBooking(
@@ -146,7 +146,7 @@ describe(`POST ${BOOKING_ENDPOINTS.REGISTER}`, () => {
           bookingStartTime: '2026-07-02T09:00:00.000Z',
           bookingEndTime: '2026-07-02T09:30:00.000Z',
         }),
-        tokenForRole(ctx, 'Standard', businessId2, user2.id),
+        await tokenForRole(ctx, 'Standard', businessId2, user2.id),
       );
 
       expect(response.status).toBe(201);
@@ -164,7 +164,7 @@ describe(`POST ${BOOKING_ENDPOINTS.REGISTER}`, () => {
       const response = await registerBooking(
         ctx,
         registerBookingPayload(businessId, serviceId, standard.id, customerId),
-        tokenForRole(ctx, 'Business Owner', businessId, owner.id),
+        await tokenForRole(ctx, 'Business Owner', businessId, owner.id),
       );
 
       expect(response.status).toBe(201);
@@ -180,7 +180,12 @@ describe(`POST ${BOOKING_ENDPOINTS.REGISTER}`, () => {
       const response = await registerBooking(
         ctx,
         registerBookingPayload(businessId, serviceId, standard.id, customerId),
-        tokenForRole(ctx, 'Business Owner', otherBusinessId, randomUUID()),
+        await tokenForRole(
+          ctx,
+          'Business Owner',
+          otherBusinessId,
+          randomUUID(),
+        ),
       );
 
       expect(response.status).toBe(401);
@@ -202,7 +207,7 @@ describe(`POST ${BOOKING_ENDPOINTS.REGISTER}`, () => {
           otherStandard.id,
           customerId,
         ),
-        tokenForRole(ctx, 'Standard', businessId, standard.id),
+        await tokenForRole(ctx, 'Standard', businessId, standard.id),
       );
 
       expect(response.status).toBe(401);
@@ -219,7 +224,7 @@ describe(`POST ${BOOKING_ENDPOINTS.REGISTER}`, () => {
       const response = await registerBooking(
         ctx,
         registerBookingPayload(businessId, serviceId, standard.id, customerId),
-        tokenForRole(ctx, 'Standard', otherBusinessId, standard.id),
+        await tokenForRole(ctx, 'Standard', otherBusinessId, standard.id),
       );
 
       expect(response.status).toBe(401);
@@ -242,7 +247,7 @@ describe(`POST ${BOOKING_ENDPOINTS.REGISTER}`, () => {
       const response = await registerBooking(
         ctx,
         payload,
-        tokenForRole(ctx, 'Standard', businessId, userId),
+        await tokenForRole(ctx, 'Standard', businessId, userId),
       );
 
       expect(response.status).toBe(400);
@@ -266,7 +271,7 @@ describe(`POST ${BOOKING_ENDPOINTS.REGISTER}`, () => {
       const response = await registerBooking(
         ctx,
         payload,
-        tokenForRole(ctx, 'Business Owner', businessId, owner.id),
+        await tokenForRole(ctx, 'Business Owner', businessId, owner.id),
       );
       expect(response.status).toBe(201);
 

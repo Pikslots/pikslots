@@ -41,6 +41,7 @@
     "lint": "bunx nx run-many -t lint",
     "test": "bunx nx run-many -t test --no-tui",
     "test-e2e": "bunx nx run-many -t test-e2e --no-tui",
+    "all": "bun run format && bun run lint && bun run test && bun run test-e2e",
     "prepare": "husky || true",
     "docker:up": "docker compose --env-file .env -f docker/postgres.yml -f docker/redis.yml -f docker/mailpit.yml up -d",
     "docker:down": "docker compose --env-file .env -f docker/postgres.yml -f docker/redis.yml -f docker/mailpit.yml down ",

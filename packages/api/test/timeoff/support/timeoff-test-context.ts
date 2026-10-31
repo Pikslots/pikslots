@@ -5,6 +5,7 @@ import type { S3Client } from '@aws-sdk/client-s3';
 
 import type { PikSlotsDatabase } from '../../../src/shared/database/schema';
 import type { JwtLoginService } from '../../../src/shared/security/jwt/jwt.login.service';
+import type { SessionCacheService } from '../../../src/shared/cache/session/session.cache.service';
 import {
   createRealInfraTestApp,
   closeRealInfraTestApp,
@@ -18,6 +19,7 @@ export interface TimeoffTestContext {
   app: INestApplication<App>;
   db: Kysely<PikSlotsDatabase>;
   jwtLoginService: JwtLoginService;
+  sessionCacheService: SessionCacheService;
   sentEmails: jest.Mock;
   /**
    * s3Client/s3Bucket/createdS3Keys exist purely so this context is
@@ -58,6 +60,7 @@ export function setupTimeoffTestContext(): TimeoffTestContext {
     ctx.app = infra.app;
     ctx.db = infra.db;
     ctx.jwtLoginService = infra.jwtLoginService;
+    ctx.sessionCacheService = infra.sessionCacheService;
     ctx.sentEmails = infra.sentEmails;
 
     const { client, bucket } = createTestS3Client(infra.configService);

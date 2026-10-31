@@ -175,11 +175,11 @@ export function findAllByUserPath(userId: string, businessId: string): string {
   });
 }
 
-export function tokenForRole(
+export async function tokenForRole(
   ctx: BreakTestContext,
   role: UserRole,
   businessId: string | null = null,
   userId?: string,
-): string {
-  return tokenFor(ctx.jwtLoginService, role, businessId, userId);
+): Promise<string> {
+  return tokenFor(ctx.sessionCacheService, role, businessId, userId);
 }

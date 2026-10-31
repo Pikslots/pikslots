@@ -20,6 +20,7 @@
 	import BreaksTab from './tabs/breaks.svelte';
 	import TimeOffTab from './tabs/timeoff.svelte';
 	import UpdatesTab from './tabs/updates.svelte';
+	import SessionsTab from './tabs/sessions.svelte';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
@@ -219,6 +220,12 @@
 					>
 						Updates
 					</Tabs.Trigger>
+					<Tabs.Trigger
+						value="sessions"
+						class="cursor-pointer rounded-none border-b-2 border-transparent px-3 pt-0 pb-2 text-muted-foreground"
+					>
+						Sessions
+					</Tabs.Trigger>
 				</Tabs.List>
 
 				<Tabs.Content value="about" class="mt-0">
@@ -251,6 +258,10 @@
 
 				<Tabs.Content value="updates" class="mt-0">
 					<UpdatesTab />
+				</Tabs.Content>
+
+				<Tabs.Content value="sessions" class="mt-0">
+					<SessionsTab userId={selected.id} />
 				</Tabs.Content>
 			</Tabs.Root>
 		{:else}

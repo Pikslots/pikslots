@@ -4,6 +4,7 @@ import type { Kysely } from 'kysely';
 
 import type { PikSlotsDatabase } from '../../../src/shared/database/schema';
 import type { JwtLoginService } from '../../../src/shared/security/jwt/jwt.login.service';
+import type { SessionCacheService } from '../../../src/shared/cache/session/session.cache.service';
 import { PasswordHashingService } from '../../../src/shared/security/hashing/password.hashing.service';
 import {
   createRealInfraTestApp,
@@ -14,6 +15,7 @@ export interface UserTestContext {
   app: INestApplication<App>;
   db: Kysely<PikSlotsDatabase>;
   jwtLoginService: JwtLoginService;
+  sessionCacheService: SessionCacheService;
   passwordHashingService: PasswordHashingService;
   sentEmails: jest.Mock;
   /**
@@ -47,6 +49,7 @@ export function setupUserTestContext(): UserTestContext {
     ctx.app = infra.app;
     ctx.db = infra.db;
     ctx.jwtLoginService = infra.jwtLoginService;
+    ctx.sessionCacheService = infra.sessionCacheService;
     ctx.sentEmails = infra.sentEmails;
     ctx.passwordHashingService = ctx.app.get(PasswordHashingService);
   });

@@ -20,7 +20,7 @@ describe(`GET ${BREAK_ENDPOINTS.FIND_ALL_BY_USER}`, () => {
   it("returns all active breaks for the caller's own user id", async () => {
     const { id: businessId } = await createBusiness(ctx);
     const userId = await createUser(ctx, businessId, 'Standard');
-    const token = tokenForRole(ctx, 'Standard', businessId, userId);
+    const token = await tokenForRole(ctx, 'Standard', businessId, userId);
 
     await createBreak(
       ctx,
@@ -59,7 +59,7 @@ describe(`GET ${BREAK_ENDPOINTS.FIND_ALL_BY_USER}`, () => {
 
     const response = await request(ctx.app.getHttpServer())
       .get(findAllByUserPath(userId, businessId))
-      .set(authHeader(tokenForRole(ctx, 'Standard', businessId, userId)))
+      .set(authHeader(await tokenForRole(ctx, 'Standard', businessId, userId)))
       .expect(200);
 
     expect(successBody(response).data).toEqual([]);
@@ -71,12 +71,12 @@ describe(`GET ${BREAK_ENDPOINTS.FIND_ALL_BY_USER}`, () => {
     await createBreak(
       ctx,
       breakPayload({ userId, businessId }),
-      tokenForRole(ctx, 'Standard', businessId, userId),
+      await tokenForRole(ctx, 'Standard', businessId, userId),
     );
 
     const response = await request(ctx.app.getHttpServer())
       .get(findAllByUserPath(userId, businessId))
-      .set(authHeader(tokenForRole(ctx, 'Admin', businessId)))
+      .set(authHeader(await tokenForRole(ctx, 'Admin', businessId)))
       .expect(200);
 
     expect(successBody(response).data).toHaveLength(1);
@@ -89,7 +89,11 @@ describe(`GET ${BREAK_ENDPOINTS.FIND_ALL_BY_USER}`, () => {
 
     const response = await request(ctx.app.getHttpServer())
       .get(findAllByUserPath(userId, businessId))
-      .set(authHeader(tokenForRole(ctx, 'Standard', businessId, otherUserId)))
+      .set(
+        authHeader(
+          await tokenForRole(ctx, 'Standard', businessId, otherUserId),
+        ),
+      )
       .expect(401);
 
     expect(errorBody(response).statusCode).toBe(401);
@@ -103,7 +107,9 @@ describe(`GET ${BREAK_ENDPOINTS.FIND_ALL_BY_USER}`, () => {
     const response = await request(ctx.app.getHttpServer())
       .get(findAllByUserPath(userId, businessId))
       .set(
-        authHeader(tokenForRole(ctx, 'Admin', otherBusinessId, randomUUID())),
+        authHeader(
+          await tokenForRole(ctx, 'Admin', otherBusinessId, randomUUID()),
+        ),
       )
       .expect(401);
 

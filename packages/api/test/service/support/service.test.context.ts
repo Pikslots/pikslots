@@ -3,6 +3,7 @@ import { INestApplication } from '@nestjs/common';
 import { Kysely } from 'kysely';
 import { PikSlotsDatabase } from 'src/shared/database/schema';
 import { JwtLoginService } from 'src/shared/security/jwt/jwt.login.service';
+import { SessionCacheService } from 'src/shared/cache/session/session.cache.service';
 import { App } from 'supertest/types';
 import {
   closeRealInfraTestApp,
@@ -17,6 +18,7 @@ export interface ServiceTestContext {
   app: INestApplication<App>;
   db: Kysely<PikSlotsDatabase>;
   jwtLoginService: JwtLoginService;
+  sessionCacheService: SessionCacheService;
   s3Client: S3Client;
   s3Bucket: string;
   // every user/business/service/s3 key created by test must be pushed here so afterall we can delete it for real
@@ -41,6 +43,7 @@ export function setupServiceTestContext(): ServiceTestContext {
     ctx.app = infra.app;
     ctx.db = infra.db;
     ctx.jwtLoginService = infra.jwtLoginService;
+    ctx.sessionCacheService = infra.sessionCacheService;
 
     const { client, bucket } = createTestS3Client(infra.configService);
     ctx.s3Client = client;

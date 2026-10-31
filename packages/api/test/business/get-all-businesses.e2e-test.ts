@@ -14,7 +14,9 @@ describe(`GET ${BUSINESS_ENDPOINTS.GET_ALL}`, () => {
 
     const response = await request(ctx.app.getHttpServer())
       .get(BUSINESS_ENDPOINTS.GET_ALL)
-      .set(authHeader(tokenFor(ctx.jwtLoginService, 'Platform Owner')))
+      .set(
+        authHeader(await tokenFor(ctx.sessionCacheService, 'Platform Owner')),
+      )
       .expect(200);
 
     const ids = successBody<Array<{ id: string }>>(response).data.map(
@@ -26,7 +28,9 @@ describe(`GET ${BUSINESS_ENDPOINTS.GET_ALL}`, () => {
   it('returns 403 for a role other than Platform Owner', async () => {
     await request(ctx.app.getHttpServer())
       .get(BUSINESS_ENDPOINTS.GET_ALL)
-      .set(authHeader(tokenFor(ctx.jwtLoginService, 'Business Owner')))
+      .set(
+        authHeader(await tokenFor(ctx.sessionCacheService, 'Business Owner')),
+      )
       .expect(403);
   });
 });

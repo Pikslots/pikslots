@@ -23,7 +23,7 @@ describe(`PATCH ${BUSINESS_ENDPOINTS.UPDATE_CUSTOMER_NOTIFICATIONS}`, () => {
           businessId,
         ),
       )
-      .set(authHeader(tokenFor(ctx.jwtLoginService, 'Admin')))
+      .set(authHeader(await tokenFor(ctx.sessionCacheService, 'Admin')))
       .send({
         notifyBookingConfirmation: false,
         notifyBookingChanges: true,

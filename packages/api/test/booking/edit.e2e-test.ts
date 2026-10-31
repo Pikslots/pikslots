@@ -24,7 +24,7 @@ describe(`PATCH ${BOOKING_ENDPOINTS.EDIT}`, () => {
     const customerId = await createCustomerForBusiness(ctx, businessId);
     const serviceId = await createServiceForBusiness(ctx, businessId);
     const otherServiceId = await createServiceForBusiness(ctx, businessId);
-    const token = tokenForRole(ctx, 'Standard', businessId, userId);
+    const token = await tokenForRole(ctx, 'Standard', businessId, userId);
     const registerPayload = registerBookingPayload(
       businessId,
       serviceId,
@@ -81,7 +81,7 @@ describe(`PATCH ${BOOKING_ENDPOINTS.EDIT}`, () => {
     const created = await createBooking(
       ctx,
       registerPayload,
-      tokenForRole(ctx, 'Standard', businessId, userId),
+      await tokenForRole(ctx, 'Standard', businessId, userId),
     );
 
     const payload = editBookingPayload({
@@ -97,7 +97,7 @@ describe(`PATCH ${BOOKING_ENDPOINTS.EDIT}`, () => {
       ctx,
       created.id,
       payload,
-      tokenForRole(ctx, 'Admin', businessId, admin.id),
+      await tokenForRole(ctx, 'Admin', businessId, admin.id),
     );
 
     expect(response.status).toBe(200);
@@ -118,7 +118,7 @@ describe(`PATCH ${BOOKING_ENDPOINTS.EDIT}`, () => {
     const created = await createBooking(
       ctx,
       registerPayload,
-      tokenForRole(ctx, 'Standard', businessId, userId),
+      await tokenForRole(ctx, 'Standard', businessId, userId),
     );
 
     const payload = editBookingPayload({
@@ -134,7 +134,7 @@ describe(`PATCH ${BOOKING_ENDPOINTS.EDIT}`, () => {
       ctx,
       created.id,
       payload,
-      tokenForRole(ctx, 'Standard', businessId, otherUser.id),
+      await tokenForRole(ctx, 'Standard', businessId, otherUser.id),
     );
 
     expect(response.status).toBe(401);
@@ -146,7 +146,7 @@ describe(`PATCH ${BOOKING_ENDPOINTS.EDIT}`, () => {
     const { id: userId } = await createStaffUser(ctx, businessId, 'Standard');
     const customerId = await createCustomerForBusiness(ctx, businessId);
     const serviceId = await createServiceForBusiness(ctx, businessId);
-    const token = tokenForRole(ctx, 'Standard', businessId, userId);
+    const token = await tokenForRole(ctx, 'Standard', businessId, userId);
 
     await createBooking(
       ctx,
@@ -188,7 +188,7 @@ describe(`PATCH ${BOOKING_ENDPOINTS.EDIT}`, () => {
     const { id: userId } = await createStaffUser(ctx, businessId, 'Standard');
     const customerId = await createCustomerForBusiness(ctx, businessId);
     const serviceId = await createServiceForBusiness(ctx, businessId);
-    const token = tokenForRole(ctx, 'Standard', businessId, userId);
+    const token = await tokenForRole(ctx, 'Standard', businessId, userId);
     const registerPayload = registerBookingPayload(
       businessId,
       serviceId,
@@ -220,7 +220,7 @@ describe(`PATCH ${BOOKING_ENDPOINTS.EDIT}`, () => {
     const { id: userId } = await createStaffUser(ctx, businessId, 'Standard');
     const customerId = await createCustomerForBusiness(ctx, businessId);
     const serviceId = await createServiceForBusiness(ctx, businessId);
-    const token = tokenForRole(ctx, 'Standard', businessId, userId);
+    const token = await tokenForRole(ctx, 'Standard', businessId, userId);
 
     const payload = editBookingPayload({
       bookingDate: '2026-09-05',

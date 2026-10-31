@@ -26,13 +26,13 @@ describe(`DELETE ${BOOKING_ENDPOINTS.DELETE}`, () => {
     const created = await createBooking(
       ctx,
       registerBookingPayload(businessId, serviceId, userId, customerId),
-      tokenForRole(ctx, 'Standard', businessId, userId),
+      await tokenForRole(ctx, 'Standard', businessId, userId),
     );
 
     const response = await deleteBooking(
       ctx,
       created.id,
-      tokenForRole(ctx, 'Business Owner', businessId, owner.id),
+      await tokenForRole(ctx, 'Business Owner', businessId, owner.id),
     );
 
     expect(response.status).toBe(200);
@@ -66,19 +66,19 @@ describe(`DELETE ${BOOKING_ENDPOINTS.DELETE}`, () => {
     const created = await createBooking(
       ctx,
       registerPayload,
-      tokenForRole(ctx, 'Standard', businessId, userId),
+      await tokenForRole(ctx, 'Standard', businessId, userId),
     );
 
     await deleteBooking(
       ctx,
       created.id,
-      tokenForRole(ctx, 'Admin', businessId, admin.id),
+      await tokenForRole(ctx, 'Admin', businessId, admin.id),
     ).then((res) => expect(res.status).toBe(200));
 
     const secondAttempt = await createBooking(
       ctx,
       registerPayload,
-      tokenForRole(ctx, 'Standard', businessId, userId),
+      await tokenForRole(ctx, 'Standard', businessId, userId),
     );
 
     expect(secondAttempt.id).not.toBe(created.id);
@@ -93,13 +93,13 @@ describe(`DELETE ${BOOKING_ENDPOINTS.DELETE}`, () => {
     const created = await createBooking(
       ctx,
       registerBookingPayload(businessId, serviceId, userId, customerId),
-      tokenForRole(ctx, 'Standard', businessId, userId),
+      await tokenForRole(ctx, 'Standard', businessId, userId),
     );
 
     const response = await deleteBooking(
       ctx,
       created.id,
-      tokenForRole(ctx, 'Admin', businessId, admin.id),
+      await tokenForRole(ctx, 'Admin', businessId, admin.id),
     );
 
     expect(response.status).toBe(200);
@@ -114,13 +114,13 @@ describe(`DELETE ${BOOKING_ENDPOINTS.DELETE}`, () => {
     const created = await createBooking(
       ctx,
       registerBookingPayload(businessId, serviceId, userId, customerId),
-      tokenForRole(ctx, 'Standard', businessId, userId),
+      await tokenForRole(ctx, 'Standard', businessId, userId),
     );
 
     const response = await deleteBooking(
       ctx,
       created.id,
-      tokenForRole(ctx, 'Admin', otherBusinessId, randomUUID()),
+      await tokenForRole(ctx, 'Admin', otherBusinessId, randomUUID()),
     );
 
     expect(response.status).toBe(401);
@@ -134,7 +134,7 @@ describe(`DELETE ${BOOKING_ENDPOINTS.DELETE}`, () => {
     const response = await deleteBooking(
       ctx,
       randomUUID(),
-      tokenForRole(ctx, 'Admin', businessId, admin.id),
+      await tokenForRole(ctx, 'Admin', businessId, admin.id),
     );
 
     expect(response.status).toBe(404);
@@ -150,9 +150,9 @@ describe(`DELETE ${BOOKING_ENDPOINTS.DELETE}`, () => {
     const created = await createBooking(
       ctx,
       registerBookingPayload(businessId, serviceId, userId, customerId),
-      tokenForRole(ctx, 'Standard', businessId, userId),
+      await tokenForRole(ctx, 'Standard', businessId, userId),
     );
-    const adminToken = tokenForRole(ctx, 'Admin', businessId, admin.id);
+    const adminToken = await tokenForRole(ctx, 'Admin', businessId, admin.id);
 
     await deleteBooking(ctx, created.id, adminToken).then((res) =>
       expect(res.status).toBe(200),
@@ -170,7 +170,7 @@ describe(`DELETE ${BOOKING_ENDPOINTS.DELETE}`, () => {
       const { id: userId } = await createStaffUser(ctx, businessId, 'Standard');
       const customerId = await createCustomerForBusiness(ctx, businessId);
       const serviceId = await createServiceForBusiness(ctx, businessId);
-      const token = tokenForRole(ctx, 'Standard', businessId, userId);
+      const token = await tokenForRole(ctx, 'Standard', businessId, userId);
       const created = await createBooking(
         ctx,
         registerBookingPayload(businessId, serviceId, userId, customerId),
@@ -191,13 +191,13 @@ describe(`DELETE ${BOOKING_ENDPOINTS.DELETE}`, () => {
       const created = await createBooking(
         ctx,
         registerBookingPayload(businessId, serviceId, userId, customerId),
-        tokenForRole(ctx, 'Standard', businessId, userId),
+        await tokenForRole(ctx, 'Standard', businessId, userId),
       );
 
       const response = await deleteBooking(
         ctx,
         created.id,
-        tokenForRole(ctx, 'Enhanced', businessId, enhanced.id),
+        await tokenForRole(ctx, 'Enhanced', businessId, enhanced.id),
       );
 
       expect(response.status).toBe(403);

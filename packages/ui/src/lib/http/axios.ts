@@ -1,33 +1,31 @@
-import axios from 'axios';
-import { authStore } from '$stores/auth.svelte.js';
-import { USER_ENDPOINTS } from '@pikslots/shared';
+import axios, { type AxiosError } from 'axios';
+import { browser } from '$app/environment';
+import { goto } from '$app/navigation';
+import { resolve } from '$app/paths';
+import { toast } from 'svelte-sonner';
+import { SESSION_EXPIRED_MESSAGE, type BaseErrorResponse } from '@pikslots/shared';
+import { authStore } from '$stores/auth.svelte';
 
 export const apiClient = axios.create({
 	baseURL: import.meta.env.VITE_API_URL,
 	withCredentials: true
 });
 
-apiClient.interceptors.request.use((config) => {
-	if (authStore.accessToken) {
-		config.headers.Authorization = `Bearer ${authStore.accessToken}`;
-	}
-	return config;
-});
+let redirectingForExpiredSession = false;
 
 apiClient.interceptors.response.use(
 	(response) => response,
-	async (error) => {
-		const original = error.config;
-		const is401 = error.response?.status === 401;
-		const isRefreshEndpoint = original.url === USER_ENDPOINTS.REFRESH;
-		const isLoginEndpoint = original.url === USER_ENDPOINTS.LOGIN;
+	(error: AxiosError<BaseErrorResponse>) => {
+		const isExpiredSession =
+			error.response?.status === 401 && error.response?.data?.message === SESSION_EXPIRED_MESSAGE;
 
-		if (is401 && !original._retry && !isRefreshEndpoint && !isLoginEndpoint) {
-			original._retry = true;
-			const { data } = await apiClient.post(USER_ENDPOINTS.REFRESH);
-			authStore.setAccessToken(data.data.accessToken);
-			original.headers.Authorization = `Bearer ${data.data.accessToken}`;
-			return apiClient(original);
+		if (browser && isExpiredSession && authStore.isAuthenticated && !redirectingForExpiredSession) {
+			redirectingForExpiredSession = true;
+			authStore.clearSession();
+			toast.error(SESSION_EXPIRED_MESSAGE);
+			goto(resolve('/login')).finally(() => {
+				redirectingForExpiredSession = false;
+			});
 		}
 
 		return Promise.reject(error);

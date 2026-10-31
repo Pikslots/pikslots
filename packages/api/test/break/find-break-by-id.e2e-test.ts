@@ -20,7 +20,7 @@ describe(`GET ${BREAK_ENDPOINTS.FIND_BY_ID}`, () => {
   it('returns the full break record for its owner', async () => {
     const { id: businessId } = await createBusiness(ctx);
     const userId = await createUser(ctx, businessId, 'Standard');
-    const token = tokenForRole(ctx, 'Standard', businessId, userId);
+    const token = await tokenForRole(ctx, 'Standard', businessId, userId);
     const created = await createBreak(
       ctx,
       breakPayload({ userId, businessId }),
@@ -46,12 +46,12 @@ describe(`GET ${BREAK_ENDPOINTS.FIND_BY_ID}`, () => {
 
   it('allows a Business Owner in the same business to view a break belonging to another user', async () => {
     const { id: businessId } = await createBusiness(ctx);
-    const ownerToken = tokenForRole(ctx, 'Business Owner', businessId);
+    const ownerToken = await tokenForRole(ctx, 'Business Owner', businessId);
     const userId = await createUser(ctx, businessId, 'Standard');
     const created = await createBreak(
       ctx,
       breakPayload({ userId, businessId }),
-      tokenForRole(ctx, 'Standard', businessId, userId),
+      await tokenForRole(ctx, 'Standard', businessId, userId),
     );
 
     await request(ctx.app.getHttpServer())
@@ -67,12 +67,16 @@ describe(`GET ${BREAK_ENDPOINTS.FIND_BY_ID}`, () => {
     const created = await createBreak(
       ctx,
       breakPayload({ userId, businessId }),
-      tokenForRole(ctx, 'Standard', businessId, userId),
+      await tokenForRole(ctx, 'Standard', businessId, userId),
     );
 
     const response = await request(ctx.app.getHttpServer())
       .get(findByIdPath(created.id))
-      .set(authHeader(tokenForRole(ctx, 'Standard', businessId, otherUserId)))
+      .set(
+        authHeader(
+          await tokenForRole(ctx, 'Standard', businessId, otherUserId),
+        ),
+      )
       .expect(401);
 
     expect(errorBody(response).statusCode).toBe(401);
@@ -83,7 +87,7 @@ describe(`GET ${BREAK_ENDPOINTS.FIND_BY_ID}`, () => {
 
     const response = await request(ctx.app.getHttpServer())
       .get(findByIdPath(randomUUID()))
-      .set(authHeader(tokenForRole(ctx, 'Admin', businessId)))
+      .set(authHeader(await tokenForRole(ctx, 'Admin', businessId)))
       .expect(404);
 
     expect(errorBody(response).statusCode).toBe(404);

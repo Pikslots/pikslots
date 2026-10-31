@@ -34,7 +34,7 @@ describe(`GET ${SERVICE_GROUP_ASSIGNMENT_ENDPOINTS.FIND_BY_GROUP}`, () => {
           serviceGroupId,
         }),
       )
-      .set(authHeader(tokenForRole(ctx, 'Admin', businessId)))
+      .set(authHeader(await tokenForRole(ctx, 'Admin', businessId)))
       .expect(200);
 
     expect(successBody(response).data).toEqual([
@@ -52,7 +52,7 @@ describe(`GET ${SERVICE_GROUP_ASSIGNMENT_ENDPOINTS.FIND_BY_GROUP}`, () => {
           serviceGroupId,
         }),
       )
-      .set(authHeader(tokenForRole(ctx, 'Admin', businessId)))
+      .set(authHeader(await tokenForRole(ctx, 'Admin', businessId)))
       .expect(200);
 
     expect(successBody(response).data).toEqual([]);
@@ -76,7 +76,7 @@ describe(`GET ${SERVICE_GROUP_ASSIGNMENT_ENDPOINTS.FIND_BY_GROUP}`, () => {
           serviceGroupId,
         }),
       )
-      .set(authHeader(tokenForRole(ctx, 'Admin', businessId)))
+      .set(authHeader(await tokenForRole(ctx, 'Admin', businessId)))
       .expect(200);
 
     expect(successBody(response).data).toEqual(
@@ -113,7 +113,7 @@ describe(`GET ${SERVICE_GROUP_ASSIGNMENT_ENDPOINTS.FIND_BY_GROUP}`, () => {
           serviceGroupId,
         }),
       )
-      .set(authHeader(tokenForRole(ctx, 'Admin', businessId)))
+      .set(authHeader(await tokenForRole(ctx, 'Admin', businessId)))
       .expect(200);
 
     expect(successBody(response).data).toEqual([]);
@@ -163,7 +163,7 @@ describe(`GET ${SERVICE_GROUP_ASSIGNMENT_ENDPOINTS.FIND_BY_GROUP}`, () => {
             serviceGroupId: serviceGroupIdInB,
           }),
         )
-        .set(authHeader(tokenForRole(ctx, 'Admin', businessA)))
+        .set(authHeader(await tokenForRole(ctx, 'Admin', businessA)))
         .expect(200);
 
       // Documents the leak: business A's Admin sees business B's service.

@@ -1,3 +1,5 @@
+import type { SessionDeviceContext } from '../base.types';
+
 export type UserRole =
   | 'Platform Owner'
   | 'Business Owner'
@@ -23,13 +25,9 @@ export interface InviteUserInput {
   businessName?: string;
 }
 
-export interface LoginUserInput {
+export interface LoginUserInput extends SessionDeviceContext {
   usernameOrEmail: string;
   password: string;
-}
-
-export interface RefreshUserSessionInput {
-  currentRefreshToken: string;
 }
 
 // --- Responses ---
@@ -43,11 +41,7 @@ export interface LogoutUserResponse {
 }
 
 export interface LoginUserResponse {
-  accessToken: string;
-}
-
-export interface RefreshUserSessionResponse {
-  accessToken: string;
+  message: 'success';
 }
 
 export type UserStatus = 'invited' | 'active' | 'inactive' | 'suspended';

@@ -44,7 +44,9 @@ describe(`PATCH ${SERVICE_ENDPOINTS.UPDATE_SERVICE_AVATAR}`, () => {
     const response = await request(ctx.app.getHttpServer())
       .patch(url)
       .set(
-        authHeader(tokenFor(ctx.jwtLoginService, 'Business Owner', businessId)),
+        authHeader(
+          await tokenFor(ctx.sessionCacheService, 'Business Owner', businessId),
+        ),
       )
       .send({ avatarKey: newKey })
       .expect(200);
@@ -78,7 +80,9 @@ describe(`PATCH ${SERVICE_ENDPOINTS.UPDATE_SERVICE_AVATAR}`, () => {
     await request(ctx.app.getHttpServer())
       .patch(url)
       .set(
-        authHeader(tokenFor(ctx.jwtLoginService, 'Business Owner', businessId)),
+        authHeader(
+          await tokenFor(ctx.sessionCacheService, 'Business Owner', businessId),
+        ),
       )
       .send({ avatarKey: 'e2e/service/unknown/avatar.png' })
       .expect(404);
@@ -110,7 +114,11 @@ describe(`PATCH ${SERVICE_ENDPOINTS.UPDATE_SERVICE_AVATAR}`, () => {
 
     await request(ctx.app.getHttpServer())
       .patch(url)
-      .set(authHeader(tokenFor(ctx.jwtLoginService, 'Enhanced', businessId)))
+      .set(
+        authHeader(
+          await tokenFor(ctx.sessionCacheService, 'Enhanced', businessId),
+        ),
+      )
       .send({ avatarKey: 'e2e/service/no-access/avatar.png' })
       .expect(403);
   });
@@ -129,7 +137,11 @@ describe(`PATCH ${SERVICE_ENDPOINTS.UPDATE_SERVICE_AVATAR}`, () => {
       .patch(url)
       .set(
         authHeader(
-          tokenFor(ctx.jwtLoginService, 'Business Owner', otherBusinessId),
+          await tokenFor(
+            ctx.sessionCacheService,
+            'Business Owner',
+            otherBusinessId,
+          ),
         ),
       )
       .send({ avatarKey: 'e2e/service/other-business/avatar.png' })

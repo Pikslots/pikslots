@@ -23,7 +23,7 @@ describe(`GET ${BOOKING_ENDPOINTS.FIND_BY_ID}`, () => {
     const { id: userId } = await createStaffUser(ctx, businessId, 'Standard');
     const customerId = await createCustomerForBusiness(ctx, businessId);
     const serviceId = await createServiceForBusiness(ctx, businessId);
-    const token = tokenForRole(ctx, 'Standard', businessId, userId);
+    const token = await tokenForRole(ctx, 'Standard', businessId, userId);
     const created = await createBooking(
       ctx,
       registerBookingPayload(businessId, serviceId, userId, customerId),
@@ -57,13 +57,13 @@ describe(`GET ${BOOKING_ENDPOINTS.FIND_BY_ID}`, () => {
     const created = await createBooking(
       ctx,
       registerBookingPayload(businessId, serviceId, userId, customerId),
-      tokenForRole(ctx, 'Standard', businessId, userId),
+      await tokenForRole(ctx, 'Standard', businessId, userId),
     );
 
     const response = await findBookingById(
       ctx,
       created.id,
-      tokenForRole(ctx, 'Admin', businessId, admin.id),
+      await tokenForRole(ctx, 'Admin', businessId, admin.id),
     );
 
     expect(response.status).toBe(200);
@@ -78,13 +78,13 @@ describe(`GET ${BOOKING_ENDPOINTS.FIND_BY_ID}`, () => {
     const created = await createBooking(
       ctx,
       registerBookingPayload(businessId, serviceId, userId, customerId),
-      tokenForRole(ctx, 'Standard', businessId, userId),
+      await tokenForRole(ctx, 'Standard', businessId, userId),
     );
 
     const response = await findBookingById(
       ctx,
       created.id,
-      tokenForRole(ctx, 'Standard', businessId, otherUser.id),
+      await tokenForRole(ctx, 'Standard', businessId, otherUser.id),
     );
 
     expect(response.status).toBe(401);
@@ -100,13 +100,13 @@ describe(`GET ${BOOKING_ENDPOINTS.FIND_BY_ID}`, () => {
     const created = await createBooking(
       ctx,
       registerBookingPayload(businessId, serviceId, userId, customerId),
-      tokenForRole(ctx, 'Standard', businessId, userId),
+      await tokenForRole(ctx, 'Standard', businessId, userId),
     );
 
     const response = await findBookingById(
       ctx,
       created.id,
-      tokenForRole(ctx, 'Admin', otherBusinessId, randomUUID()),
+      await tokenForRole(ctx, 'Admin', otherBusinessId, randomUUID()),
     );
 
     expect(response.status).toBe(401);
@@ -120,7 +120,7 @@ describe(`GET ${BOOKING_ENDPOINTS.FIND_BY_ID}`, () => {
     const response = await findBookingById(
       ctx,
       randomUUID(),
-      tokenForRole(ctx, 'Admin', businessId, userId),
+      await tokenForRole(ctx, 'Admin', businessId, userId),
     );
 
     expect(response.status).toBe(404);
@@ -132,7 +132,7 @@ describe(`GET ${BOOKING_ENDPOINTS.FIND_BY_ID}`, () => {
     const { id: userId } = await createStaffUser(ctx, businessId, 'Standard');
     const customerId = await createCustomerForBusiness(ctx, businessId);
     const serviceId = await createServiceForBusiness(ctx, businessId);
-    const token = tokenForRole(ctx, 'Standard', businessId, userId);
+    const token = await tokenForRole(ctx, 'Standard', businessId, userId);
     const created = await createBooking(
       ctx,
       registerBookingPayload(businessId, serviceId, userId, customerId),
@@ -143,7 +143,7 @@ describe(`GET ${BOOKING_ENDPOINTS.FIND_BY_ID}`, () => {
     await deleteBooking(
       ctx,
       created.id,
-      tokenForRole(ctx, 'Admin', businessId, admin.id),
+      await tokenForRole(ctx, 'Admin', businessId, admin.id),
     ).then((res) => expect(res.status).toBe(200));
 
     const response = await findBookingById(ctx, created.id, token);

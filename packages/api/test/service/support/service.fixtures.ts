@@ -172,7 +172,11 @@ export async function createService(
     .post(SERVICE_ENDPOINTS.REGISTER)
     .set(
       authHeader(
-        tokenFor(ctx.jwtLoginService, 'Business Owner', payload.businessId),
+        await tokenFor(
+          ctx.sessionCacheService,
+          'Business Owner',
+          payload.businessId,
+        ),
       ),
     )
     .send(payload)

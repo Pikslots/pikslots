@@ -18,7 +18,7 @@ describe(`PATCH ${BUSINESS_ENDPOINTS.UPDATE_LOCATION}`, () => {
   it('updates location and persists it for real', async () => {
     await request(ctx.app.getHttpServer())
       .patch(endpointFor(BUSINESS_ENDPOINTS.UPDATE_LOCATION, businessId))
-      .set(authHeader(tokenFor(ctx.jwtLoginService, 'Admin')))
+      .set(authHeader(await tokenFor(ctx.sessionCacheService, 'Admin')))
       .send({
         address: '1 Test Street',
         city: 'Testville',

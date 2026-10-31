@@ -20,7 +20,7 @@ describe(`DELETE ${BREAK_ENDPOINTS.DELETE}`, () => {
   it('soft-deletes a real row in Postgres for its owner', async () => {
     const { id: businessId } = await createBusiness(ctx);
     const userId = await createUser(ctx, businessId, 'Standard');
-    const token = tokenForRole(ctx, 'Standard', businessId, userId);
+    const token = await tokenForRole(ctx, 'Standard', businessId, userId);
     const created = await createBreak(
       ctx,
       breakPayload({ userId, businessId }),
@@ -46,7 +46,7 @@ describe(`DELETE ${BREAK_ENDPOINTS.DELETE}`, () => {
   it('frees up the time slot for a new break after deletion', async () => {
     const { id: businessId } = await createBusiness(ctx);
     const userId = await createUser(ctx, businessId, 'Standard');
-    const token = tokenForRole(ctx, 'Standard', businessId, userId);
+    const token = await tokenForRole(ctx, 'Standard', businessId, userId);
     const created = await createBreak(
       ctx,
       breakPayload({
@@ -85,12 +85,12 @@ describe(`DELETE ${BREAK_ENDPOINTS.DELETE}`, () => {
     const created = await createBreak(
       ctx,
       breakPayload({ userId, businessId }),
-      tokenForRole(ctx, 'Standard', businessId, userId),
+      await tokenForRole(ctx, 'Standard', businessId, userId),
     );
 
     await request(ctx.app.getHttpServer())
       .delete(deletePath(created.id))
-      .set(authHeader(tokenForRole(ctx, 'Admin', businessId)))
+      .set(authHeader(await tokenForRole(ctx, 'Admin', businessId)))
       .expect(200);
   });
 
@@ -101,12 +101,16 @@ describe(`DELETE ${BREAK_ENDPOINTS.DELETE}`, () => {
     const created = await createBreak(
       ctx,
       breakPayload({ userId, businessId }),
-      tokenForRole(ctx, 'Standard', businessId, userId),
+      await tokenForRole(ctx, 'Standard', businessId, userId),
     );
 
     const response = await request(ctx.app.getHttpServer())
       .delete(deletePath(created.id))
-      .set(authHeader(tokenForRole(ctx, 'Standard', businessId, otherUserId)))
+      .set(
+        authHeader(
+          await tokenForRole(ctx, 'Standard', businessId, otherUserId),
+        ),
+      )
       .expect(401);
 
     expect(errorBody(response).statusCode).toBe(401);
@@ -117,7 +121,7 @@ describe(`DELETE ${BREAK_ENDPOINTS.DELETE}`, () => {
 
     const response = await request(ctx.app.getHttpServer())
       .delete(deletePath(randomUUID()))
-      .set(authHeader(tokenForRole(ctx, 'Admin', businessId)))
+      .set(authHeader(await tokenForRole(ctx, 'Admin', businessId)))
       .expect(404);
 
     expect(errorBody(response).statusCode).toBe(404);
@@ -126,7 +130,7 @@ describe(`DELETE ${BREAK_ENDPOINTS.DELETE}`, () => {
   it('returns 404 when deleting a break that was already deleted', async () => {
     const { id: businessId } = await createBusiness(ctx);
     const userId = await createUser(ctx, businessId, 'Standard');
-    const token = tokenForRole(ctx, 'Standard', businessId, userId);
+    const token = await tokenForRole(ctx, 'Standard', businessId, userId);
     const created = await createBreak(
       ctx,
       breakPayload({ userId, businessId }),

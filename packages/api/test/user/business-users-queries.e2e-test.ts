@@ -22,7 +22,7 @@ describe('business/role user queries', () => {
       const response = await getBusinessUsers(
         ctx,
         businessId,
-        tokenForRole(ctx, 'Business Owner', businessId, ownerId),
+        await tokenForRole(ctx, 'Business Owner', businessId, ownerId),
       );
 
       expect(response.status).toBe(200);
@@ -39,7 +39,7 @@ describe('business/role user queries', () => {
       const response = await getBusinessUsers(
         ctx,
         businessId,
-        tokenForRole(ctx, 'Standard', businessId, userId),
+        await tokenForRole(ctx, 'Standard', businessId, userId),
       );
 
       expect(response.status).toBe(200);
@@ -62,7 +62,7 @@ describe('business/role user queries', () => {
         const response = await getBusinessUsers(
           ctx,
           businessB,
-          tokenForRole(ctx, 'Admin', businessA, adminOfA.id),
+          await tokenForRole(ctx, 'Admin', businessA, adminOfA.id),
         );
 
         expect(response.status).toBe(200);
@@ -83,7 +83,7 @@ describe('business/role user queries', () => {
       const response = await getUsersByRole(
         ctx,
         'Admin',
-        tokenForRole(ctx, 'Platform Owner'),
+        await tokenForRole(ctx, 'Platform Owner'),
       );
 
       expect(response.status).toBe(200);
@@ -93,7 +93,12 @@ describe('business/role user queries', () => {
 
     it('lets a Business Owner query Admins, but not other Business Owners', async () => {
       const { id: businessId, ownerId } = await createBusiness(ctx);
-      const token = tokenForRole(ctx, 'Business Owner', businessId, ownerId);
+      const token = await tokenForRole(
+        ctx,
+        'Business Owner',
+        businessId,
+        ownerId,
+      );
 
       const allowed = await getUsersByRole(ctx, 'Admin', token);
       expect(allowed.status).toBe(200);
@@ -105,7 +110,7 @@ describe('business/role user queries', () => {
     it('lets an Admin query Standard users, but not other Admins', async () => {
       const { id: businessId } = await createBusiness(ctx);
       const admin = await createStaffUser(ctx, businessId, 'Admin');
-      const token = tokenForRole(ctx, 'Admin', businessId, admin.id);
+      const token = await tokenForRole(ctx, 'Admin', businessId, admin.id);
 
       const allowed = await getUsersByRole(ctx, 'Standard', token);
       expect(allowed.status).toBe(200);
@@ -121,7 +126,7 @@ describe('business/role user queries', () => {
       const response = await getUsersByRole(
         ctx,
         'Standard',
-        tokenForRole(ctx, 'Standard', businessId, userId),
+        await tokenForRole(ctx, 'Standard', businessId, userId),
       );
 
       expect(response.status).toBe(403);
@@ -147,7 +152,7 @@ describe('business/role user queries', () => {
         const response = await getUsersByRole(
           ctx,
           'Admin',
-          tokenForRole(ctx, 'Business Owner', businessA, ownerId),
+          await tokenForRole(ctx, 'Business Owner', businessA, ownerId),
         );
 
         expect(response.status).toBe(200);
@@ -169,7 +174,7 @@ describe('business/role user queries', () => {
 
       const response = await getAllBusinessOwners(
         ctx,
-        tokenForRole(ctx, 'Platform Owner'),
+        await tokenForRole(ctx, 'Platform Owner'),
       );
 
       expect(response.status).toBe(200);
@@ -182,7 +187,7 @@ describe('business/role user queries', () => {
 
       const response = await getAllBusinessOwners(
         ctx,
-        tokenForRole(ctx, 'Business Owner', businessId, ownerId),
+        await tokenForRole(ctx, 'Business Owner', businessId, ownerId),
       );
 
       expect(response.status).toBe(403);
