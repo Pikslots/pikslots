@@ -4,6 +4,7 @@ import { SESSION_EXPIRED_MESSAGE } from '@pikslots/shared';
 import { SecurityContext } from '../context/security.context';
 import { SessionCacheService } from 'src/shared/cache/session/session.cache.service';
 import { PikslotsBaseErrorResponse } from 'src/shared/types/base.error.response';
+import type { AuthenticatedRequest } from '../types/authenticated.request';
 
 // Supports exact paths ('/users/register') and wildcards ('/users/*', '/foo/*/bar').
 const PUBLIC_ROUTES: string[] = [
@@ -83,6 +84,12 @@ export class SessionVerifcationMiddleware implements NestMiddleware {
       this.securityContext.userId = session.userId;
       this.securityContext.role = session.role;
       this.securityContext.businessId = session.businessId;
+
+      (req as AuthenticatedRequest).actor = {
+        userId: session.userId,
+        role: session.role,
+        businessId: session.businessId,
+      };
 
       next();
     } catch {

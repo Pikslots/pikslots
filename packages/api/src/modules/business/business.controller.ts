@@ -13,6 +13,8 @@ import {
 import type { Response } from 'express';
 import { ApiTags } from '@nestjs/swagger';
 import { mapBusinessError } from './errors/business.errors.map';
+import { AuditLog } from '../audit-log/decorators/audit.log.decorator';
+import { PIKSLOT_EVENTS } from 'src/shared/queue/jobs/pikslot.events';
 import { BUSINESS_ENDPOINTS } from '@pikslots/shared';
 import { RegisterBusinessDto } from './dto/register.business.dto';
 import { UpdateBusinessBrandDetailsDto } from './dto/update.business.brand.details.dto';
@@ -176,6 +178,10 @@ export class BusinessController {
   @UpdateBusinessBrandDetailsDocs()
   @UseGuards(RolesGuard)
   @Roles('Platform Owner', 'Business Owner', 'Admin')
+  @AuditLog({
+    action: PIKSLOT_EVENTS.AUDIT_LOG.BUSINESS_BRAND_DETAILS_UPDATED,
+    description: 'Updated brand details',
+  })
   @Patch(BUSINESS_ENDPOINTS.UPDATE_BRAND_DETAILS)
   async updateBusinessBrandDetails(
     @Res({ passthrough: true }) res: Response,
@@ -217,6 +223,10 @@ export class BusinessController {
   @UpdateBusinessAppearanceDocs()
   @UseGuards(RolesGuard)
   @Roles('Platform Owner', 'Business Owner', 'Admin')
+  @AuditLog({
+    action: PIKSLOT_EVENTS.AUDIT_LOG.BUSINESS_APPEARANCE_UPDATED,
+    description: 'Updated appearance settings',
+  })
   @Patch(BUSINESS_ENDPOINTS.UPDATE_APPEARANCE)
   async updateBusinessAppearance(
     @Res({ passthrough: true }) res: Response,
@@ -256,6 +266,10 @@ export class BusinessController {
   @UpdateBusinessLocationDocs()
   @UseGuards(RolesGuard)
   @Roles('Platform Owner', 'Business Owner', 'Admin')
+  @AuditLog({
+    action: PIKSLOT_EVENTS.AUDIT_LOG.BUSINESS_LOCATION_UPDATED,
+    description: 'Updated location',
+  })
   @Patch(BUSINESS_ENDPOINTS.UPDATE_LOCATION)
   async updateBusinessLocation(
     @Res({ passthrough: true }) res: Response,
@@ -296,6 +310,10 @@ export class BusinessController {
   @UpdateBusinessGeneralDocs()
   @UseGuards(RolesGuard)
   @Roles('Platform Owner', 'Business Owner', 'Admin')
+  @AuditLog({
+    action: PIKSLOT_EVENTS.AUDIT_LOG.BUSINESS_GENERAL_UPDATED,
+    description: 'Updated general settings',
+  })
   @Patch(BUSINESS_ENDPOINTS.UPDATE_GENERAL)
   async updateBusinessGeneral(
     @Res({ passthrough: true }) res: Response,
@@ -330,6 +348,10 @@ export class BusinessController {
   @UpdateBusinessBookingPoliciesDocs()
   @UseGuards(RolesGuard)
   @Roles('Platform Owner', 'Business Owner', 'Admin')
+  @AuditLog({
+    action: PIKSLOT_EVENTS.AUDIT_LOG.BUSINESS_BOOKING_POLICIES_UPDATED,
+    description: 'Updated booking policies',
+  })
   @Patch(BUSINESS_ENDPOINTS.UPDATE_BOOKING_POLICIES)
   async updateBusinessBookingPolicies(
     @Res({ passthrough: true }) res: Response,
@@ -370,6 +392,10 @@ export class BusinessController {
   @UpdateBusinessBookingSetupDocs()
   @UseGuards(RolesGuard)
   @Roles('Platform Owner', 'Business Owner', 'Admin')
+  @AuditLog({
+    action: PIKSLOT_EVENTS.AUDIT_LOG.BUSINESS_BOOKING_SETUP_UPDATED,
+    description: 'Updated booking setup',
+  })
   @Patch(BUSINESS_ENDPOINTS.UPDATE_BOOKING_SETUP)
   async updateBusinessBookingSetup(
     @Res({ passthrough: true }) res: Response,
@@ -431,6 +457,10 @@ export class BusinessController {
   @UpdateBusinessBookingCustomizationDocs()
   @UseGuards(RolesGuard)
   @Roles('Platform Owner', 'Business Owner', 'Admin')
+  @AuditLog({
+    action: PIKSLOT_EVENTS.AUDIT_LOG.BUSINESS_BOOKING_CUSTOMIZATION_UPDATED,
+    description: 'Updated booking customization',
+  })
   @Patch(BUSINESS_ENDPOINTS.UPDATE_BOOKING_CUSTOMIZATION)
   async updateBusinessBookingCustomization(
     @Res({ passthrough: true }) res: Response,
@@ -486,6 +516,10 @@ export class BusinessController {
   @UpdateBusinessVisibilityDocs()
   @UseGuards(RolesGuard)
   @Roles('Platform Owner', 'Business Owner', 'Admin')
+  @AuditLog({
+    action: PIKSLOT_EVENTS.AUDIT_LOG.BUSINESS_VISIBILITY_UPDATED,
+    description: 'Updated booking page visibility',
+  })
   @Patch(BUSINESS_ENDPOINTS.UPDATE_VISIBILITY)
   async updateBusinessVisibility(
     @Res({ passthrough: true }) res: Response,
@@ -522,6 +556,10 @@ export class BusinessController {
   @UpdateBusinessTeamNotificationsDocs()
   @UseGuards(RolesGuard)
   @Roles('Platform Owner', 'Business Owner', 'Admin')
+  @AuditLog({
+    action: PIKSLOT_EVENTS.AUDIT_LOG.BUSINESS_TEAM_NOTIFICATIONS_UPDATED,
+    description: 'Updated team notifications',
+  })
   @Patch(BUSINESS_ENDPOINTS.UPDATE_TEAM_NOTIFICATIONS)
   async updateBusinessTeamNotifications(
     @Res({ passthrough: true }) res: Response,
@@ -562,6 +600,10 @@ export class BusinessController {
   @UpdateBusinessCustomerNotificationsDocs()
   @UseGuards(RolesGuard)
   @Roles('Platform Owner', 'Business Owner', 'Admin')
+  @AuditLog({
+    action: PIKSLOT_EVENTS.AUDIT_LOG.BUSINESS_CUSTOMER_NOTIFICATIONS_UPDATED,
+    description: 'Updated customer notifications',
+  })
   @Patch(BUSINESS_ENDPOINTS.UPDATE_CUSTOMER_NOTIFICATIONS)
   async updateBusinessCustomerNotifications(
     @Res({ passthrough: true }) res: Response,
@@ -601,6 +643,11 @@ export class BusinessController {
   @UpdateBusinessNotificationCustomizationDocs()
   @UseGuards(RolesGuard)
   @Roles('Platform Owner', 'Business Owner', 'Admin')
+  @AuditLog({
+    action:
+      PIKSLOT_EVENTS.AUDIT_LOG.BUSINESS_NOTIFICATION_CUSTOMIZATION_UPDATED,
+    description: 'Updated notification customization',
+  })
   @Patch(BUSINESS_ENDPOINTS.UPDATE_NOTIFICATION_CUSTOMIZATION)
   async updateBusinessNotificationCustomization(
     @Res({ passthrough: true }) res: Response,
@@ -638,6 +685,10 @@ export class BusinessController {
   @UpdateBusinessHoursDocs()
   @UseGuards(RolesGuard)
   @Roles('Platform Owner', 'Business Owner', 'Admin')
+  @AuditLog({
+    action: PIKSLOT_EVENTS.AUDIT_LOG.BUSINESS_HOURS_UPDATED,
+    description: 'Updated business hours',
+  })
   @Patch(BUSINESS_ENDPOINTS.UPDATE_BUSINESS_HOURS)
   async updateBusinessHours(
     @Res({ passthrough: true }) res: Response,
@@ -680,6 +731,10 @@ export class BusinessController {
   @UpdateBusinessLinksDocs()
   @UseGuards(RolesGuard)
   @Roles('Platform Owner', 'Business Owner', 'Admin')
+  @AuditLog({
+    action: PIKSLOT_EVENTS.AUDIT_LOG.BUSINESS_LINKS_UPDATED,
+    description: 'Updated social links',
+  })
   @Patch(BUSINESS_ENDPOINTS.UPDATE_BUSINESS_LINKS)
   async updateBusinessLinks(
     @Res({ passthrough: true }) res: Response,
@@ -722,6 +777,10 @@ export class BusinessController {
   @UpdateBusinessContactDetailsDocs()
   @UseGuards(RolesGuard)
   @Roles('Platform Owner', 'Business Owner', 'Admin')
+  @AuditLog({
+    action: PIKSLOT_EVENTS.AUDIT_LOG.BUSINESS_CONTACT_DETAILS_UPDATED,
+    description: 'Updated contact details',
+  })
   @Patch(BUSINESS_ENDPOINTS.UPDATE_CONTACT_DETAILS)
   async updateBusinessContactDetails(
     @Res({ passthrough: true }) res: Response,
@@ -763,6 +822,10 @@ export class BusinessController {
   @UpdateBusinessBrandDetailsImagesDocs()
   @UseGuards(RolesGuard)
   @Roles('Platform Owner', 'Business Owner', 'Admin')
+  @AuditLog({
+    action: PIKSLOT_EVENTS.AUDIT_LOG.BUSINESS_BRAND_IMAGES_UPDATED,
+    description: 'Updated brand images',
+  })
   @Patch(BUSINESS_ENDPOINTS.UPDATE_BRAND_DETAILS_IMAGES)
   async updateBusinessBrandDetailsImages(
     @Res({ passthrough: true }) res: Response,
@@ -801,6 +864,10 @@ export class BusinessController {
   @UpdateBusinessGalleryPhotosDocs()
   @UseGuards(RolesGuard)
   @Roles('Platform Owner', 'Business Owner', 'Admin')
+  @AuditLog({
+    action: PIKSLOT_EVENTS.AUDIT_LOG.BUSINESS_GALLERY_UPDATED,
+    description: 'Updated gallery photos',
+  })
   @Patch(BUSINESS_ENDPOINTS.UPDATE_GALLERY_PHOTOS)
   async updateBusinessGalleryPhotos(
     @Res({ passthrough: true }) res: Response,
