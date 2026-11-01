@@ -10,6 +10,7 @@
 	import { getCustomersByBusinessQueryOptions } from '../api/customer/get.customers.by.business.query';
 	import { getCustomerByIdQueryOptions } from '../api/customer/get.customer.by.id.query';
 	import { deleteCustomerMutationOptions } from '../api/customer/delete.customer.mutation';
+	import { exportCustomers } from '../api/customer/export.customers';
 	import type { PartialCustomerModel } from '../api/customer/models/customer-model';
 	import { toast } from 'svelte-sonner';
 	import Plus from '@tabler/icons-svelte/icons/plus';
@@ -39,6 +40,7 @@
 	let editCustomerOpen = $state(false);
 	let deleteCustomerId = $state<string | null>(null);
 	let deleteCustomerName = $state<string>('');
+	let exportingCustomers = $state(false);
 
 	$effect(() => {
 		if ($page.url.searchParams.get('add') === 'true') {
@@ -105,6 +107,26 @@
 		deleteCustomerName = `${customer.firstName} ${customer.lastName}`;
 	}
 
+	async function handleExportCustomers() {
+		const businessId = businessStore.selectedBusiness?.id;
+
+		if (!businessId) {
+			toast.error('Select a business before exporting customers');
+			return;
+		}
+
+		exportingCustomers = true;
+
+		try {
+			await exportCustomers(businessId);
+			toast.success('Customers exported');
+		} catch {
+			toast.error('Failed to export customers');
+		} finally {
+			exportingCustomers = false;
+		}
+	}
+
 	// ── Effect ───────────────────────────────────────────────────────────────
 	$effect(() => {
 		if (customersQuery.data && customersQuery.data.length > 0 && !selectedCustomerId) {
@@ -140,8 +162,13 @@
 					<DropdownMenu.Item class="cursor-pointer"
 						><IconFileImport></IconFileImport>Import Customers</DropdownMenu.Item
 					>
-					<DropdownMenu.Item class="cursor-pointer"
-						><IconFileExport></IconFileExport>Export Customers</DropdownMenu.Item
+					<DropdownMenu.Item
+						class="cursor-pointer"
+						disabled={exportingCustomers}
+						onclick={handleExportCustomers}
+						><IconFileExport></IconFileExport>{exportingCustomers
+							? 'Exporting...'
+							: 'Export Customers'}</DropdownMenu.Item
 					>
 				</DropdownMenu.Content>
 			</DropdownMenu.Root>
