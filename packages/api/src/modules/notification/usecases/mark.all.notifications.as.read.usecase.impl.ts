@@ -9,9 +9,7 @@ import {
 import type { NotificationRepository } from '@pikslots/domain';
 
 @Injectable()
-export class MarkAllNotificationsAsReadUseCaseImpl
-  implements MarkAllNotificationsAsReadUseCase
-{
+export class MarkAllNotificationsAsReadUseCaseImpl implements MarkAllNotificationsAsReadUseCase {
   constructor(
     @Inject(INotificationRepository)
     private readonly notificationRepository: NotificationRepository,

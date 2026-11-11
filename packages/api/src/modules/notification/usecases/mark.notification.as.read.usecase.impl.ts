@@ -20,9 +20,7 @@ const UNAUTHORIZED_ERROR: UnauthorizedError = {
 };
 
 @Injectable()
-export class MarkNotificationAsReadUseCaseImpl
-  implements MarkNotificationAsReadUseCase
-{
+export class MarkNotificationAsReadUseCaseImpl implements MarkNotificationAsReadUseCase {
   constructor(
     @Inject(INotificationRepository)
     private readonly notificationRepository: NotificationRepository,
