@@ -27,6 +27,7 @@ export const customerAccess: UserRole[] = ['Platform Owner', 'Business Owner', '
 
 export type SearchPage = {
 	label: string;
+	description: string;
 	url: ResolvedPathname;
 	icon: Icon;
 	group: 'Pages' | 'Settings';
@@ -37,6 +38,7 @@ export type SearchPage = {
 export const searchPages: SearchPage[] = [
 	{
 		label: 'Home',
+		description: 'View a summary of your business activity and key metrics.',
 		url: resolve('/home'),
 		icon: Home,
 		group: 'Pages',
@@ -44,6 +46,7 @@ export const searchPages: SearchPage[] = [
 	},
 	{
 		label: 'Notifications',
+		description: 'See recent alerts and updates about your account and bookings.',
 		url: resolve('/home/notifications'),
 		icon: Bell,
 		group: 'Pages',
@@ -51,6 +54,7 @@ export const searchPages: SearchPage[] = [
 	},
 	{
 		label: 'Bookings',
+		description: 'View and manage upcoming and past appointments on your calendar.',
 		url: resolve('/home/bookings'),
 		icon: CalendarCheck,
 		group: 'Pages',
@@ -58,6 +62,7 @@ export const searchPages: SearchPage[] = [
 	},
 	{
 		label: 'Services',
+		description: 'Manage the services, classes, and treatments you offer to customers.',
 		url: resolve('/home/services'),
 		icon: Briefcase,
 		group: 'Pages',
@@ -65,6 +70,7 @@ export const searchPages: SearchPage[] = [
 	},
 	{
 		label: 'Customers',
+		description: 'View and manage your customer list and their contact details.',
 		url: resolve('/home/customers'),
 		icon: UserHeart,
 		group: 'Pages',
@@ -73,6 +79,7 @@ export const searchPages: SearchPage[] = [
 	},
 	{
 		label: 'Payments',
+		description: 'Track transactions, revenue, and billing for your business.',
 		url: resolve('/home/payments'),
 		icon: Cash,
 		group: 'Pages',
@@ -81,6 +88,7 @@ export const searchPages: SearchPage[] = [
 	},
 	{
 		label: 'Integrations',
+		description: 'Connect third-party apps and services to your business.',
 		url: resolve('/home/integrations'),
 		icon: Puzzle,
 		group: 'Pages',
@@ -89,6 +97,7 @@ export const searchPages: SearchPage[] = [
 	},
 	{
 		label: 'Your brand',
+		description: 'Overview of your business and brand settings.',
 		url: resolve('/home/settings/your-brand'),
 		icon: BuildingStore,
 		group: 'Settings',
@@ -96,6 +105,7 @@ export const searchPages: SearchPage[] = [
 	},
 	{
 		label: 'Your profile',
+		description: 'Update your personal account details and preferences.',
 		url: resolve('/home/settings/profile'),
 		icon: User,
 		group: 'Settings',
@@ -103,6 +113,7 @@ export const searchPages: SearchPage[] = [
 	},
 	{
 		label: 'Your team',
+		description: 'Manage staff members and their roles and permissions.',
 		url: resolve('/home/settings/team'),
 		icon: Users,
 		group: 'Settings',
@@ -111,6 +122,7 @@ export const searchPages: SearchPage[] = [
 	},
 	{
 		label: 'General',
+		description: 'Configure general preferences for your business account.',
 		url: resolve('/home/settings/general'),
 		icon: AdjustmentsHorizontal,
 		group: 'Settings',
@@ -119,6 +131,7 @@ export const searchPages: SearchPage[] = [
 	},
 	{
 		label: 'Brand details',
+		description: 'Edit your business name and other core brand information.',
 		url: resolve('/home/settings/brand/brand-details'),
 		icon: BuildingStore,
 		group: 'Settings',
@@ -127,6 +140,7 @@ export const searchPages: SearchPage[] = [
 	},
 	{
 		label: 'Appearance',
+		description: 'Customize the theme and colors used across your brand.',
 		url: resolve('/home/settings/brand/appearance'),
 		icon: Palette,
 		group: 'Settings',
@@ -135,6 +149,7 @@ export const searchPages: SearchPage[] = [
 	},
 	{
 		label: 'Contact details',
+		description: 'Set the phone number and email customers can use to reach you.',
 		url: resolve('/home/settings/brand/contact'),
 		icon: Phone,
 		group: 'Settings',
@@ -143,6 +158,7 @@ export const searchPages: SearchPage[] = [
 	},
 	{
 		label: 'Location',
+		description: 'Set your business address and location on the map.',
 		url: resolve('/home/settings/brand/location'),
 		icon: MapPin,
 		group: 'Settings',
@@ -151,6 +167,7 @@ export const searchPages: SearchPage[] = [
 	},
 	{
 		label: 'Business Hours',
+		description: 'Set the opening and closing hours for your business.',
 		url: resolve('/home/settings/brand/business-hours'),
 		icon: Clock,
 		group: 'Settings',
@@ -159,6 +176,7 @@ export const searchPages: SearchPage[] = [
 	},
 	{
 		label: 'Your links',
+		description: 'Add links to your website and social media profiles.',
 		url: resolve('/home/settings/brand/links'),
 		icon: Link,
 		group: 'Settings',
@@ -167,6 +185,7 @@ export const searchPages: SearchPage[] = [
 	},
 	{
 		label: 'Booking policies',
+		description: 'Define cancellation rules and other booking policies.',
 		url: resolve('/home/settings/booking-preferences/booking-policies'),
 		icon: CalendarCog,
 		group: 'Settings',
@@ -175,6 +194,7 @@ export const searchPages: SearchPage[] = [
 	},
 	{
 		label: 'Booking setup',
+		description: 'Configure availability and how customers can book with you.',
 		url: resolve('/home/settings/booking-preferences/booking-setup'),
 		icon: CalendarCheck,
 		group: 'Settings',
@@ -183,6 +203,7 @@ export const searchPages: SearchPage[] = [
 	},
 	{
 		label: 'Customization',
+		description: 'Customize the look and feel of your public booking page.',
 		url: resolve('/home/settings/booking-preferences/customization'),
 		icon: Palette,
 		group: 'Settings',
@@ -191,6 +212,7 @@ export const searchPages: SearchPage[] = [
 	},
 	{
 		label: 'Booking page visibility',
+		description: 'Control whether your booking page is public or hidden.',
 		url: resolve('/home/settings/booking-preferences/booking-page-visibility'),
 		icon: Eye,
 		group: 'Settings',
@@ -199,6 +221,7 @@ export const searchPages: SearchPage[] = [
 	},
 	{
 		label: 'Your notifications',
+		description: 'Choose which alerts and emails you receive.',
 		url: resolve('/home/settings/notifications/your-notifications'),
 		icon: Bell,
 		group: 'Settings',
@@ -206,6 +229,7 @@ export const searchPages: SearchPage[] = [
 	},
 	{
 		label: 'Team notifications',
+		description: 'Choose which alerts your staff members receive.',
 		url: resolve('/home/settings/notifications/team-notifications'),
 		icon: Users,
 		group: 'Settings',
@@ -214,6 +238,7 @@ export const searchPages: SearchPage[] = [
 	},
 	{
 		label: 'Customer notifications',
+		description: 'Choose which alerts and reminders your customers receive.',
 		url: resolve('/home/settings/notifications/customer-notifications'),
 		icon: UserHeart,
 		group: 'Settings',
@@ -222,6 +247,7 @@ export const searchPages: SearchPage[] = [
 	},
 	{
 		label: 'Notification customization',
+		description: 'Customize the templates used for outgoing notifications.',
 		url: resolve('/home/settings/notifications/customization'),
 		icon: Palette,
 		group: 'Settings',

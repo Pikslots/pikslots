@@ -72,7 +72,10 @@
 									onSelect={() => select(page)}
 								>
 									<page.icon class="text-muted-foreground" />
-									<span>{page.label}</span>
+									<div class="flex flex-col">
+										<span>{page.label}</span>
+										<span class="text-xs text-muted-foreground">{page.description}</span>
+									</div>
 								</Command.Item>
 							{/each}
 						</Command.Group>
