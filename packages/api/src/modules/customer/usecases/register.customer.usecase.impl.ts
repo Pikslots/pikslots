@@ -21,6 +21,8 @@ import {
   PIKSLOT_EVENTS,
 } from 'src/shared/queue/jobs/pikslot.events';
 import type { AuditLogJobName } from 'src/shared/queue/jobs';
+import { NotificationDispatchService } from 'src/shared/realtime/notification.dispatch.service';
+import { NOTIFICATION_ICON_CLASS_NAMES } from 'src/shared/realtime/notification.dispatch.types';
 import { v7 as uuidv7 } from 'uuid';
 
 const UNAUTHORIZED_ERROR: UnauthorizedError = {
@@ -41,6 +43,7 @@ export class RegisterCustomerUseCaseImpl implements RegisterCustomerUseCase {
       void,
       AuditLogJobName
     >,
+    private readonly notificationDispatchService: NotificationDispatchService,
   ) {}
 
   async execute(
@@ -85,7 +88,22 @@ export class RegisterCustomerUseCaseImpl implements RegisterCustomerUseCase {
 
     await this.logCustomerCreatedAudit(customer);
 
+    await this.notifyCustomerCreated(customer);
+
     return ok(customer);
+  }
+
+  private async notifyCustomerCreated(customer: Customer): Promise<void> {
+    await this.notificationDispatchService.dispatch({
+      businessId: customer.businessId,
+      kind: 'system',
+      iconClassName: NOTIFICATION_ICON_CLASS_NAMES.system,
+      title: 'New customer added',
+      message: `${customer.name.firstName} ${customer.name.lastName} was added as a customer.`,
+      body: [
+        `${customer.name.firstName} ${customer.name.lastName} has been added to your customer list.`,
+      ],
+    });
   }
 
   private async logCustomerCreatedAudit(customer: Customer): Promise<void> {

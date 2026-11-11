@@ -16,3 +16,4 @@ export * from './public-booking-page';
 export * from './onboarding';
 export * from './audit-logs';
 export * from './session';
+export * from './notification';

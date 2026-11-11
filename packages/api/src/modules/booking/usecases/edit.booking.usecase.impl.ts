@@ -16,12 +16,15 @@ import {
   UnauthorizedError,
 } from '@pikslots/domain';
 import { Queue } from 'bullmq';
+import { v7 as uuidv7 } from 'uuid';
 import { SecurityContext } from 'src/shared/security/context/security.context';
 import {
   AUDIT_LOG_QUEUE,
   PIKSLOT_EVENTS,
 } from 'src/shared/queue/jobs/pikslot.events';
 import type { AuditLogJobName } from 'src/shared/queue/jobs';
+import { NotificationDispatchService } from 'src/shared/realtime/notification.dispatch.service';
+import { NOTIFICATION_ICON_CLASS_NAMES } from 'src/shared/realtime/notification.dispatch.types';
 
 const UNAUTHORIZED_ERROR: UnauthorizedError = {
   kind: 'unauthorized',
@@ -41,6 +44,7 @@ export class EditBookingUseCaseImpl implements EditBookingUseCase {
       void,
       AuditLogJobName
     >,
+    private readonly notificationDispatchService: NotificationDispatchService,
   ) {}
 
   async execute(
@@ -113,7 +117,22 @@ export class EditBookingUseCaseImpl implements EditBookingUseCase {
 
     await this.logBookingUpdatedAudit(updated);
 
+    await this.notifyBookingUpdated(updated);
+
     return ok(updated);
+  }
+
+  private async notifyBookingUpdated(booking: Booking): Promise<void> {
+    if (!booking.userId) return;
+
+    await this.notificationDispatchService.dispatch({
+      userId: booking.userId,
+      kind: 'booking',
+      iconClassName: NOTIFICATION_ICON_CLASS_NAMES.booking,
+      title: 'Booking updated',
+      message: `Booking ${booking.bookingId} was updated.`,
+      body: [`Booking ${booking.bookingId} has been updated.`],
+    });
   }
 
   private async logBookingUpdatedAudit(booking: Booking): Promise<void> {

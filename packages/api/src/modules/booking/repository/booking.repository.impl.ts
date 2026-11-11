@@ -131,6 +131,30 @@ export class BookingRepositoryImpl implements BookingRepository {
     }
   }
 
+  async findStartingBetween(
+    windowStartIso: string,
+    windowEndIso: string,
+  ): Promise<Result<Booking[], InfrastructureError>> {
+    try {
+      const rows = await this.db
+        .selectFrom('bookings')
+        .selectAll()
+        .where('is_deleted', '=', false)
+        .where('booking_start_time', '>=', new Date(windowStartIso))
+        .where('booking_start_time', '<', new Date(windowEndIso))
+        .execute();
+
+      return ok(rows.map((row) => this.mapper.persistenceToDomain(row)));
+    } catch (cause) {
+      return err<InfrastructureError>({
+        kind: 'infrastructure',
+        message: 'Failed to find bookings starting between window',
+        timestamp: new Date(),
+        cause,
+      });
+    }
+  }
+
   async update(
     booking: Booking,
   ): Promise<Result<void, BookingNotFoundError | InfrastructureError>> {

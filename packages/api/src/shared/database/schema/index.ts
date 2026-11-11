@@ -14,6 +14,7 @@ import { BookingTable } from './booking.table';
 import { BreakTable } from './break.table';
 import { AuditLogTable } from './audit.log.table';
 import { SessionTable } from './session.table';
+import { NotificationTable } from './notification.table';
 
 export type { AuditFields };
 
@@ -33,4 +34,5 @@ export interface PikSlotsDatabase {
   breaks: BreakTable;
   audit_logs: AuditLogTable;
   sessions: SessionTable;
+  notifications: NotificationTable;
 }

@@ -1,5 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import cookieParser from 'cookie-parser';
+import type { Server as HttpServer } from 'http';
 import { ConfigService } from '@nestjs/config';
 import { PikslotsAppModule } from './pikslots.app.module';
 import { type Env } from './shared/config/env';
@@ -8,6 +9,11 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import type { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface';
 import { validationExceptionFactory } from './shared/pipes/validation.exception.factory';
+import {
+  buildCorsOriginMatchers,
+  isAllowedOrigin,
+} from './shared/security/cors';
+import { RedisIoAdapter } from './shared/realtime/redis-io.adapter';
 
 async function bootstrap() {
   const app = await NestFactory.create(PikslotsAppModule);
@@ -25,20 +31,11 @@ async function bootstrap() {
   const config = app.get(ConfigService<Env, true>);
 
   const corsOrigins = config.get('CORS_ORIGINS', { infer: true });
-  const corsOriginMatchers = corsOrigins.map(
-    (pattern) =>
-      new RegExp(
-        `^${pattern
-          .split('*')
-          .map((part) => part.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
-          .join('.*')}$`,
-      ),
-  );
+  const corsOriginMatchers = buildCorsOriginMatchers(corsOrigins);
 
   const corsOptions: CorsOptions = {
     origin: (origin, callback) => {
-      // requests with no origin (e.g. curl, server-to-server) are allowed
-      if (!origin || corsOriginMatchers.some((re) => re.test(origin))) {
+      if (isAllowedOrigin(origin, corsOriginMatchers)) {
         callback(null, true);
       } else {
         callback(new Error(`Not allowed by CORS: ${origin}`));
@@ -46,7 +43,16 @@ async function bootstrap() {
     },
     credentials: true,
   };
+
   app.enableCors(corsOptions);
+
+  const redisIoAdapter = new RedisIoAdapter(
+    app.getHttpServer() as HttpServer,
+    config,
+    corsOriginMatchers,
+  );
+  redisIoAdapter.connectToRedis();
+  app.useWebSocketAdapter(redisIoAdapter);
 
   const enableApiDocs = config.get('ENABLE_API_DOCS', { infer: true });
 
