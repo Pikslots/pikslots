@@ -5,31 +5,29 @@ import { firstValueFrom, of } from 'rxjs';
 import type { AuditLogJobDataShape } from '@pikslots/domain';
 import { PIKSLOT_EVENTS } from 'src/shared/queue/jobs/pikslot.events';
 import type { AuditLogJobName } from 'src/shared/queue/jobs';
-import type { AuthenticatedActor } from 'src/shared/security/types/authenticated.request';
+import type { SecurityContext } from 'src/shared/security/context/security.context';
 import { AuditLogInterceptor } from './audit.log.interceptor';
 import type { AuditLogOptions } from '../decorators/audit.log.decorator';
 
 const handler = () => undefined;
 
-const actor: AuthenticatedActor = {
+const securityContext = {
   userId: 'user-1',
   role: 'Business Owner',
   businessId: 'biz-1',
-};
+} as SecurityContext;
 
 function createContext({
   params = { id: 'biz-1' },
-  requestActor = actor,
   statusCode = 200,
 }: {
   params?: Record<string, string>;
-  requestActor?: AuthenticatedActor;
   statusCode?: number;
 } = {}): ExecutionContext {
   return {
     getHandler: () => handler,
     switchToHttp: () => ({
-      getRequest: () => ({ params, actor: requestActor, ip: '127.0.0.1' }),
+      getRequest: () => ({ params, ip: '127.0.0.1' }),
       getResponse: () => ({ statusCode }),
     }),
   } as unknown as ExecutionContext;
@@ -50,12 +48,14 @@ describe('AuditLogInterceptor', () => {
   };
 
   beforeEach(() => {
+    securityContext.userId = 'user-1';
     reflector = { get: jest.fn() };
     queue = { add: jest.fn().mockResolvedValue(undefined) };
 
     interceptor = new AuditLogInterceptor(
       reflector as unknown as Reflector,
       queue as unknown as Queue<AuditLogJobDataShape, void, AuditLogJobName>,
+      securityContext,
     );
   });
 
@@ -126,14 +126,12 @@ describe('AuditLogInterceptor', () => {
     expect(queue.add).not.toHaveBeenCalled();
   });
 
-  it('does not queue when there is no authenticated actor', async () => {
+  it('does not queue when there is no authenticated user', async () => {
     reflector.get.mockReturnValue(options);
+    securityContext.userId = '';
 
     await firstValueFrom(
-      interceptor.intercept(
-        createContext({ params: {}, requestActor: { ...actor, userId: '' } }),
-        createNext(),
-      ),
+      interceptor.intercept(createContext({ params: {} }), createNext()),
     );
     await Promise.resolve();
 

@@ -8,12 +8,14 @@ import {
   Patch,
   Post,
   Res,
+  UseInterceptors,
   UseGuards,
 } from '@nestjs/common';
 import type { Response } from 'express';
 import { ApiTags } from '@nestjs/swagger';
 import { mapBusinessError } from './errors/business.errors.map';
 import { AuditLog } from '../audit-log/decorators/audit.log.decorator';
+import { AuditLogInterceptor } from '../audit-log/interceptors/audit.log.interceptor';
 import { PIKSLOT_EVENTS } from 'src/shared/queue/jobs/pikslot.events';
 import { BUSINESS_ENDPOINTS } from '@pikslots/shared';
 import { RegisterBusinessDto } from './dto/register.business.dto';
@@ -87,6 +89,7 @@ import {
 
 @ApiTags('Businesses')
 @Controller('')
+@UseInterceptors(AuditLogInterceptor)
 export class BusinessController {
   constructor(
     private readonly businessUseCaseFactory: BusinessUseCaseFactory,

@@ -2,18 +2,18 @@ import {
   CallHandler,
   ExecutionContext,
   Injectable,
-  Logger,
   NestInterceptor,
+  Scope,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
-import type { Response } from 'express';
 import { Observable, tap } from 'rxjs';
 import type { AuditLogJobDataShape } from '@pikslots/domain';
 import { AUDIT_LOG_QUEUE } from 'src/shared/queue/jobs/pikslot.events';
 import type { AuditLogJobName } from 'src/shared/queue/jobs';
-import type { AuthenticatedRequest } from 'src/shared/security/types/authenticated.request';
+import { SecurityContext } from 'src/shared/security/context/security.context';
+import { enqueueAuditLog } from 'src/shared/utils/audit.log.util';
 import {
   AUDIT_LOG_METADATA_KEY,
   type AuditLogOptions,
@@ -27,10 +27,8 @@ import {
  * concern: handlers only declare *what* happened, and the audit module owns
  * *how* it is persisted (queue + processor + audit_logs table).
  */
-@Injectable()
+@Injectable({ scope: Scope.REQUEST })
 export class AuditLogInterceptor implements NestInterceptor {
-  private readonly logger = new Logger(AuditLogInterceptor.name);
-
   constructor(
     private readonly reflector: Reflector,
     @InjectQueue(AUDIT_LOG_QUEUE)
@@ -39,6 +37,7 @@ export class AuditLogInterceptor implements NestInterceptor {
       void,
       AuditLogJobName
     >,
+    private readonly securityContext: SecurityContext,
   ) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
@@ -56,7 +55,9 @@ export class AuditLogInterceptor implements NestInterceptor {
       // in addition to relying on the absence of a thrown error.
       tap({
         next: () => {
-          const response = context.switchToHttp().getResponse<Response>();
+          const response = context
+            .switchToHttp()
+            .getResponse<{ statusCode: number }>();
           if (response.statusCode >= 400) return;
 
           void this.enqueue(context, options);
@@ -70,19 +71,21 @@ export class AuditLogInterceptor implements NestInterceptor {
     options: AuditLogOptions,
   ): Promise<void> {
     try {
-      const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
-      const actor = request.actor;
+      const request = context.switchToHttp().getRequest<{
+        params?: Record<string, string | string[]>;
+        ip?: string;
+      }>();
       const routeParam = request.params?.[options.businessIdParam ?? 'id'];
       const routeBusinessId = Array.isArray(routeParam)
         ? routeParam[0]
         : routeParam;
-      const businessId = routeBusinessId || actor?.businessId;
+      const businessId = routeBusinessId || this.securityContext.businessId;
 
-      if (!businessId || !actor?.userId) return;
+      if (!businessId || !this.securityContext.userId) return;
 
       const payload: AuditLogJobDataShape = {
         businessId,
-        userId: actor.userId,
+        userId: this.securityContext.userId,
         userType: 'user',
         action: options.action,
         description: options.description,
@@ -92,13 +95,9 @@ export class AuditLogInterceptor implements NestInterceptor {
         ipAddress: request.ip,
       };
 
-      await this.auditLogQueue.add(options.action, payload);
-    } catch (error) {
+      await enqueueAuditLog(this.auditLogQueue, options.action, payload);
+    } catch {
       // Audit failures must never break the request that triggered them.
-      this.logger.error(
-        `Failed to enqueue '${options.action}' audit event`,
-        error instanceof Error ? error.stack : undefined,
-      );
     }
   }
 }
