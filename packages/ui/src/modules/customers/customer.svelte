@@ -59,7 +59,6 @@
 		enabled: !!selectedCustomerId
 	}));
 
-
 	// ── Derived ───────────────────────────────────────────────────────────────
 
 	const filteredCustomers = $derived(
