@@ -31,6 +31,7 @@ import {
   FindCustomerByIdDocs,
   UpdateCustomerProfileImageDocs,
   DebounceCustomerSearchDocs,
+  ExportCustomersByBusinessDocs,
 } from './docs/customer.controller.docs';
 import { CustomerUseCasesFactory } from './factory/customer.usecases.factory';
 import type {
@@ -48,6 +49,8 @@ import {
   type PikslotS3Service,
 } from 'src/shared/s3/s3.service';
 import { DebounceCustomerSearchDto } from './dto/debounce.customer.search.dto';
+import { toCustomersCsv } from './mappers/customer.csv.mapper';
+import { CSV_BOM } from 'src/shared/csv/csv.util';
 
 @ApiTags('Customers')
 @Controller('')
@@ -278,6 +281,34 @@ export class CustomerController {
       })),
       HttpStatus.OK,
     );
+  }
+
+  @ExportCustomersByBusinessDocs()
+  @UseGuards(RolesGuard)
+  @Roles('Platform Owner', 'Business Owner', 'Admin', 'Enhanced', 'Standard')
+  @Get(CUSTOMER_ENDPOINTS.EXPORT_BY_BUSINESS)
+  async exportCustomersByBusiness(
+    @Res({ passthrough: true }) res: Response,
+    @Param('businessId') businessId: string,
+  ): Promise<PikslotsBaseErrorResponse | string> {
+    const result =
+      await this.customerUseCasesFactory.exportCustomersByBusinessUseCase.execute(
+        businessId,
+      );
+
+    if (!result.ok) {
+      const errorResponse = mapCustomerError(result.error);
+      res.status(errorResponse.statusCode);
+      return errorResponse;
+    }
+
+    const fileName = `customers-${new Date().toISOString().slice(0, 10)}.csv`;
+
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+    res.status(HttpStatus.OK);
+
+    return CSV_BOM + toCustomersCsv(result.value);
   }
 
   @UpdateCustomerProfileImageDocs()

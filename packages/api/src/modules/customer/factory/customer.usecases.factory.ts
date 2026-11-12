@@ -7,6 +7,7 @@ import {
   IFindCustomerByIdUseCase,
   IUpdateCustomerProfileImageUseCase,
   IDebounceCustomerSearchByBusinessIdUseCase,
+  IExportCustomersByBusinessUseCase,
 } from '@pikslots/domain';
 import type {
   RegisterCustomerUseCase,
@@ -16,6 +17,7 @@ import type {
   FindCustomerByIdUseCase,
   UpdateCustomerProfileImageUseCase,
   DebounceCustomerSearchByBusinessIdUseCase,
+  ExportCustomersByBusinessUseCase,
 } from '@pikslots/domain';
 
 @Injectable()
@@ -40,4 +42,7 @@ export class CustomerUseCasesFactory {
 
   @Inject(IDebounceCustomerSearchByBusinessIdUseCase)
   public readonly debounceCustomerSearchByBusinessIdUseCase: DebounceCustomerSearchByBusinessIdUseCase;
+
+  @Inject(IExportCustomersByBusinessUseCase)
+  public readonly exportCustomersByBusinessUseCase: ExportCustomersByBusinessUseCase;
 }

@@ -7,6 +7,7 @@ import {
   IFindCustomerByIdUseCase,
   IUpdateCustomerProfileImageUseCase,
   IDebounceCustomerSearchByBusinessIdUseCase,
+  IExportCustomersByBusinessUseCase,
 } from '@pikslots/domain';
 import { RegisterCustomerUseCaseImpl } from './register.customer.usecase.impl';
 import { EditCustomerUseCaseImpl } from './edit.customer.usecase.impl';
@@ -15,6 +16,7 @@ import { FindAllCustomersByBusinessUseCaseImpl } from './find.all.customers.by.b
 import { FindCustomerByIdUseCaseImpl } from './find.customer.by.id.usecase.impl';
 import { UpdateCustomerProfileImageUseCaseImpl } from './update.customer.profile.image.usecase.impl';
 import { DebounceCustomerSearchByBusinessIdUseCaseImpl } from './debounce.customer.search.by.business.id.usecase.impl';
+import { ExportCustomersByBusinessUseCaseImpl } from './export.customers.by.business.usecase.impl';
 
 export const CUSTOMER_USECASES: Provider[] = [
   { useClass: RegisterCustomerUseCaseImpl, provide: IRegisterCustomerUseCase },
@@ -32,5 +34,9 @@ export const CUSTOMER_USECASES: Provider[] = [
   {
     useClass: DebounceCustomerSearchByBusinessIdUseCaseImpl,
     provide: IDebounceCustomerSearchByBusinessIdUseCase,
+  },
+  {
+    useClass: ExportCustomersByBusinessUseCaseImpl,
+    provide: IExportCustomersByBusinessUseCase,
   },
 ];
