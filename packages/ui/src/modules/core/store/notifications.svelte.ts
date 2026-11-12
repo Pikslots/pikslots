@@ -26,8 +26,11 @@ function createNotificationsStore() {
 		notifications = response.map(toNotificationItem);
 	}
 
-	function addNotification(item: Omit<NotificationItem, 'read'>) {
+	function addNotification(item: Omit<NotificationItem, 'read'>): boolean {
+		if (notifications.some((notification) => notification.id === item.id)) return false;
+
 		notifications = [{ ...item, read: false }, ...notifications];
+		return true;
 	}
 
 	async function markAllAsRead() {

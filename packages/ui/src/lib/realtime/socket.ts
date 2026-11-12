@@ -1,5 +1,7 @@
 import { io, type Socket } from 'socket.io-client';
+import { toast } from 'svelte-sonner';
 import { notificationsStore } from '$stores/notifications.svelte';
+import NotificationToast from '../../modules/notifications/notification-toast.svelte';
 import type { NotificationItem } from '../../modules/notifications/data';
 
 let socket: Socket | null = null;
@@ -13,8 +15,16 @@ export function connectSocket(): void {
 	});
 
 	socket.on('notification', (payload: Omit<NotificationItem, 'read'>) => {
-		alert('this is ' + JSON.stringify(payload));
-		notificationsStore.addNotification(payload);
+		const added = notificationsStore.addNotification(payload);
+		if (!added) return;
+		console.log('aya');
+		toast.custom(NotificationToast, {
+			id: payload.id,
+			componentProps: {
+				notification: { ...payload, read: false }
+			},
+			duration: 10_000
+		});
 	});
 }
 

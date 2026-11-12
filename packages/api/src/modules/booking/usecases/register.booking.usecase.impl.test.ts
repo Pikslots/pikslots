@@ -25,7 +25,6 @@ import { CUSTOMER_TEST_DATA } from '../../customer/repository/customer.test.data
 import { UserRepositoryTestImpl } from '../../user/repository/user.repository.fake.impl';
 import { USER_TEST_DATA } from '../../user/repository/user.test.data';
 import { AUDIT_LOG_QUEUE } from 'src/shared/queue/jobs/pikslot.events';
-import { NotificationDispatchService } from 'src/shared/realtime/notification.dispatch.service';
 
 jest.mock('uuid', () => ({
   v7: () => 'mock-generated-id',
@@ -113,10 +112,6 @@ describe('RegisterBookingUseCaseImpl', () => {
         {
           provide: getQueueToken(AUDIT_LOG_QUEUE),
           useValue: { add: jest.fn().mockResolvedValue(undefined) },
-        },
-        {
-          provide: NotificationDispatchService,
-          useValue: { dispatch: jest.fn().mockResolvedValue(undefined) },
         },
       ],
     }).compile();

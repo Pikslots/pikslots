@@ -59,9 +59,6 @@
 		enabled: !!selectedCustomerId
 	}));
 
-	$effect(() => {
-		console.log('customer query', customersQuery.data);
-	});
 
 	// ── Derived ───────────────────────────────────────────────────────────────
 

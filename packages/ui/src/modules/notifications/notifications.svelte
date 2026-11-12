@@ -101,7 +101,7 @@
 					type="button"
 					class="relative flex w-full items-start gap-3 border-b px-4 py-4 text-left transition-colors last:border-b-0 hover:bg-muted/50 {notification.read
 						? ''
-						: 'bg-primary/[0.03]'}"
+						: 'bg-primary/3'}"
 					onclick={() => openNotification(notification)}
 				>
 					<div

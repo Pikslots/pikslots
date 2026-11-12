@@ -32,8 +32,6 @@ import {
   PIKSLOT_EVENTS,
 } from 'src/shared/queue/jobs/pikslot.events';
 import type { AuditLogJobName } from 'src/shared/queue/jobs';
-import { NotificationDispatchService } from 'src/shared/realtime/notification.dispatch.service';
-import { NOTIFICATION_ICON_CLASS_NAMES } from 'src/shared/realtime/notification.dispatch.types';
 import { v7 as uuidv7 } from 'uuid';
 
 const UNAUTHORIZED_ERROR: UnauthorizedError = {
@@ -63,7 +61,6 @@ export class RegisterBookingUseCaseImpl implements RegisterBookingUseCase {
       void,
       AuditLogJobName
     >,
-    private readonly notificationDispatchService: NotificationDispatchService,
   ) {}
 
   async execute(
@@ -125,22 +122,7 @@ export class RegisterBookingUseCaseImpl implements RegisterBookingUseCase {
 
     await this.logBookingCreatedAudit(booking);
 
-    await this.notifyBookingCreated(booking);
-
     return ok(booking);
-  }
-
-  private async notifyBookingCreated(booking: Booking): Promise<void> {
-    if (!booking.userId) return;
-
-    await this.notificationDispatchService.dispatch({
-      userId: booking.userId,
-      kind: 'booking',
-      iconClassName: NOTIFICATION_ICON_CLASS_NAMES.booking,
-      title: 'New booking confirmed',
-      message: `${booking.serviceSnapshot.title} booked for ${booking.bookingDate}.`,
-      body: [`Booking ${booking.bookingId} has been created.`],
-    });
   }
 
   private async logBookingCreatedAudit(booking: Booking): Promise<void> {

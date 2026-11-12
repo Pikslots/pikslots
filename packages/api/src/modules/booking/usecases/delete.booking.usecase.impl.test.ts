@@ -13,7 +13,6 @@ import { BookingRepositoryTestImpl } from '../repository/booking.repository.fake
 import { DeleteBookingUseCaseImpl } from './delete.booking.usecase.impl';
 import { SecurityContext } from 'src/shared/security/context/security.context';
 import { AUDIT_LOG_QUEUE } from 'src/shared/queue/jobs/pikslot.events';
-import { NotificationDispatchService } from 'src/shared/realtime/notification.dispatch.service';
 
 jest.mock('uuid', () => ({
   v7: () => 'mock-generated-id',
@@ -54,10 +53,6 @@ describe('DeleteBookingUseCaseImpl', () => {
         {
           provide: getQueueToken(AUDIT_LOG_QUEUE),
           useValue: { add: jest.fn().mockResolvedValue(undefined) },
-        },
-        {
-          provide: NotificationDispatchService,
-          useValue: { dispatch: jest.fn().mockResolvedValue(undefined) },
         },
       ],
     }).compile();
