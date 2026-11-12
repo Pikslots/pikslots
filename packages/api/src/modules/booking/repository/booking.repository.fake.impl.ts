@@ -102,6 +102,24 @@ export class BookingRepositoryTestImpl implements BookingRepository {
     return true;
   }
 
+  async findStartingBetween(
+    windowStartIso: string,
+    windowEndIso: string,
+  ): Promise<Result<Booking[], InfrastructureError>> {
+    await Promise.resolve('');
+
+    const start = new Date(windowStartIso).getTime();
+    const end = new Date(windowEndIso).getTime();
+
+    return ok(
+      BOOKING_TEST_DATA.filter((b) => {
+        if (b.isDeleted) return false;
+        const startTime = new Date(b.bookingStartTime).getTime();
+        return startTime >= start && startTime < end;
+      }),
+    );
+  }
+
   async update(
     booking: Booking,
   ): Promise<Result<void, BookingNotFoundError | InfrastructureError>> {

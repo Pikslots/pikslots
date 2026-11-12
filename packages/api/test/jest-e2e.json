@@ -17,7 +17,9 @@
       }
     ]
   },
-  "transformIgnorePatterns": ["node_modules/(?!.*(kysely|uuid))"],
+  "transformIgnorePatterns": [
+    "node_modules/(?!.*(kysely|uuid|@nestjs/schedule))"
+  ],
   "moduleNameMapper": {
     "^src/(.*)$": "<rootDir>/../src/$1"
   },

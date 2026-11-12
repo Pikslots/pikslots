@@ -9,6 +9,7 @@ import {
   Patch,
   Post,
   Res,
+  UseInterceptors,
   UseGuards,
 } from '@nestjs/common';
 import type { Response } from 'express';
@@ -16,6 +17,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { PikslotsBaseErrorResponse } from 'src/shared/types/base.error.response';
 import { PikslotsBaseResponse } from 'src/shared/types/base.response';
 import { SecurityContext } from 'src/shared/security/context/security.context';
+import { AuditLogInterceptor } from '../audit-log/interceptors/audit.log.interceptor';
 import { RolesGuard } from 'src/shared/security/guards/roles.guard';
 import { Roles } from 'src/shared/security/guards/roles.decorator';
 import { mapServiceError } from './errors/service.errors.map';
@@ -46,6 +48,7 @@ import {
 
 @ApiTags('Services')
 @Controller('')
+@UseInterceptors(AuditLogInterceptor)
 export class ServiceController {
   constructor(
     private readonly serviceUseCasesFactory: ServiceUseCasesFactory,

@@ -16,6 +16,13 @@ export interface BookingRepository {
     startDateTime?: string,
     endDateTime?: string,
   ): Promise<Result<Booking[], InfrastructureError>>;
+  /** Cross-business lookup of confirmed, non-deleted bookings whose
+   * bookingStartTime falls within [windowStartIso, windowEndIso). Used by the
+   * reminder scheduler to scan for bookings starting soon. */
+  findStartingBetween(
+    windowStartIso: string,
+    windowEndIso: string,
+  ): Promise<Result<Booking[], InfrastructureError>>;
   update(booking: Booking): Promise<Result<void, BookingNotFoundError | InfrastructureError>>;
   delete(id: string): Promise<Result<void, BookingNotFoundError | InfrastructureError>>;
   hasConflict(

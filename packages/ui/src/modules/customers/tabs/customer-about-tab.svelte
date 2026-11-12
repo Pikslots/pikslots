@@ -16,9 +16,6 @@
 
 	let { customer }: { customer: FullCustomerModel } = $props();
 
-	$effect(() => {
-		console.log('what is the customer details', customer);
-	});
 	const SOCIAL_ICONS: Record<string, typeof World> = {
 		website: World,
 		instagram: BrandInstagram,

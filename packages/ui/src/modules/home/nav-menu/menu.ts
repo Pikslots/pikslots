@@ -1,4 +1,4 @@
-import HelpIcon from '@tabler/icons-svelte/icons/help';
+import NotificationIcon from '@tabler/icons-svelte/icons/notification';
 import SearchIcon from '@tabler/icons-svelte/icons/search';
 import SettingsIcon from '@tabler/icons-svelte/icons/settings';
 import Briefcase from '@tabler/icons-svelte/icons/briefcase';
@@ -9,6 +9,7 @@ import { IconCalendarCheck } from '@tabler/icons-svelte';
 import type { Icon } from '@tabler/icons-svelte';
 import { settingsStore } from '$stores/settings.svelte.js';
 import { searchStore } from '$stores/search.svelte.js';
+import { notificationsStore } from '$stores/notifications.svelte';
 import { resolve } from '$app/paths';
 import type { ResolvedPathname } from '$app/types';
 import type { UserRole } from '@pikslots/shared';
@@ -33,6 +34,7 @@ export const navSecondary: {
 	icon: Icon;
 	onclick?: () => void;
 	shortcut?: boolean;
+	badge?: () => number;
 }[] = [
 	{
 		title: 'Settings',
@@ -40,7 +42,12 @@ export const navSecondary: {
 		icon: SettingsIcon,
 		onclick: () => settingsStore.toggle()
 	},
-	{ title: 'Get Help', url: '#', icon: HelpIcon },
+	{
+		title: 'Notifications',
+		url: resolve('/home/notifications'),
+		icon: NotificationIcon,
+		badge: () => notificationsStore.unreadCount
+	},
 	{
 		title: 'Search',
 		url: '#',
