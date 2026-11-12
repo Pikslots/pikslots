@@ -72,6 +72,7 @@
 		"axios": "^1.16.1",
 		"clsx": "^2.1.1",
 		"jwt-decode": "^4.0.0",
+		"socket.io-client": "^4.8.4",
 		"svelte-easy-crop": "^5.0.1",
 		"sveltekit-superforms": "^2.30.1",
 		"tailwind-merge": "^3.6.0",

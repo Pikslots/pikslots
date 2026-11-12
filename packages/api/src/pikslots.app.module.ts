@@ -1,4 +1,5 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { ScheduleModule } from '@nestjs/schedule';
 import { PikslotsConfigModule } from './shared/config/pikslots.config.module';
 import { PikslotsDatabaseModule } from './shared/database/pikslots.database.module';
 import { UserModule } from './modules/user/user.module';
@@ -26,16 +27,20 @@ import { HealtController } from './health.controller';
 import { AuditLogModule } from './modules/audit-log/audit.log.module';
 import { SessionModule } from './modules/session/session.module';
 import { SessionVerifcationMiddleware } from './shared/security/middleware/session.verifcation.middleware';
+import { PikslotsRealtimeModule } from './shared/realtime/pikslots.realtime.module';
+import { NotificationModule } from './modules/notification/notification.module';
 
 @Module({
   imports: [
     PikslotsSecurityModule,
     PikslotsConfigModule,
     PikslotsDatabaseModule, // also runs the migrations
+    ScheduleModule.forRoot(),
     PikslotsQueueModule,
     PikslotEmailModule,
     PikslotCacheModule,
     PikslotS3Module,
+    PikslotsRealtimeModule,
 
     // domain modules
     UserModule,
@@ -55,6 +60,7 @@ import { SessionVerifcationMiddleware } from './shared/security/middleware/sessi
     OnboardingModule,
     AuditLogModule,
     SessionModule,
+    NotificationModule,
   ],
   controllers: [HealtController],
   providers: [],

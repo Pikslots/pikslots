@@ -5,6 +5,7 @@ import { resolve } from '$app/paths';
 import { toast } from 'svelte-sonner';
 import { SESSION_EXPIRED_MESSAGE, type BaseErrorResponse } from '@pikslots/shared';
 import { authStore } from '$stores/auth.svelte';
+import { disconnectSocket } from '$lib/realtime/socket';
 
 export const apiClient = axios.create({
 	baseURL: import.meta.env.VITE_API_URL,
@@ -22,6 +23,7 @@ apiClient.interceptors.response.use(
 		if (browser && isExpiredSession && authStore.isAuthenticated && !redirectingForExpiredSession) {
 			redirectingForExpiredSession = true;
 			authStore.clearSession();
+			disconnectSocket();
 			toast.error(SESSION_EXPIRED_MESSAGE);
 			goto(resolve('/login')).finally(() => {
 				redirectingForExpiredSession = false;

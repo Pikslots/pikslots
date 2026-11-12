@@ -14,6 +14,10 @@ import { DeleteBookingUseCaseImpl } from './delete.booking.usecase.impl';
 import { SecurityContext } from 'src/shared/security/context/security.context';
 import { AUDIT_LOG_QUEUE } from 'src/shared/queue/jobs/pikslot.events';
 
+jest.mock('uuid', () => ({
+  v7: () => 'mock-generated-id',
+}));
+
 function buildCommand(
   overrides: Partial<DeleteBookingCommand> = {},
 ): DeleteBookingCommand {

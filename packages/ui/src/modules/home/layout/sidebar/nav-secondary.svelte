@@ -1,5 +1,6 @@
 <script lang="ts">
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
+	import { Badge } from '$lib/components/ui/badge/index.js';
 	import type { WithoutChildren } from '$lib/utils.js';
 	import type { ComponentProps } from 'svelte';
 	import type { Icon } from '@tabler/icons-svelte';
@@ -17,6 +18,7 @@
 			icon: Icon;
 			onclick?: () => void;
 			shortcut?: boolean;
+			badge?: () => number;
 		}[];
 	} & WithoutChildren<ComponentProps<typeof Sidebar.Group>> = $props();
 
@@ -39,6 +41,14 @@
 								<a href={item.url} {...props} onclick={item.onclick}>
 									<item.icon />
 									<span>{item.title}</span>
+									{#if item.badge && item.badge() > 0}
+										<Badge
+											aria-label="{item.badge()} unread notifications"
+											class="ml-auto h-5 min-w-5 justify-center rounded-full bg-red-600 px-1.5 text-[10px] font-semibold text-white"
+										>
+											{item.badge()}
+										</Badge>
+									{/if}
 									{#if item.shortcut}
 										<span class="ml-auto text-xs text-muted-foreground"
 											>{isMac ? '⌘K' : 'Ctrl K'}</span
@@ -49,6 +59,14 @@
 								<button type="button" {...props} onclick={item.onclick}>
 									<item.icon />
 									<span>{item.title}</span>
+									{#if item.badge && item.badge() > 0}
+										<Badge
+											aria-label="{item.badge()} unread notifications"
+											class="ml-auto h-5 min-w-5 justify-center rounded-full bg-red-600 px-1.5 text-[10px] font-semibold text-white"
+										>
+											{item.badge()}
+										</Badge>
+									{/if}
 									{#if item.shortcut}
 										<span class="ml-auto text-xs text-muted-foreground"
 											>{isMac ? '⌘K' : 'Ctrl K'}</span

@@ -7,6 +7,8 @@
 	import { Toaster } from 'svelte-sonner';
 	import { getCurrentSession } from '../modules/api/session/get.current.session.query';
 	import { browser } from '$app/environment';
+	import { connectSocket } from '$lib/realtime/socket';
+	import { notificationsStore } from '$stores/notifications.svelte';
 
 	let { children } = $props();
 
@@ -27,7 +29,11 @@
 	$effect(() => {
 		themeStore.init();
 		getCurrentSession()
-			.then((session) => authStore.setSession(session))
+			.then((session) => {
+				authStore.setSession(session);
+				connectSocket();
+				notificationsStore.loadNotifications().catch(() => {});
+			})
 			.catch(() => {})
 			.finally(() => authStore.setInitialized());
 	});
