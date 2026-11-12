@@ -4,6 +4,7 @@ import { ServiceUseCasesFactory } from './factory/service.usecases.factory';
 import { SERVICE_USECASES } from './usecases';
 import { ServiceRepositoryImpl } from './repository/service.repository.impl';
 import { IServiceRepository } from '@pikslots/domain';
+import { AuditLogInterceptor } from '../audit-log/interceptors/audit.log.interceptor';
 
 @Module({
   imports: [],
@@ -12,6 +13,7 @@ import { IServiceRepository } from '@pikslots/domain';
     ServiceUseCasesFactory,
     ...SERVICE_USECASES,
     { useClass: ServiceRepositoryImpl, provide: IServiceRepository },
+    AuditLogInterceptor,
   ],
   exports: [IServiceRepository],
 })

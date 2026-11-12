@@ -29,6 +29,28 @@ export const PIKSLOT_EVENTS = {
     USER_PROFILE_UPDATED: 'audit.log.user.profile.updated',
     USER_WORKING_HOURS_UPDATED: 'audit.log.user.working.hours.updated',
     BUSINESS_REGISTERED: 'audit.log.business.registered',
+    BUSINESS_GENERAL_UPDATED: 'audit.log.business.general.updated',
+    BUSINESS_BRAND_DETAILS_UPDATED: 'audit.log.business.brand.details.updated',
+    BUSINESS_BRAND_IMAGES_UPDATED: 'audit.log.business.brand.images.updated',
+    BUSINESS_APPEARANCE_UPDATED: 'audit.log.business.appearance.updated',
+    BUSINESS_LOCATION_UPDATED: 'audit.log.business.location.updated',
+    BUSINESS_BOOKING_POLICIES_UPDATED:
+      'audit.log.business.booking.policies.updated',
+    BUSINESS_BOOKING_SETUP_UPDATED: 'audit.log.business.booking.setup.updated',
+    BUSINESS_BOOKING_CUSTOMIZATION_UPDATED:
+      'audit.log.business.booking.customization.updated',
+    BUSINESS_VISIBILITY_UPDATED: 'audit.log.business.visibility.updated',
+    BUSINESS_TEAM_NOTIFICATIONS_UPDATED:
+      'audit.log.business.team.notifications.updated',
+    BUSINESS_CUSTOMER_NOTIFICATIONS_UPDATED:
+      'audit.log.business.customer.notifications.updated',
+    BUSINESS_NOTIFICATION_CUSTOMIZATION_UPDATED:
+      'audit.log.business.notification.customization.updated',
+    BUSINESS_HOURS_UPDATED: 'audit.log.business.hours.updated',
+    BUSINESS_LINKS_UPDATED: 'audit.log.business.links.updated',
+    BUSINESS_CONTACT_DETAILS_UPDATED:
+      'audit.log.business.contact.details.updated',
+    BUSINESS_GALLERY_UPDATED: 'audit.log.business.gallery.updated',
     BOOKING_CREATED: 'audit.log.booking.created',
     BOOKING_UPDATED: 'audit.log.booking.updated',
     BOOKING_DELETED: 'audit.log.booking.deleted',
