@@ -50,7 +50,7 @@ jobs:
       S3_ACCESS_KEY: admin
       S3_SECRET_KEY: admin
       S3_HOST: http://localhost:9000
-      S3_REGION: eu-east-1
+      S3_REGION: us-east-1
       S3_BUCKET_NAME: pikslots-test
       S3_FORCED_PATH_STYLE: 'true'
 
