@@ -19,6 +19,7 @@ describe('InviteUserUsecaseImpl', () => {
   const createUseCase = async (
     role: UserRole,
     userId: string,
+    businessId: string | null = null,
   ): Promise<InviteUserUsecaseImpl> => {
     const moduleRef: TestingModule = await Test.createTestingModule({
       providers: [
@@ -32,6 +33,7 @@ describe('InviteUserUsecaseImpl', () => {
           useValue: {
             role,
             userId,
+            businessId,
           },
         },
         {
@@ -78,6 +80,42 @@ describe('InviteUserUsecaseImpl', () => {
       businessName: 'Acme',
     };
   };
+
+  describe('business resolution', () => {
+    it("falls back to the inviter's business when none is provided", async () => {
+      const useCase = await createUseCase(
+        'Platform Owner',
+        'user-platform-owner-1',
+        'business-1',
+      );
+      const command = {
+        ...buildCommand('Business Owner'),
+        businessId: undefined,
+      };
+
+      const result = await useCase.execute(command);
+
+      expect(result.ok).toBe(true);
+    });
+
+    it('rejects when neither the command nor inviter has a business', async () => {
+      const useCase = await createUseCase(
+        'Platform Owner',
+        'user-platform-owner-1',
+      );
+      const command = {
+        ...buildCommand('Business Owner'),
+        businessId: undefined,
+      };
+
+      const result = await useCase.execute(command);
+
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.error.kind).toBe('inviter_not_authorized');
+      }
+    });
+  });
 
   describe('Platform Owner permissions', () => {
     it.each([

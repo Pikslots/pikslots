@@ -20,6 +20,7 @@ import {
   IUpdateUserAvatarUseCase,
   IGetAvailableDatesForBookingUseCase,
   IUpdateUserProfileUseCase,
+  ISwitchUserBusinessUseCase,
 } from '@pikslots/domain';
 
 import { LoginUserUseCaseImpl } from './login.user.usecase.impl';
@@ -32,6 +33,7 @@ import { GetFreeSlotsForUserUseCaseImpl } from './get.free.slots.for.user.usecas
 import { GetAvailableDatesForBookingUseCaseImpl } from './get.available.dates.for.booking.usecase.impl';
 import { UpdateUserAvatarUseCaseImpl } from './update.user.avatar.usecase.impl';
 import { UpdateUserProfileUseCaseImpl } from './update.user.profile.usecase.impl';
+import { SwitchUserBusinessUseCaseImpl } from './switch.user.business.usecase.impl';
 
 export const USER_USECASES: Provider[] = [
   { useClass: InviteUserUsecaseImpl, provide: IInviteUserUseCase },
@@ -69,5 +71,9 @@ export const USER_USECASES: Provider[] = [
   {
     useClass: UpdateUserProfileUseCaseImpl,
     provide: IUpdateUserProfileUseCase,
+  },
+  {
+    useClass: SwitchUserBusinessUseCaseImpl,
+    provide: ISwitchUserBusinessUseCase,
   },
 ];

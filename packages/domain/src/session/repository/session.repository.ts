@@ -6,6 +6,7 @@ export interface SessionRepository {
   save(session: Session): Promise<Result<void, InfrastructureError>>;
   findById(id: string): Promise<Result<Session, SessionNotFound | InfrastructureError>>;
   findAllByUserId(userId: string): Promise<Result<Session[], InfrastructureError>>;
+  update(session: Session): Promise<Result<void, SessionNotFound | InfrastructureError>>;
   delete(id: string): Promise<Result<void, SessionNotFound | InfrastructureError>>;
 }
 

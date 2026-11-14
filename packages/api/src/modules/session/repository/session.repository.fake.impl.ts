@@ -51,6 +51,26 @@ export class SessionRepositoryTestImpl implements SessionRepository {
     return ok(SESSION_TEST_DATA.filter((session) => session.userId === userId));
   }
 
+  async update(
+    session: Session,
+  ): Promise<Result<void, SessionNotFound | InfrastructureError>> {
+    await Promise.resolve('');
+    const index = SESSION_TEST_DATA.findIndex((item) => item.id === session.id);
+
+    if (index === -1) {
+      return err<SessionNotFound>({
+        kind: 'session_not_found',
+        message: 'Session not found',
+        by: 'id',
+        value: session.id,
+        timestamp: new Date(),
+      });
+    }
+
+    SESSION_TEST_DATA[index] = session;
+    return ok(undefined);
+  }
+
   async delete(
     id: string,
   ): Promise<Result<void, SessionNotFound | InfrastructureError>> {

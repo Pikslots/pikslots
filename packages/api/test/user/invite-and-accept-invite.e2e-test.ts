@@ -137,13 +137,24 @@ describe(`POST ${USER_ENDPOINTS.INVITE} -> ${USER_ENDPOINTS.REQUEST_INVITE_OTP} 
 
   describe('role matrix (User.canInviteRole)', () => {
     it('lets a Platform Owner invite a Business Owner', async () => {
+      const { id: businessId } = await createBusiness(ctx);
+      const payload = inviteUserPayload({ role: 'Business Owner' });
+
       const response = await inviteUser(
         ctx,
-        inviteUserPayload({ role: 'Business Owner' }),
-        await tokenForRole(ctx, 'Platform Owner'),
+        payload,
+        await tokenForRole(ctx, 'Platform Owner', businessId),
       );
 
       expect(response.status).toBe(201);
+
+      const invited = await ctx.db
+        .selectFrom('users')
+        .select('business_id')
+        .where('email', '=', payload.email)
+        .executeTakeFirstOrThrow();
+
+      expect(invited.business_id).toBe(businessId);
     });
 
     it('blocks a Business Owner from inviting a Platform Owner', async () => {

@@ -77,6 +77,10 @@ export class Session {
     return this.props.expiresAt.getTime() <= now.getTime();
   }
 
+  assignBusiness(businessId: string): Session {
+    return new Session({ ...this.props, businessId });
+  }
+
   // ── Identity ───────────────────────────────────────────────────────────────
 
   get id(): string {

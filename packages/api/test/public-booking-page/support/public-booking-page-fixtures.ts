@@ -26,7 +26,7 @@ const DEFAULT_WORKING_HOURS: UserWorkingHours = {
 
 async function insertUser(
   ctx: PublicBookingPageTestContext,
-  businessId: string | null,
+  businessId: string,
   role: UserRole,
 ): Promise<string> {
   const id = randomUUID();
@@ -75,7 +75,7 @@ async function insertUser(
 export async function createBusiness(
   ctx: PublicBookingPageTestContext,
 ): Promise<{ id: string; slug: string; ownerId: string }> {
-  const ownerId = await insertUser(ctx, null, 'Business Owner');
+  const ownerId = await insertUser(ctx, randomUUID(), 'Business Owner');
   const slug = unique('e2e-pbp-biz');
 
   await request(ctx.app.getHttpServer())

@@ -16,7 +16,7 @@ export interface CreateUser {
   id: string;
   username: string;
   password: string;
-  businessId: string | null;
+  businessId: string;
   name: FullName;
   email: string;
   phone?: string;

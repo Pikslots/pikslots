@@ -24,6 +24,7 @@ import {
 } from 'src/shared/queue/jobs/pikslot.events';
 import type { AuditLogJobName } from 'src/shared/queue/jobs';
 import { mapUserError } from './errors/user.errors.map';
+import { mapBusinessError } from '../business/errors/business.errors.map';
 import { USER_ENDPOINTS } from '@pikslots/shared';
 import { LoginUserDto } from './dto/login.user.dto';
 import { InviteUserDto } from './dto/invite.user.dto';
@@ -40,6 +41,7 @@ import {
   GetFreeSlotsForUserDocs,
   UpdateUserAvatarDocs,
   UpdateUserProfileDocs,
+  SwitchUserBusinessDocs,
 } from './docs/user.controller.docs';
 import { GetUsersByRoleDto } from './dto/get.users.by.role.dto';
 import { PikslotsBaseErrorResponse } from 'src/shared/types/base.error.response';
@@ -52,6 +54,7 @@ import type {
   LoginUserResponse,
   LogoutUserResponse,
   RequestInviteOtpResponse,
+  SwitchUserBusinessResponse,
   UpdateUserAvatarResponse,
   UpdateUserProfileResponse,
   UpdateUserWorkingHoursResponse,
@@ -61,6 +64,7 @@ import { UserResponseMapper } from './mappers/user.response.mapper';
 import { UpdateUserWorkingHoursDto } from './dto/update.user.working.hours.dto';
 import { UpdateUserAvatarDto } from './dto/update.user.avatar.dto';
 import { UpdateUserProfileDto } from './dto/update.user.profile.dto';
+import { SwitchUserBusinessDto } from './dto/switch.user.business.dto';
 import { RequestInviteOtpDto } from './dto/request.invite.otp.dto';
 import { AcceptInviteDto } from './dto/accept.invite.dto';
 import { GetFreeSlotsForUserDto } from './dto/get.free.slots.for.user.dto';
@@ -234,6 +238,38 @@ export class UserController {
     res.status(HttpStatus.OK);
     return new PikslotsBaseResponse<UpdateUserProfileResponse>(
       { message: 'success' },
+      HttpStatus.OK,
+    );
+  }
+
+  @SwitchUserBusinessDocs()
+  @UseGuards(RolesGuard)
+  @Roles('Platform Owner')
+  @Patch(USER_ENDPOINTS.SWITCH_BUSINESS)
+  async switchBusiness(
+    @Res({ passthrough: true }) res: Response,
+    @Body() dto: SwitchUserBusinessDto,
+  ): Promise<
+    PikslotsBaseErrorResponse | PikslotsBaseResponse<SwitchUserBusinessResponse>
+  > {
+    const result =
+      await this.userUseCaseFactory.switchUserBusinessUseCase.execute({
+        userId: this.securityContext.userId,
+        businessId: dto.businessId,
+      });
+
+    if (!result.ok) {
+      const errorResponse =
+        result.error.kind === 'business_not_found'
+          ? mapBusinessError(result.error)
+          : mapUserError(result.error);
+      res.status(errorResponse.statusCode);
+      return errorResponse;
+    }
+
+    res.status(HttpStatus.OK);
+    return new PikslotsBaseResponse<SwitchUserBusinessResponse>(
+      { message: 'success', businessId: result.value.businessId },
       HttpStatus.OK,
     );
   }

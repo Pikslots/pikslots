@@ -22,7 +22,7 @@ const DEFAULT_WORKING_HOURS: UserWorkingHours = {
 
 async function insertUser(
   ctx: BreakTestContext,
-  businessId: string | null,
+  businessId: string,
   role: UserRole,
 ): Promise<string> {
   const id = randomUUID();
@@ -71,7 +71,7 @@ async function insertUser(
 export async function createBusiness(
   ctx: BreakTestContext,
 ): Promise<{ id: string; ownerId: string }> {
-  const ownerId = await insertUser(ctx, null, 'Business Owner');
+  const ownerId = await insertUser(ctx, randomUUID(), 'Business Owner');
   const slug = unique('e2e-break-biz');
 
   await request(ctx.app.getHttpServer())

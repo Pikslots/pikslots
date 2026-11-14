@@ -33,7 +33,7 @@ const DEFAULT_WORKING_HOURS: UserWorkingHours = {
 async function createOwnerUser(
   ctx: ServiceGroupAssignmentTestContext,
 ): Promise<string> {
-  return insertTestUser(ctx, null, 'Business Owner', 'Owner');
+  return insertTestUser(ctx, randomUUID(), 'Business Owner', 'Owner');
 }
 
 async function createTeamMember(
@@ -45,7 +45,7 @@ async function createTeamMember(
 
 async function insertTestUser(
   ctx: ServiceGroupAssignmentTestContext,
-  businessId: string | null,
+  businessId: string,
   role: UserRole,
   lastName: string,
 ): Promise<string> {

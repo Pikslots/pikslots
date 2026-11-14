@@ -47,7 +47,7 @@ export interface EditPayloadOverrides {
 export async function createOwnerUser(
   ctx: ServiceTestContext,
 ): Promise<string> {
-  return insertTestUser(ctx, null, 'Business Owner', 'E2E', 'Owner');
+  return insertTestUser(ctx, randomUUID(), 'Business Owner', 'E2E', 'Owner');
 }
 
 // A real user row inside the business, required so a service can be
@@ -61,7 +61,7 @@ export async function createTeamMember(
 
 async function insertTestUser(
   ctx: ServiceTestContext,
-  businessId: string | null,
+  businessId: string,
   role: 'Business Owner' | 'Standard',
   firstName: string,
   lastName: string,

@@ -62,6 +62,18 @@ export class InviteUserUsecaseImpl implements InviteUserUseCase {
         timestamp: new Date(),
       });
 
+    const businessId = command.businessId ?? this.securityContext.businessId;
+
+    if (!businessId) {
+      return err<InviterNotAuthorizedError>({
+        kind: 'inviter_not_authorized',
+        message: 'The inviter is not attached to a business',
+        inviterRole,
+        attemptedRole: command.role,
+        timestamp: new Date(),
+      });
+    }
+
     const emailExists = await this.userRepository.existsByEmail(command.email);
 
     if (!emailExists.ok) return err(emailExists.error);
@@ -96,7 +108,7 @@ export class InviteUserUsecaseImpl implements InviteUserUseCase {
       email: command.email,
       phone: command.phone,
       role: command.role,
-      businessId: command.businessId ?? null,
+      businessId,
       bookingUrl: '', // contruct the booking url later
       createdBy: this.securityContext.userId, // the id of the logged in user acting as inviter
     });
@@ -107,7 +119,6 @@ export class InviteUserUsecaseImpl implements InviteUserUseCase {
 
     // send invite only when not following roles : business owner ,no access
     if (
-      command.businessId &&
       command.businessName &&
       (user.role === 'Enhanced' ||
         user.role === 'Admin' ||
@@ -120,7 +131,7 @@ export class InviteUserUsecaseImpl implements InviteUserUseCase {
         context: {
           firstName: user.name.firstName,
           businessName: command.businessName,
-          acceptUrl: this.buildInviteUrl(user.id, command.businessId),
+          acceptUrl: this.buildInviteUrl(user.id, businessId),
         },
       });
 

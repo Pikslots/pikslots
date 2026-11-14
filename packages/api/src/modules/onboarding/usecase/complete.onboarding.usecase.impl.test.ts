@@ -342,7 +342,7 @@ describe('CompleteOnboardingUseCaseImpl', () => {
       );
       expect(onboarding.platformOwner.password).toBe('hashed-password');
       expect(onboarding.platformOwner.email).toBe(command.platformOwner.email);
-      expect(onboarding.platformOwner.businessId).toBeNull();
+      expect(onboarding.platformOwner.businessId).toBe('mock-uuid-3');
       expect(onboarding.platformOwner.createdBy).toBe('mock-uuid-1');
 
       expect(onboarding.businessOwner.id).toBe('mock-uuid-2');

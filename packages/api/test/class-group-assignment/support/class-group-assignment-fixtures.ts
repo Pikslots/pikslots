@@ -40,7 +40,7 @@ async function createOwnerUser(
     .insertInto('users')
     .values({
       id,
-      business_id: null,
+      business_id: randomUUID(),
       username: `e2e${suffix}`,
       password: 'e2e-unused-password-hash',
       first_name: 'E2E',

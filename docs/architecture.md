@@ -328,7 +328,7 @@ erDiagram
         uuid id PK
         varchar username UK
         varchar password
-        uuid business_id FK "nullable"
+        uuid business_id FK
         varchar role "Platform Owner, Business Owner, Admin, Enhanced, Standard, No Access"
         varchar status "invited, active, inactive, suspended"
         varchar email UK

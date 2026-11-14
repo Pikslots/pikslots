@@ -6,7 +6,7 @@ export const USER_TEST_DATA: User[] = [
     id: 'user-platform-owner-1',
     username: 'platform_owner',
     password: 'hashed_password_2',
-    businessId: null,
+    businessId: 'business-platform-owner-1',
     name: { firstName: 'Alice', lastName: 'Walker' },
     email: 'alice@pikslots.com',
     phone: '+1000000001',

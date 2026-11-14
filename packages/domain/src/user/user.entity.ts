@@ -23,7 +23,7 @@ export interface UserProps {
   readonly lastLoginAt: Date | null;
   readonly suspendedReason: string | null;
 
-  readonly businessId: string | null; // platform owner -> businessid is null
+  readonly businessId: string;
   // audit
   readonly createdAt: Date;
   readonly createdBy: string;
@@ -40,7 +40,7 @@ export interface CreateUserInput {
   id: string;
   username: string;
   password: string;
-  businessId: string | null;
+  businessId: string;
   name: FullName;
   email: string;
   phone?: string;
@@ -199,7 +199,7 @@ export class User {
   get username(): string {
     return this.props.username;
   }
-  get businessId(): string | null {
+  get businessId(): string {
     return this.props.businessId;
   }
   get password(): string {

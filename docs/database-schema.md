@@ -29,7 +29,7 @@ Core user accounts with authentication, profile, and preferences.
 | `id` | `UUID` | PK | Primary identifier |
 | `username` | `VARCHAR` | UNIQUE, NOT NULL | Login username |
 | `password` | `VARCHAR` | NOT NULL | bcrypt-hashed password |
-| `business_id` | `UUID` | FK → businesses.id, NULLABLE | Associated business (null for Platform Owners) |
+| `business_id` | `UUID` | FK → businesses.id, NOT NULL | Associated business (Platform Owners are attached to the platform/demo business) |
 | `first_name` | `VARCHAR` | NOT NULL | |
 | `last_name` | `VARCHAR` | NOT NULL | |
 | `email` | `VARCHAR` | UNIQUE, NOT NULL | |
@@ -120,7 +120,7 @@ Services/classes offered by a business.
 erDiagram
     users {
         uuid id PK
-        uuid business_id FK "nullable"
+        uuid business_id FK
     }
     
     businesses {
@@ -139,8 +139,8 @@ erDiagram
 ```
 
 - A **user** may own zero or one **business** (if role = Business Owner)
-- A **user** may belong to a **business** (if business_id is set)
-- A **Platform Owner** has `business_id = null`
+- A **user** always belongs to a **business**
+- A **Platform Owner** is attached to the platform/demo business
 - A **business** has many **users** (team members)
 - A **business** has many **services**
 

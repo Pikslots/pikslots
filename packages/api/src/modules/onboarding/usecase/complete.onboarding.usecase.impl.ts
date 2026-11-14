@@ -143,7 +143,7 @@ export class CompleteOnboardingUseCaseImpl implements CompleteOnBoardingUseCase 
         phone: command.platformOwner.phone ?? undefined,
         status: 'active',
         role: command.platformOwner.role,
-        businessId: null,
+        businessId: businessuuid,
         bookingUrl: '',
         createdBy: PlatformOwneruuid,
       },

@@ -26,7 +26,7 @@ describe(`POST ${ONBOARDING_ENDPOINTS.ONBOARDING_COMPLETE}`, () => {
     expect(platformOwner.username).toBe(payload.platformOwner.username);
     expect(platformOwner.email).toBe(payload.platformOwner.email);
     expect(platformOwner.role).toBe('Platform Owner');
-    expect(platformOwner.business_id).toBeNull();
+    expect(platformOwner.business_id).toBe(businessId);
     expect(platformOwner.created_by).toBe(platformOwnerId);
 
     const businessOwner = await ctx.db

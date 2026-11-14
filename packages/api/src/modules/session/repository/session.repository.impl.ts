@@ -90,6 +90,37 @@ export class SessionRepositoryImpl implements SessionRepository {
     }
   }
 
+  async update(
+    session: Session,
+  ): Promise<Result<void, SessionNotFound | InfrastructureError>> {
+    try {
+      const result = await this.db
+        .updateTable('sessions')
+        .set(this.mapper.domainToPersistence(session))
+        .where('id', '=', session.id)
+        .executeTakeFirst();
+
+      if (!result.numUpdatedRows || result.numUpdatedRows === BigInt(0)) {
+        return err<SessionNotFound>({
+          kind: 'session_not_found',
+          by: 'id',
+          value: session.id,
+          message: `Session not found against ${session.id}`,
+          timestamp: new Date(),
+        });
+      }
+
+      return ok(undefined);
+    } catch (cause) {
+      return err<InfrastructureError>({
+        kind: 'infrastructure',
+        message: 'Failed to update session',
+        timestamp: new Date(),
+        cause,
+      });
+    }
+  }
+
   async delete(
     id: string,
   ): Promise<Result<void, SessionNotFound | InfrastructureError>> {

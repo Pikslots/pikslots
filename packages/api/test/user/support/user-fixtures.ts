@@ -33,7 +33,7 @@ export const DEFAULT_WORKING_HOURS: UserWorkingHours = {
 
 export async function createStaffUser(
   ctx: UserTestContext,
-  businessId: string | null,
+  businessId: string,
   role: UserRole = 'Business Owner',
   overrides: { password?: string } = {},
 ): Promise<{ id: string; username: string; email: string }> {
@@ -85,7 +85,7 @@ export async function createStaffUser(
 export async function createBusiness(
   ctx: UserTestContext,
 ): Promise<{ id: string; ownerId: string }> {
-  const owner = await createStaffUser(ctx, null, 'Business Owner');
+  const owner = await createStaffUser(ctx, randomUUID(), 'Business Owner');
   const slug = unique('e2e-user-biz');
 
   await request(ctx.app.getHttpServer())

@@ -5,6 +5,8 @@ import type {
 	LoginUserInput,
 	LoginUserResponse,
 	LogoutUserResponse,
+	SwitchUserBusinessInput,
+	SwitchUserBusinessResponse,
 	UpdateUserAvatarInput,
 	UpdateUserAvatarResponse,
 	UpdateUserProfileInput,
@@ -31,3 +33,5 @@ export type UpdateAvatarInput = UpdateUserAvatarInput & { userId: string };
 export type UpdateAvatarResult = UpdateUserAvatarResponse;
 export type UpdateProfileInput = UpdateUserProfileInput;
 export type UpdateProfileResult = UpdateUserProfileResponse;
+export type SwitchBusinessInput = SwitchUserBusinessInput;
+export type SwitchBusinessResult = SwitchUserBusinessResponse;

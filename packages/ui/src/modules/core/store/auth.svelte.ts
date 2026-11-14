@@ -17,6 +17,11 @@ function createAuthStore() {
 		isInitializing = false;
 	}
 
+	function updateBusinessId(businessId: string) {
+		if (!session) return;
+		session = { ...session, businessId };
+	}
+
 	function getPayloadData(): LoginJwtPayload | null {
 		if (!session) return null;
 		return { userId: session.userId, role: session.role, businessId: session.businessId };
@@ -35,7 +40,8 @@ function createAuthStore() {
 		setSession,
 		clearSession,
 		getPayloadData,
-		setInitialized
+		setInitialized,
+		updateBusinessId
 	};
 }
 

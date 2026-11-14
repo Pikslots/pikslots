@@ -1,8 +1,8 @@
 -- =============================================================================
 -- Platform owner user
 -- Seeds the single "Platform Owner" account used to access the platform-level
--- admin surfaces. business_id is NULL because this role is not scoped to a
--- specific business.
+-- admin surfaces. Every user belongs to a business, so the Platform Owner is
+-- attached to the demo business created below.
 -- =============================================================================
 WITH seed_id AS (
   SELECT '019f3a2c-8b1e-7d4f-9a3b-c5e7f2814d60'::uuid AS id
@@ -40,7 +40,7 @@ INSERT INTO users (
 )
 SELECT
   seed_id.id,
-  NULL,
+  '019f3a2d-4c7f-7b8e-a2d5-e9f1c3057b84',
   'afaqjaved',
   '$2b$12$oKeoI5cSWasiDKsGarVXAeaSKFMA2N7Kc8mqgsV2h8G9zWEmSyeg2', -- admin12345
   'Afaq',

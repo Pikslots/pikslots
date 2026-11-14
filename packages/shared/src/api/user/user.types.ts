@@ -81,7 +81,7 @@ export interface UserSummary {
   avatarUrl: string | null;
   emailVerified: boolean;
   bookingUrl: string;
-  businessId: string | null;
+  businessId: string;
   lastLoginAt: string | null;
   suspendedReason: string | null;
   notificationPreferences: UserNotificationPreferences;
@@ -116,6 +116,17 @@ export interface UpdateUserProfileInput {
 
 export interface UpdateUserProfileResponse {
   message: 'success';
+}
+
+// --- Switch Business ---
+
+export interface SwitchUserBusinessInput {
+  businessId: string;
+}
+
+export interface SwitchUserBusinessResponse {
+  message: 'success';
+  businessId: string;
 }
 
 // --- Working Hours ---

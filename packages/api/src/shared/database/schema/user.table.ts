@@ -11,7 +11,7 @@ export interface UserTable extends AuditFields {
   id: string; // uuid primary key
   username: string; // unique login handle
   password: string; // bcrypt-hashed password
-  business_id: string | null; // plaform owner -> business id null
+  business_id: string; // every user belongs to a business
   first_name: string; // given name
   last_name: string; // family name
   email: string; // unique email address

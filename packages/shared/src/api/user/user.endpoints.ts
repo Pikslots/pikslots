@@ -13,4 +13,5 @@ export const USER_ENDPOINTS = {
   AVAILABLE_DATES: '/users/available-dates/:userId',
   UPDATE_AVATAR: '/users/:userId/avatar',
   UPDATE_PROFILE: '/users/me',
+  SWITCH_BUSINESS: '/users/me/business',
 } as const;
