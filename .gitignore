@@ -46,3 +46,6 @@ Thumbs.db
 .claude/settings.local.json
 
 vitest.config.*.timestamp*
+
+# nx dev server log
+/.nx/dev.log

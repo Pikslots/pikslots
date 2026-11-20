@@ -1,5 +1,11 @@
 import { HttpStatus, applyDecorators } from '@nestjs/common';
-import { ApiBody, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiProduces,
+  ApiResponse,
+} from '@nestjs/swagger';
 import { PikslotsBaseErrorResponse } from 'src/shared/types/base.error.response';
 import { RegisterCustomerDto } from '../dto/register.customer.dto';
 import { EditCustomerDto } from '../dto/edit.customer.dto';
@@ -302,6 +308,40 @@ export const DebounceCustomerSearchDocs = () =>
     ApiResponse({
       status: HttpStatus.BAD_REQUEST,
       description: 'Validation error',
+      type: PikslotsBaseErrorResponse,
+    }),
+    ApiResponse({
+      status: HttpStatus.INTERNAL_SERVER_ERROR,
+      description: 'Infrastructure failure',
+      type: PikslotsBaseErrorResponse,
+    }),
+  );
+
+export const ExportCustomersByBusinessDocs = () =>
+  applyDecorators(
+    ApiOperation({ summary: 'Export all customers for a business as CSV' }),
+    ApiParam({
+      name: 'businessId',
+      description: 'Business ID',
+      example: 'biz_01j...',
+    }),
+    ApiProduces('text/csv'),
+    ApiResponse({
+      status: HttpStatus.OK,
+      description: 'Customers exported successfully',
+      content: {
+        'text/csv': {
+          schema: {
+            type: 'string',
+            example:
+              'Customer ID,First Name,Last Name,Email,Additional Email,Primary Phone,Additional Phone,Company,Address,City,State,Zip Code,Country,Notes,Created At',
+          },
+        },
+      },
+    }),
+    ApiResponse({
+      status: HttpStatus.UNAUTHORIZED,
+      description: 'Caller is not authorized to view this business customers',
       type: PikslotsBaseErrorResponse,
     }),
     ApiResponse({
