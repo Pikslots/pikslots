@@ -1,6 +1,0 @@
-
-
-
-- edit you own profile is missing
-- edit booking dialog remove the scrollbar 
-- hide the add booking button on the calendar 
