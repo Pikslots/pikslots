@@ -115,8 +115,8 @@
 		<Dialog.Header class="px-6 pt-6 pb-4">
 			<Dialog.Title>{title}</Dialog.Title>
 			<Dialog.Description class="text-xs">
-				{pixels.x} × {pixels.y} px recommended · JPG, JPEG and PNG · Up to 10MB · Drag to reposition
-				· Scroll to zoom
+				{pixels.x} × {pixels.y} px recommended · JPG, JPEG and PNG · Up to 10MB · Drag to reposition ·
+				Scroll to zoom
 			</Dialog.Description>
 		</Dialog.Header>
 
