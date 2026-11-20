@@ -1,7 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import {
   BusinessAlreadyExistsError,
-  businessOwnerAlreadyExist,
   CompleteOnBoardingCommand,
   err,
   IBusinessRepository,
@@ -36,14 +35,6 @@ function buildCommand(
       email: 'alice.new@pikslots.com',
       phone: '+1000000001',
       role: 'Platform Owner',
-    },
-    businessOwner: {
-      username: 'business_owner_new',
-      password: 'password123',
-      name: { firstName: 'Bob', lastName: 'Smith' },
-      email: 'bob.new@acme.com',
-      phone: '+1000000002',
-      role: 'Business Owner',
     },
     business: {
       slug: 'new-salon-and-spa',
@@ -140,58 +131,6 @@ describe('CompleteOnboardingUseCaseImpl', () => {
           'platform_owner_already_exist',
         );
         expect((result.error as PlatformOwnerAlreadyExist).field).toBe(
-          'username',
-        );
-      }
-      expect(registerSpy).not.toHaveBeenCalled();
-    });
-
-    it('returns business_owner_already_exist when the business owner email is taken', async () => {
-      const registerSpy = jest.spyOn(
-        onboardingRepository,
-        'registerOnboarding',
-      );
-
-      const result = await useCase.execute(
-        buildCommand({
-          businessOwner: {
-            ...buildCommand().businessOwner,
-            email: 'bob@acme.com',
-          },
-        }),
-      );
-
-      expect(result.ok).toBe(false);
-      if (!result.ok) {
-        expect((result.error as businessOwnerAlreadyExist).kind).toBe(
-          'business_owner_already_exist',
-        );
-        expect((result.error as businessOwnerAlreadyExist).field).toBe('email');
-      }
-      expect(registerSpy).not.toHaveBeenCalled();
-    });
-
-    it('returns business_owner_already_exist when the business owner username is taken', async () => {
-      const registerSpy = jest.spyOn(
-        onboardingRepository,
-        'registerOnboarding',
-      );
-
-      const result = await useCase.execute(
-        buildCommand({
-          businessOwner: {
-            ...buildCommand().businessOwner,
-            username: 'business_owner',
-          },
-        }),
-      );
-
-      expect(result.ok).toBe(false);
-      if (!result.ok) {
-        expect((result.error as businessOwnerAlreadyExist).kind).toBe(
-          'business_owner_already_exist',
-        );
-        expect((result.error as businessOwnerAlreadyExist).field).toBe(
           'username',
         );
       }
@@ -305,17 +244,14 @@ describe('CompleteOnboardingUseCaseImpl', () => {
   });
 
   describe('successful onboarding', () => {
-    it('hashes both passwords with the hashing service', async () => {
+    it('hashes the platform owner password with the hashing service', async () => {
       const command = buildCommand();
 
       await useCase.execute(command);
 
-      expect(passwordHashingService.hash).toHaveBeenCalledTimes(2);
+      expect(passwordHashingService.hash).toHaveBeenCalledTimes(1);
       expect(passwordHashingService.hash).toHaveBeenCalledWith(
         command.platformOwner.password,
-      );
-      expect(passwordHashingService.hash).toHaveBeenCalledWith(
-        command.businessOwner.password,
       );
     });
 
@@ -342,20 +278,11 @@ describe('CompleteOnboardingUseCaseImpl', () => {
       );
       expect(onboarding.platformOwner.password).toBe('hashed-password');
       expect(onboarding.platformOwner.email).toBe(command.platformOwner.email);
-      expect(onboarding.platformOwner.businessId).toBeNull();
+      expect(onboarding.platformOwner.businessId).toBe('mock-uuid-2');
       expect(onboarding.platformOwner.createdBy).toBe('mock-uuid-1');
 
-      expect(onboarding.businessOwner.id).toBe('mock-uuid-2');
-      expect(onboarding.businessOwner.username).toBe(
-        command.businessOwner.username,
-      );
-      expect(onboarding.businessOwner.password).toBe('hashed-password');
-      expect(onboarding.businessOwner.email).toBe(command.businessOwner.email);
-      expect(onboarding.businessOwner.businessId).toBe('mock-uuid-3');
-      expect(onboarding.businessOwner.createdBy).toBe('mock-uuid-1');
-
-      expect(onboarding.business.id).toBe('mock-uuid-3');
-      expect(onboarding.business.ownerId).toBe('mock-uuid-2');
+      expect(onboarding.business.id).toBe('mock-uuid-2');
+      expect(onboarding.business.ownerId).toBe('mock-uuid-1');
       expect(onboarding.business.slug).toBe(command.business.slug);
       expect(onboarding.business.name).toBe(command.business.name);
       expect(onboarding.business.industry).toBe(command.business.industry);
@@ -374,8 +301,8 @@ describe('CompleteOnboardingUseCaseImpl', () => {
         (o) => o.platformOwner.id === 'mock-uuid-1',
       );
       expect(persisted).toBeDefined();
-      expect(persisted?.businessOwner.id).toBe('mock-uuid-2');
-      expect(persisted?.business.id).toBe('mock-uuid-3');
+      expect(persisted?.business.id).toBe('mock-uuid-2');
+      expect(persisted?.business.ownerId).toBe('mock-uuid-1');
     });
   });
 });

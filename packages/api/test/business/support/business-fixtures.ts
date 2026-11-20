@@ -45,7 +45,7 @@ export async function createOwnerUser(
     .insertInto('users')
     .values({
       id,
-      business_id: null,
+      business_id: randomUUID(), // placeholder until the real USER_ASSIGN_TO_BUSINESS job sets it
       username: `e2e${suffix}`,
       password: 'e2e-unused-password-hash',
       first_name: 'E2E',

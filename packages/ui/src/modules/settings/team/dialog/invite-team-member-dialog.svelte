@@ -52,13 +52,18 @@
 			resetForm: false,
 			onUpdate({ form }) {
 				if (form.valid) {
+					const business = businessStore.selectedBusiness;
+					if (!business) {
+						toast.error('Select a business before inviting a team member');
+						return;
+					}
 					inviteMutation.mutate({
 						username: form.data.username,
 						email: form.data.email,
 						name: { firstName: form.data.firstName, lastName: form.data.lastName },
 						role: form.data.role,
-						businessId: businessStore.selectedBusiness?.id,
-						businessName: businessStore.selectedBusiness?.name
+						businessId: business.id,
+						businessName: business.name
 					});
 				}
 			}

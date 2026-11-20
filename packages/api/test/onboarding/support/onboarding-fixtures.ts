@@ -21,14 +21,6 @@ export interface OnboardingPayload {
     phone: string;
     role: 'Platform Owner';
   };
-  businessOwner: {
-    username: string;
-    password: string;
-    name: { firstName: string; lastName: string };
-    email: string;
-    phone: string;
-    role: 'Business Owner';
-  };
   business: {
     slug: string;
     name: string;
@@ -40,8 +32,6 @@ export interface OnboardingPayload {
 export interface OnboardingPayloadOverrides {
   platformOwnerEmail?: string;
   platformOwnerUsername?: string;
-  businessOwnerEmail?: string;
-  businessOwnerUsername?: string;
   businessSlug?: string;
 }
 
@@ -58,15 +48,6 @@ export function completePayload(
       phone: '+12025551234',
       role: 'Platform Owner',
     },
-    businessOwner: {
-      username: overrides.businessOwnerUsername ?? shortUnique('bo'),
-      password: DEFAULT_PASSWORD,
-      name: { firstName: 'E2E', lastName: 'Business Owner' },
-      email:
-        overrides.businessOwnerEmail ?? `${shortUnique('bomail')}@example.com`,
-      phone: '+12025551234',
-      role: 'Business Owner',
-    },
     business: {
       slug: overrides.businessSlug ?? unique('e2e-onb'),
       name: 'E2E Onboarding Business',
@@ -79,7 +60,6 @@ export function completePayload(
 export interface CompleteOnboardingResult {
   payload: OnboardingPayload;
   platformOwnerId: string;
-  businessOwnerId: string;
   businessId: string;
   response: request.Response;
 }
@@ -102,25 +82,18 @@ export async function completeOnboarding(
     .where('email', '=', payload.platformOwner.email)
     .executeTakeFirstOrThrow();
 
-  const businessOwner = await ctx.db
-    .selectFrom('users')
-    .select('id')
-    .where('email', '=', payload.businessOwner.email)
-    .executeTakeFirstOrThrow();
-
   const business = await ctx.db
     .selectFrom('businesses')
     .select('id')
     .where('slug', '=', payload.business.slug)
     .executeTakeFirstOrThrow();
 
-  ctx.createdUserIds.push(platformOwner.id, businessOwner.id);
+  ctx.createdUserIds.push(platformOwner.id);
   ctx.createdBusinessIds.push(business.id);
 
   return {
     payload,
     platformOwnerId: platformOwner.id,
-    businessOwnerId: businessOwner.id,
     businessId: business.id,
     response,
   };

@@ -61,6 +61,8 @@
 						email: form.data.email,
 						name: { firstName: form.data.firstName, lastName: form.data.lastName },
 						role: 'Business Owner',
+						// Placeholder: the business doesn't exist yet; registering it in step 2 reassigns the owner via USER_ASSIGN_TO_BUSINESS
+						businessId: crypto.randomUUID(),
 						...(form.data.phone ? { phone: form.data.phone } : {})
 					});
 				}

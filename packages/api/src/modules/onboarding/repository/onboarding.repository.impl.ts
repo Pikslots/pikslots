@@ -39,11 +39,6 @@ export class OnboardingRepositoryImpl implements OnboardingRepository {
           .execute();
 
         await trx
-          .insertInto('users')
-          .values(this.mapper.userToPresistence(onboarding.businessOwner))
-          .execute();
-
-        await trx
           .insertInto('businesses')
           .values(this.mapper.businessToPresistence(onboarding.business))
           .execute();

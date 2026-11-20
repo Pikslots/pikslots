@@ -35,7 +35,7 @@ const DEFAULT_WORKING_HOURS: UserWorkingHours = {
 
 export async function createStaffUser(
   ctx: ServiceUserAssignmentTestContext,
-  businessId: string | null,
+  businessId: string,
   role: UserRole = 'Business Owner',
 ): Promise<{ id: string; email: string }> {
   const id = randomUUID();
@@ -83,7 +83,8 @@ export async function createStaffUser(
 export async function createBusiness(
   ctx: ServiceUserAssignmentTestContext,
 ): Promise<{ id: string; ownerId: string }> {
-  const owner = await createStaffUser(ctx, null, 'Business Owner');
+  // Placeholder until the real USER_ASSIGN_TO_BUSINESS job sets the registered business's id
+  const owner = await createStaffUser(ctx, randomUUID(), 'Business Owner');
   const slug = unique('e2e-sua-biz');
 
   await request(ctx.app.getHttpServer())

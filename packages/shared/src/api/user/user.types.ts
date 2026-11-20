@@ -21,7 +21,7 @@ export interface InviteUserInput {
   name: FullNameInput;
   role: UserRole;
   phone?: string;
-  businessId?: string;
+  businessId: string;
   businessName?: string;
 }
 

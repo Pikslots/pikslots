@@ -1,18 +1,14 @@
 <script lang="ts">
-	import type {
-		OwnerFormValues,
-		BusinessOwnerFormValues,
-		BusinessFormValues
-	} from './utils/schema';
-	import OwnerStep from './steps/owner-step.svelte';
-	import BusinessOwnerStep from './steps/business-owner-step.svelte';
-	import BusinessStep from './steps/business-step.svelte';
-	import { Check, ShieldAlert } from '@lucide/svelte';
-	import { Card } from '$lib/components/ui/card';
-	import CardHeader from '$lib/components/ui/card/card-header.svelte';
-	import CardTitle from '$lib/components/ui/card/card-title.svelte';
-	import CardDescription from '$lib/components/ui/card/card-description.svelte';
-	import CardContent from '$lib/components/ui/card/card-content.svelte';
+	import type { OnboardingFormValues } from './utils/schema';
+	import OnboardingStep from './steps/onboarding-step.svelte';
+	import {
+		CalendarCheck,
+		Check,
+		Globe,
+		LoaderCircle,
+		ShieldAlert,
+		UsersRound
+	} from '@lucide/svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
@@ -22,50 +18,37 @@
 	import type { OnboardingCompleteInput } from '@pikslots/shared';
 	import { GetOnboardingStatusQueryOptions } from '../api/onboarding/get.onboarding.status.query';
 
-	let currentStep = $state(0);
+	let isComplete = $state(false);
 
-	let ownerValues: OwnerFormValues = {
+	let values: OnboardingFormValues = {
 		username: '',
 		password: '',
 		first_name: '',
 		last_name: '',
 		email: '',
-		booking_url: 'Platform Owner'
-	};
-
-	let businessOwnerValues: BusinessOwnerFormValues = {
-		username: '',
-		password: '',
-		first_name: '',
-		last_name: '',
-		email: '',
-		booking_url: 'Business Owner'
-	};
-
-	let businessValues: BusinessFormValues = {
 		name: '',
 		slug: '',
-		industry: '' as BusinessFormValues['industry'],
+		industry: '' as OnboardingFormValues['industry'],
 		default_time_zone: ''
 	};
 
-	const steps = [
-		{ title: 'Platform Owner', description: 'Create your account' },
-		{ title: 'Business Owner', description: 'Create the business owner account' },
-		{ title: 'Business Details', description: 'Set up your business' }
+	const features = [
+		{
+			icon: CalendarCheck,
+			title: 'Bookings on autopilot',
+			description: 'Customers book 24/7 while you focus on the work.'
+		},
+		{
+			icon: Globe,
+			title: 'Your own booking page',
+			description: 'A branded link you can share anywhere, live in minutes.'
+		},
+		{
+			icon: UsersRound,
+			title: 'Built for your whole team',
+			description: 'Staff schedules, breaks and services in one place.'
+		}
 	];
-
-	function handleOwnerNext() {
-		currentStep = 1;
-	}
-
-	function handleBusinessOwnerNext() {
-		currentStep = 2;
-	}
-
-	function handleBack() {
-		if (currentStep > 0) currentStep -= 1;
-	}
 
 	const completeOnboardingMutation = createMutation(completeOnboardingMutationOptions);
 	const OnboardingStatusQuery = createQuery(GetOnboardingStatusQueryOptions);
@@ -84,48 +67,28 @@
 	function buildPayload(): OnboardingCompleteInput {
 		return {
 			platformOwner: {
-				username: ownerValues.username,
-				password: ownerValues.password,
-				name: { firstName: ownerValues.first_name, lastName: ownerValues.last_name },
-				email: ownerValues.email,
-				phone: ownerValues.phone ? ownerValues.phone?.toString() : '',
+				username: values.username,
+				password: values.password,
+				name: { firstName: values.first_name, lastName: values.last_name },
+				email: values.email,
+				phone: values.phone ? values.phone.toString() : '',
 				role: 'Platform Owner'
 			},
-			businessOwner: {
-				username: businessOwnerValues.username,
-				password: businessOwnerValues.password,
-				name: {
-					firstName: businessOwnerValues.first_name,
-					lastName: businessOwnerValues.last_name
-				},
-				email: businessOwnerValues.email,
-				phone: businessOwnerValues.phone ? businessOwnerValues.phone.toString() : '',
-				role: 'Business Owner'
-			},
 			business: {
-				slug: businessValues.slug,
-				name: businessValues.name,
-				industry: businessValues.industry,
-				defaultTimeZone: businessValues.default_time_zone
+				slug: values.slug,
+				name: values.name,
+				industry: values.industry,
+				defaultTimeZone: values.default_time_zone
 			}
 		};
 	}
 
-	function handleBusinessNext() {
+	function handleSubmit() {
 		const payload = buildPayload();
-		if (payload.platformOwner.username === payload.businessOwner.username) {
-			toast.error('Platform owner and business owner usernames must be different!');
-			return;
-		}
-
-		if (payload.platformOwner.email === payload.businessOwner.email) {
-			toast.error('Platform owner and business owner emails must be different!');
-			return;
-		}
 
 		completeOnboardingMutation.mutate(payload, {
 			onSuccess: async () => {
-				currentStep = 3;
+				isComplete = true;
 
 				await new Promise((resolve) => setTimeout(resolve, 3000));
 
@@ -138,124 +101,126 @@
 	}
 </script>
 
-<div class="r flex min-h-screen items-center justify-center p-4">
-	<div class="w-full max-w-2xl">
-		{#if onboardingComplete}
-			<Card class="rounded-2xl border-slate-200/60 shadow-xl ">
-				<CardHeader class="text-center">
-					<CardTitle class="text-2xl">403 - Forbidden</CardTitle>
-					<CardDescription>Onboarding is already complete. Redirecting to login...</CardDescription>
-				</CardHeader>
-				<CardContent>
-					<div class="space-y-4 py-6 text-center">
-						<div
-							class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-destructive/10"
+<div class="grid min-h-svh lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
+	<!-- Brand panel -->
+	<aside
+		class="relative hidden overflow-hidden bg-primary text-primary-foreground lg:flex lg:flex-col lg:justify-between lg:p-12 dark:border-r dark:bg-linear-to-br dark:from-card dark:via-background dark:to-background"
+	>
+		<div
+			aria-hidden="true"
+			class="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,currentColor_1px,transparent_1px),linear-gradient(to_bottom,currentColor_1px,transparent_1px)] [mask-image:radial-gradient(ellipse_at_top_left,black_20%,transparent_75%)] bg-[size:48px_48px] opacity-[0.07]"
+		></div>
+		<div
+			aria-hidden="true"
+			class="pointer-events-none absolute -top-32 -right-32 size-96 rounded-full bg-chart-1/40 blur-3xl dark:bg-chart-3/40"
+		></div>
+		<div
+			aria-hidden="true"
+			class="pointer-events-none absolute -bottom-40 -left-24 size-96 rounded-full bg-chart-2/50 blur-3xl dark:bg-chart-2/25"
+		></div>
+
+		<a href={resolve('/')} class="font-code relative text-2xl">Pikslots</a>
+
+		<div class="relative space-y-10">
+			<div class="space-y-4">
+				<h1 class="text-4xl leading-tight font-bold tracking-tight text-balance xl:text-5xl">
+					Fill your calendar, not your inbox.
+				</h1>
+				<p class="max-w-md text-base text-primary-foreground/75">
+					Create your workspace and start taking online bookings today.
+				</p>
+			</div>
+
+			<ul class="space-y-5">
+				{#each features as feature (feature.title)}
+					<li class="flex items-start gap-4">
+						<span
+							class="flex size-10 shrink-0 items-center justify-center border border-primary-foreground/20 bg-primary-foreground/10"
 						>
-							<ShieldAlert class="h-8 w-8 text-destructive" />
-						</div>
+							<feature.icon class="size-5" />
+						</span>
 						<div>
-							<h3 class="text-xl font-semibold">Access denied</h3>
-							<p class="mt-1 text-sm text-muted-foreground">
-								You'll be redirected to the login page shortly.
+							<p class="font-semibold">{feature.title}</p>
+							<p class="text-sm text-primary-foreground/70">{feature.description}</p>
+						</div>
+					</li>
+				{/each}
+			</ul>
+		</div>
+
+		<p class="relative text-xs text-primary-foreground/60">
+			© {new Date().getFullYear()} Pikslots. All rights reserved.
+		</p>
+	</aside>
+
+	<!-- Form panel -->
+	<main class="flex flex-col p-6 md:p-10">
+		<a href={resolve('/')} class="font-code text-center text-2xl lg:hidden">Pikslots</a>
+
+		<div class="flex flex-1 items-center justify-center py-8">
+			<div class="w-full max-w-xl">
+				{#if onboardingComplete}
+					<div class="space-y-6 text-center">
+						<div
+							class="mx-auto flex size-16 items-center justify-center rounded-full bg-destructive/10"
+						>
+							<ShieldAlert class="size-8 text-destructive" />
+						</div>
+						<div class="space-y-2">
+							<h1 class="text-2xl font-bold">Onboarding is already complete</h1>
+							<p class="text-sm text-muted-foreground">
+								This workspace is already set up. Redirecting you to login...
 							</p>
 						</div>
 						<Button variant="outline" class="w-full" onclick={() => goto(resolve('/login'))}>
 							Go to login now
 						</Button>
 					</div>
-				</CardContent>
-			</Card>
-		{:else if OnboardingStatusQuery.isPending}
-			<div class="flex items-center justify-center py-24">
-				<div
-					class="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent"
-				></div>
-			</div>
-		{:else}
-			<!-- Step indicator -->
-			<div class="mb-8 flex items-center justify-center gap-2 sm:gap-4">
-				{#each steps as step, i (i)}
-					<div class="flex items-center gap-2 sm:gap-4">
-						<div class="flex flex-col items-center gap-2">
-							<div
-								class="flex h-10 w-10 items-center justify-center rounded-full border-2 text-sm font-semibold transition-all duration-300
-							{currentStep === i
-									? 'scale-110 border-primary bg-primary text-primary-foreground shadow-lg'
-									: currentStep > i
-										? 'border-primary bg-primary/10 text-primary'
-										: 'border-muted-foreground/30 bg-background text-muted-foreground'}"
-							>
-								{#if currentStep > i}
-									<Check class="h-5 w-5" />
-								{:else}
-									{i + 1}
-								{/if}
-							</div>
+				{:else if OnboardingStatusQuery.isPending}
+					<div class="flex items-center justify-center py-24">
+						<LoaderCircle class="size-8 animate-spin text-primary" />
+					</div>
+				{:else if isComplete}
+					<div class="space-y-6 text-center">
+						<div class="relative mx-auto flex size-20 items-center justify-center">
+							<span class="absolute inset-0 animate-ping rounded-full bg-primary/20"></span>
 							<span
-								class="hidden text-xs font-medium sm:block {currentStep === i
-									? 'text-foreground'
-									: 'text-muted-foreground'}"
+								class="relative flex size-20 items-center justify-center rounded-full bg-primary text-primary-foreground"
 							>
-								{step.title}
+								<Check class="size-10" />
 							</span>
 						</div>
-						{#if i < steps.length - 1}
-							<div
-								class="h-0.5 w-8 rounded-full transition-all duration-300 sm:w-16 {currentStep > i
-									? 'bg-primary'
-									: 'bg-muted-foreground/20'}"
-							></div>
-						{/if}
-					</div>
-				{/each}
-			</div>
-
-			<Card class="rounded-2xl border-slate-200/60 shadow-xl ">
-				<CardHeader class="text-center">
-					{#if currentStep < steps.length}
-						<CardTitle class="text-2xl">{steps[currentStep].title}</CardTitle>
-						<CardDescription>{steps[currentStep].description}</CardDescription>
-					{:else}
-						<CardTitle class="text-2xl">You're all set</CardTitle>
-						<CardDescription>Your account is ready</CardDescription>
-					{/if}
-				</CardHeader>
-				<CardContent>
-					{#if currentStep === 0}
-						<OwnerStep values={ownerValues} onNext={handleOwnerNext} />
-					{:else if currentStep === 1}
-						<BusinessOwnerStep
-							values={businessOwnerValues}
-							onNext={handleBusinessOwnerNext}
-							onBack={handleBack}
-						/>
-					{:else if currentStep === 2}
-						<BusinessStep
-							values={businessValues}
-							onSubmit={handleBusinessNext}
-							onBack={handleBack}
-							isSubmitting={completeOnboardingMutation.isPending}
-						/>
-					{:else}
-						<div class="space-y-4 py-6 text-center">
-							<div
-								class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary/10"
-							>
-								<Check class="h-8 w-8 text-primary" />
-							</div>
-							<div>
-								<h3 class="text-xl font-semibold">Welcome aboard!</h3>
-								<p class="mt-1 text-sm text-muted-foreground">
-									Your account is ready. You'll be redirected to login in {3}s.
-								</p>
-							</div>
-							<Button variant="outline" class="w-full" onclick={() => goto(resolve('/login'))}>
-								Go to login now
-							</Button>
+						<div class="space-y-2">
+							<h1 class="text-3xl font-bold tracking-tight">Welcome aboard!</h1>
+							<p class="text-sm text-muted-foreground">
+								Your workspace is ready. Taking you to login in a few seconds...
+							</p>
 						</div>
-					{/if}
-				</CardContent>
-			</Card>
-		{/if}
-	</div>
+						<Button class="w-full" onclick={() => goto(resolve('/login'))}>Go to login now</Button>
+					</div>
+				{:else}
+					<div class="mb-8 space-y-2">
+						<p class="text-sm font-medium text-primary dark:text-chart-1">Get started</p>
+						<h1 class="text-3xl font-bold tracking-tight">Create your workspace</h1>
+						<p class="text-sm text-muted-foreground">
+							Set up your account and business in one go. You can change everything later.
+						</p>
+					</div>
+					<OnboardingStep
+						{values}
+						onSubmit={handleSubmit}
+						isSubmitting={completeOnboardingMutation.isPending}
+					/>
+					<p class="mt-6 text-center text-sm text-muted-foreground">
+						Already set up?
+						<a
+							href={resolve('/login')}
+							class="font-medium text-primary underline-offset-4 hover:underline dark:text-chart-1"
+							>Log in</a
+						>
+					</p>
+				{/if}
+			</div>
+		</div>
+	</main>
 </div>

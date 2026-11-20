@@ -96,7 +96,7 @@ export class InviteUserUsecaseImpl implements InviteUserUseCase {
       email: command.email,
       phone: command.phone,
       role: command.role,
-      businessId: command.businessId ?? null,
+      businessId: command.businessId,
       bookingUrl: '', // contruct the booking url later
       createdBy: this.securityContext.userId, // the id of the logged in user acting as inviter
     });

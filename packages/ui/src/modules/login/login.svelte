@@ -7,12 +7,14 @@
 		FieldError,
 		FieldSeparator
 	} from '$lib/components/ui/field/index.js';
-	import { Input } from '$lib/components/ui/input/index.js';
+	import * as InputGroup from '$lib/components/ui/input-group/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { cn } from '$lib/utils.js';
-	import loginImage from '$lib/assets/login-image.jpg';
-	import { createMutation } from '@tanstack/svelte-query';
+	import { fade } from 'svelte/transition';
+	import { ArrowRight, Eye, EyeOff, LoaderCircle, Lock, Quote, UserRound } from '@lucide/svelte';
+	import { createMutation, createQuery } from '@tanstack/svelte-query';
 	import { loginUser } from '../api/user/login.user.mutation';
+	import { GetOnboardingStatusQueryOptions } from '../api/onboarding/get.onboarding.status.query';
 	import { getCurrentSession } from '../api/session/get.current.session.query';
 	import type { BaseErrorResponse, LoginUserInput, LoginUserResponse } from '@pikslots/shared';
 	import type { AxiosError } from 'axios';
@@ -25,6 +27,33 @@
 	import { LoginUserFormSchema } from './validations/schema';
 	import { getDeviceInfo } from './utils/device-info';
 
+	const quotes = [
+		{ text: 'Time is what we want most, but what we use worst.', author: 'William Penn' },
+		{
+			text: "The key is not to prioritize what's on your schedule, but to schedule your priorities.",
+			author: 'Stephen R. Covey'
+		},
+		{ text: 'Lost time is never found again.', author: 'Benjamin Franklin' },
+		{ text: 'Until we can manage time, we can manage nothing else.', author: 'Peter Drucker' },
+		{
+			text: "The bad news is time flies. The good news is you're the pilot.",
+			author: 'Michael Altshuler'
+		},
+		{ text: "Don't watch the clock; do what it does. Keep going.", author: 'Sam Levenson' }
+	];
+
+	let quoteIndex = $state(Math.floor(Math.random() * quotes.length));
+	const quote = $derived(quotes[quoteIndex]);
+
+	$effect(() => {
+		const timer = setInterval(() => {
+			quoteIndex = (quoteIndex + 1) % quotes.length;
+		}, 7000);
+		return () => clearInterval(timer);
+	});
+
+	let showPassword = $state(false);
+
 	const loginMutation = createMutation<
 		LoginUserResponse,
 		AxiosError<BaseErrorResponse>,
@@ -32,6 +61,16 @@
 	>(() => ({
 		mutationFn: loginUser
 	}));
+
+	const onboardingStatusQuery = createQuery(GetOnboardingStatusQueryOptions);
+
+	// Nobody can log in before the platform owner exists, so send first-time setups to onboarding
+	$effect(() => {
+		if (onboardingStatusQuery.isFetching) return;
+		if (onboardingStatusQuery.data?.isOnboardingComplete === false) {
+			goto(resolve('/onboarding'), { replaceState: true });
+		}
+	});
 
 	const { form, errors, enhance } = superForm(
 		{ userNameOrEmail: '', password: '' },
@@ -78,17 +117,76 @@
 	});
 </script>
 
-<div class="grid min-h-svh lg:grid-cols-2">
-	<div class="flex flex-col gap-4 p-6 md:p-10">
-		<div class="flex justify-center gap-2 md:justify-start">
-			<a href="/" class="font-code flex items-center gap-2 text-2xl">Pikslots</a>
+<div class="grid min-h-svh lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
+	<!-- Brand panel -->
+	<aside
+		class="relative hidden overflow-hidden bg-primary text-primary-foreground lg:flex lg:flex-col lg:justify-between lg:p-12 dark:border-r dark:bg-linear-to-br dark:from-card dark:via-background dark:to-background"
+	>
+		<div
+			aria-hidden="true"
+			class="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,currentColor_1px,transparent_1px),linear-gradient(to_bottom,currentColor_1px,transparent_1px)] [mask-image:radial-gradient(ellipse_at_top_left,black_20%,transparent_75%)] bg-[size:48px_48px] opacity-[0.07]"
+		></div>
+		<div
+			aria-hidden="true"
+			class="pointer-events-none absolute -top-32 -right-32 size-96 rounded-full bg-chart-1/40 blur-3xl dark:bg-chart-3/40"
+		></div>
+		<div
+			aria-hidden="true"
+			class="pointer-events-none absolute -bottom-40 -left-24 size-96 rounded-full bg-chart-2/50 blur-3xl dark:bg-chart-2/25"
+		></div>
+
+		<a href={resolve('/')} class="font-code relative text-2xl">Pikslots</a>
+
+		<div class="relative max-w-lg space-y-8">
+			<Quote class="size-10 text-primary-foreground/40" />
+			<div class="grid min-h-48 items-end">
+				{#key quoteIndex}
+					<div
+						class="col-start-1 row-start-1 space-y-6"
+						in:fade={{ duration: 500, delay: 250 }}
+						out:fade={{ duration: 250 }}
+					>
+						<blockquote
+							class="text-3xl leading-snug font-semibold tracking-tight text-balance xl:text-4xl"
+						>
+							{quote.text}
+						</blockquote>
+						<p class="text-sm text-primary-foreground/70">— {quote.author}</p>
+					</div>
+				{/key}
+			</div>
+			<div class="flex gap-2">
+				{#each quotes as item, i (item.author)}
+					<button
+						type="button"
+						aria-label={`Show quote ${i + 1}`}
+						class="h-1 transition-all duration-300 {i === quoteIndex
+							? 'w-8 bg-primary-foreground'
+							: 'w-4 bg-primary-foreground/30 hover:bg-primary-foreground/60'}"
+						onclick={() => (quoteIndex = i)}
+					></button>
+				{/each}
+			</div>
 		</div>
-		<div class="flex flex-1 items-center justify-center">
-			<div class="w-full max-w-xs">
+
+		<p class="relative text-xs text-primary-foreground/60">
+			© {new Date().getFullYear()} Pikslots. All rights reserved.
+		</p>
+	</aside>
+
+	<!-- Form panel -->
+	<main class="flex flex-col p-6 md:p-10">
+		<a href={resolve('/')} class="font-code text-center text-2xl lg:hidden">Pikslots</a>
+
+		<div class="flex flex-1 items-center justify-center py-8">
+			<div class="w-full max-w-sm">
 				<form class={cn('flex flex-col gap-6')} use:enhance>
 					<FieldGroup>
-						<div class="flex flex-col items-center gap-1 text-center">
-							<h1 data-testid="login-heading" class="text-2xl font-bold">Login to your account</h1>
+						<div class="space-y-2">
+							<p class="text-sm font-medium text-primary dark:text-chart-1">Welcome back</p>
+							<h1 data-testid="login-heading" class="text-3xl font-bold tracking-tight">
+								Login to your account
+							</h1>
 							<p data-testid="login-paragraph" class="text-sm text-balance text-muted-foreground">
 								Enter your email below to login to your account
 							</p>
@@ -96,14 +194,17 @@
 
 						<Field>
 							<FieldLabel for="userNameOrEmail">Username or Email</FieldLabel>
-							<Input
-								data-testid="email"
-								id="userNameOrEmail"
-								name="userNameOrEmail"
-								type="text"
-								placeholder="m@example.com"
-								bind:value={$form.userNameOrEmail}
-							/>
+							<InputGroup.Root>
+								<InputGroup.Addon><UserRound /></InputGroup.Addon>
+								<InputGroup.Input
+									data-testid="email"
+									id="userNameOrEmail"
+									name="userNameOrEmail"
+									type="text"
+									placeholder="m@example.com"
+									bind:value={$form.userNameOrEmail}
+								/>
+							</InputGroup.Root>
 							<FieldError
 								data-testid="email-error"
 								errors={$errors.userNameOrEmail?.map((e) => ({ message: e }))}
@@ -113,17 +214,33 @@
 						<Field>
 							<div class="flex items-center">
 								<FieldLabel for="password">Password</FieldLabel>
-								<a href="##" class="ms-auto text-sm underline-offset-4 hover:underline">
+								<a
+									href="##"
+									class="ms-auto text-xs text-primary underline-offset-4 hover:underline dark:text-chart-1"
+								>
 									Forgot your password?
 								</a>
 							</div>
-							<Input
-								data-testid="password"
-								id="password"
-								name="password"
-								type="password"
-								bind:value={$form.password}
-							/>
+							<InputGroup.Root>
+								<InputGroup.Addon><Lock /></InputGroup.Addon>
+								<InputGroup.Input
+									data-testid="password"
+									id="password"
+									name="password"
+									type={showPassword ? 'text' : 'password'}
+									placeholder="••••••••"
+									bind:value={$form.password}
+								/>
+								<InputGroup.Addon align="inline-end">
+									<InputGroup.Button
+										size="icon-xs"
+										aria-label={showPassword ? 'Hide password' : 'Show password'}
+										onclick={() => (showPassword = !showPassword)}
+									>
+										{#if showPassword}<EyeOff />{:else}<Eye />{/if}
+									</InputGroup.Button>
+								</InputGroup.Addon>
+							</InputGroup.Root>
 							<FieldError
 								data-testid="password-error"
 								errors={$errors.password?.map((e) => ({ message: e }))}
@@ -134,12 +251,19 @@
 							<Button
 								data-testid="login-btn"
 								type="submit"
+								size="lg"
 								disabled={loginMutation.isPending ||
 									!$form.userNameOrEmail.trim() ||
 									!$form.password.trim()}
-								class="disabled:cursor-not-allowed disabled:opacity-50"
+								class="w-full disabled:cursor-not-allowed disabled:opacity-50"
 							>
-								{loginMutation.isPending ? 'Please wait...' : 'Login'}
+								{#if loginMutation.isPending}
+									<LoaderCircle class="animate-spin" />
+									Please wait...
+								{:else}
+									Login
+									<ArrowRight />
+								{/if}
 							</Button>
 						</Field>
 
@@ -155,12 +279,5 @@
 				</form>
 			</div>
 		</div>
-	</div>
-	<div class="relative hidden bg-muted lg:block">
-		<img
-			src={loginImage}
-			alt="placeholder"
-			class="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
-		/>
-	</div>
+	</main>
 </div>

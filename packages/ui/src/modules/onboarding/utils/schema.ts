@@ -21,18 +21,10 @@ export const ownerSchema = z.object({
 			.refine((value) => value.toString().length >= 10, 'Phone number must be at least 10 digits!')
 			.refine((value) => value.toString().length <= 15, 'Phone number must be at most 15 digits!')
 			.optional()
-	),
-	booking_url: z
-		.string()
-		.min(3, 'Booking URL must be at least 3 characters')
-		.regex(/^[a-zA-Z0-9-]+$/, 'Booking URL can only contain letters, numbers, and hyphens')
+	)
 });
 
-export const PlatformOwnerSchema = ownerSchema.omit({ booking_url: true });
 export type OwnerFormValues = z.infer<typeof ownerSchema>;
-
-export const businessOwnerSchema = ownerSchema.omit({ booking_url: true });
-export type BusinessOwnerFormValues = z.infer<typeof ownerSchema>;
 
 const BUSINESS_INDUSTRIES = [
 	'salon_and_beauty',
@@ -59,6 +51,11 @@ export const businessSchema = z.object({
 });
 
 export type BusinessFormValues = z.infer<typeof businessSchema>;
+
+// Owner and business field names don't overlap, so both shapes merge into one flat form
+export const onboardingSchema = ownerSchema.extend(businessSchema.shape);
+
+export type OnboardingFormValues = z.infer<typeof onboardingSchema>;
 
 export const loginSchema = z.object({
 	identifier: z.string().min(1, 'Email or username is required'),

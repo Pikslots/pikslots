@@ -64,6 +64,7 @@ export class CompleteOnboardingUseCaseImpl implements CompleteOnBoardingUseCase 
     const usernameExists = await this.userRepository.existsByUsername(
       command.platformOwner.username,
     );
+
     if (!usernameExists.ok) return err(usernameExists.error);
 
     if (usernameExists.value) {
@@ -75,67 +76,30 @@ export class CompleteOnboardingUseCaseImpl implements CompleteOnBoardingUseCase 
       });
     }
 
-    const businessOwnerEmailExists = await this.userRepository.existsByEmail(
-      command.businessOwner.email,
-    );
-
-    if (!businessOwnerEmailExists.ok)
-      return err(businessOwnerEmailExists.error);
-
-    if (businessOwnerEmailExists.value) {
-      return err<businessOwnerAlreadyExist>({
-        kind: 'business_owner_already_exist',
-        message: 'A business owner is aready registered',
-        field: 'email',
-        timestamp: new Date(),
-      });
-    }
-
-    const businessOwnerUsernameExists =
-      await this.userRepository.existsByUsername(
-        command.businessOwner.username,
-      );
-    if (!businessOwnerUsernameExists.ok)
-      return err(businessOwnerUsernameExists.error);
-
-    if (businessOwnerUsernameExists.value) {
-      return err<businessOwnerAlreadyExist>({
-        kind: 'business_owner_already_exist',
-        message: 'A business owner is aready registered',
-        field: 'username',
-        timestamp: new Date(),
-      });
-    }
-
     const businessAlreadyExistBySlug =
       await this.businessRepository.existsBySlug(command.business.slug);
 
     if (!businessAlreadyExistBySlug.ok)
       return err(businessAlreadyExistBySlug.error);
 
-    if (businessAlreadyExistBySlug.value) {
+    if (businessAlreadyExistBySlug.value)
       return err<BusinessAlreadyExistsError>({
         kind: 'business_already_exists',
         message: 'business with this name is already exist',
         field: 'slug',
         timestamp: new Date(),
       });
-    }
 
     const platformOwnerHashPasswrod = await this.passwordHasingService.hash(
       command.platformOwner.password,
     );
-    const businessOwnerHashPassword = await this.passwordHasingService.hash(
-      command.businessOwner.password,
-    );
 
-    const PlatformOwneruuid = uuidv7();
-    const businessOwneruuid = uuidv7();
-    const businessuuid = uuidv7();
+    const platformOwnerId = uuidv7();
+    const businessId = uuidv7();
 
     const onboarding = Onboarding.create({
       platformOwner: {
-        id: PlatformOwneruuid,
+        id: platformOwnerId,
         username: command.platformOwner.username,
         password: platformOwnerHashPasswrod,
         name: command.platformOwner.name,
@@ -143,31 +107,18 @@ export class CompleteOnboardingUseCaseImpl implements CompleteOnBoardingUseCase 
         phone: command.platformOwner.phone ?? undefined,
         status: 'active',
         role: command.platformOwner.role,
-        businessId: null,
+        businessId,
         bookingUrl: '',
-        createdBy: PlatformOwneruuid,
-      },
-      businessOwner: {
-        id: businessOwneruuid,
-        username: command.businessOwner.username,
-        password: businessOwnerHashPassword,
-        name: command.businessOwner.name,
-        email: command.businessOwner.email,
-        phone: command.businessOwner.phone ?? undefined,
-        status: 'active',
-        role: command.businessOwner.role,
-        businessId: businessuuid,
-        bookingUrl: '',
-        createdBy: PlatformOwneruuid,
+        createdBy: platformOwnerId,
       },
       business: {
-        id: businessuuid,
-        ownerId: businessOwneruuid,
+        id: businessId,
+        ownerId: platformOwnerId,
         slug: command.business.slug,
         name: command.business.name,
         industry: command.business.industry,
         defaultTimeZone: command.business.defaultTimeZone,
-        createdBy: PlatformOwneruuid,
+        createdBy: platformOwnerId,
       },
     });
 

@@ -1,6 +1,6 @@
 import request from 'supertest';
 import { randomUUID } from 'node:crypto';
-import type { UserRole, UserWorkingHours } from '@pikslots/domain';
+import type { UserRole, UserWorkingHours, WeekDay } from '@pikslots/domain';
 import {
   BUSINESS_ENDPOINTS,
   USER_ENDPOINTS,
@@ -33,7 +33,7 @@ export const DEFAULT_WORKING_HOURS: UserWorkingHours = {
 
 export async function createStaffUser(
   ctx: UserTestContext,
-  businessId: string | null,
+  businessId: string,
   role: UserRole = 'Business Owner',
   overrides: { password?: string } = {},
 ): Promise<{ id: string; username: string; email: string }> {
@@ -85,7 +85,8 @@ export async function createStaffUser(
 export async function createBusiness(
   ctx: UserTestContext,
 ): Promise<{ id: string; ownerId: string }> {
-  const owner = await createStaffUser(ctx, null, 'Business Owner');
+  // Placeholder until the real USER_ASSIGN_TO_BUSINESS job sets the registered business's id
+  const owner = await createStaffUser(ctx, randomUUID(), 'Business Owner');
   const slug = unique('e2e-user-biz');
 
   await request(ctx.app.getHttpServer())
@@ -541,7 +542,7 @@ export async function insertBooking(
       booking_id: `BK${unique('')
         .replace(/[^0-9]/g, '')
         .slice(0, 10)}`,
-      booking_date: params.bookingDate,
+      booking_date: new Date(params.bookingDate),
       booking_start_time: new Date(params.startTimeIso),
       booking_end_time: new Date(params.endTimeIso),
       business_id: params.businessId,
@@ -550,6 +551,7 @@ export async function insertBooking(
         title: 'E2E Service',
         durationInMins: 30,
         cost: 2500,
+        colorCode: '#111111',
       },
       customer_id: params.customerId,
       user_id: params.userId,
@@ -570,7 +572,7 @@ export async function insertBreak(
   params: {
     businessId: string;
     userId: string;
-    day: string; // lowercase weekday, e.g. 'monday'
+    day: WeekDay;
     startTime: string; // HH:mm
     endTime: string; // HH:mm
   },

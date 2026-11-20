@@ -98,12 +98,6 @@ export class CompleteOnboardingDto implements OnboardingCompleteInput {
   @Type(() => OnboardingUserDto)
   platformOwner: OnboardingUserDto;
 
-  @ApiProperty({ type: OnboardingUserDto })
-  @IsObject()
-  @ValidateNested()
-  @Type(() => OnboardingUserDto)
-  businessOwner: OnboardingUserDto;
-
   @ApiProperty({ type: OnboardingBusinessDto })
   @IsObject()
   @ValidateNested()

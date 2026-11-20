@@ -21,7 +21,6 @@ export interface OnboardingBusinessInput {
 
 export interface CompleteOnBoardingCommand {
   platformOwner: OnboardingUserInput;
-  businessOwner: OnboardingUserInput;
   business: OnboardingBusinessInput;
 }
 

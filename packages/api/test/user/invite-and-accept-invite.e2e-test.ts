@@ -137,9 +137,15 @@ describe(`POST ${USER_ENDPOINTS.INVITE} -> ${USER_ENDPOINTS.REQUEST_INVITE_OTP} 
 
   describe('role matrix (User.canInviteRole)', () => {
     it('lets a Platform Owner invite a Business Owner', async () => {
+      const { id: businessId } = await createBusiness(ctx);
+
       const response = await inviteUser(
         ctx,
-        inviteUserPayload({ role: 'Business Owner' }),
+        inviteUserPayload({
+          role: 'Business Owner',
+          businessId,
+          businessName: 'E2E Business',
+        }),
         await tokenForRole(ctx, 'Platform Owner'),
       );
 

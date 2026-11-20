@@ -6,7 +6,6 @@ import { User, type UserRole, type UserStatus } from '../user';
 
 export interface OnboardingProps {
   readonly platformOwner: User;
-  readonly businessOwner: User;
   readonly business: Business;
 }
 
@@ -16,7 +15,7 @@ export interface CreateUser {
   id: string;
   username: string;
   password: string;
-  businessId: string | null;
+  businessId: string;
   name: FullName;
   email: string;
   phone?: string;
@@ -28,7 +27,6 @@ export interface CreateUser {
 
 export interface CreateOnboarding {
   platformOwner: CreateUser;
-  businessOwner: CreateUser;
   business: {
     id: string;
     ownerId: string;
@@ -52,7 +50,6 @@ export class Onboarding {
   static create(input: CreateOnboarding): Onboarding {
     return new Onboarding({
       platformOwner: User.create(input.platformOwner),
-      businessOwner: User.create(input.businessOwner),
       business: Business.create(input.business),
     });
   }
@@ -63,9 +60,6 @@ export class Onboarding {
 
   get platformOwner(): User {
     return this.props.platformOwner;
-  }
-  get businessOwner(): User {
-    return this.props.businessOwner;
   }
   get business(): Business {
     return this.props.business;

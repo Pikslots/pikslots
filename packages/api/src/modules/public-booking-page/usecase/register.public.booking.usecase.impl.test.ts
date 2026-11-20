@@ -254,7 +254,7 @@ describe('RegisterPublicBookingUseCaseImpl', () => {
   it('rejects an assigned user from another business', async () => {
     const saveSpy = jest.spyOn(bookingRepository, 'save');
     const result = await useCase.execute(
-      buildCommand({ userId: 'user-platform-owner-1' }),
+      buildCommand({ userId: 'user-business-owner-2' }),
     );
 
     expect(result.ok).toBe(false);
