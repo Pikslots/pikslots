@@ -75,7 +75,7 @@
 	}
 </script>
 
-<div class="flex w-[60%] flex-col px-6">
+<div class="flex w-full max-w-3xl flex-col px-4 sm:px-6">
 	<p class="pt-4 pb-2 text-xs text-muted-foreground">
 		What days and hours does your business operate? This determines your business availability.
 	</p>

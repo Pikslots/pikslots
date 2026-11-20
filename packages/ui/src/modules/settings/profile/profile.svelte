@@ -1,4 +1,6 @@
 <script lang="ts">
+	import BrandBackdrop from '$lib/components/brand-backdrop.svelte';
+	import { brandSurfaceClass } from '$lib/brand/brand';
 	import * as Avatar from '$lib/components/ui/avatar/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Tabs from '$lib/components/ui/tabs/index.js';
@@ -44,7 +46,10 @@
 
 <div class="flex flex-col">
 	<!-- Profile header -->
-	<div class="relative flex items-center gap-4 px-6 py-5">
+	<div class="{brandSurfaceClass} h-20 sm:h-24" aria-hidden="true">
+		<BrandBackdrop />
+	</div>
+	<div class="relative flex items-start gap-4 px-4 pb-5 sm:px-6">
 		{#if userQuery.isLoading}
 			<Skeleton class="size-16 rounded-full" />
 			<div class="flex flex-col gap-1.5">
@@ -54,20 +59,23 @@
 		{:else if userQuery.data}
 			{@const fullName = `${userQuery.data.name.firstName} ${userQuery.data.name.lastName}`}
 			{@const initials = `${userQuery.data.name.firstName[0]}${userQuery.data.name.lastName[0]}`}
-			<Avatar.Root class="size-16 text-lg">
+			<Avatar.Root class="-mt-10 size-20 shrink-0 bg-background text-xl ring-4 ring-background">
 				<Avatar.Image src={userQuery.data.avatarUrl ?? ''} alt={fullName} />
-				<Avatar.Fallback class="bg-muted font-semibold text-foreground">
+				<Avatar.Fallback
+					class="bg-primary/10 font-semibold text-primary dark:bg-primary/30 dark:text-chart-1"
+				>
 					{initials}
 				</Avatar.Fallback>
 			</Avatar.Root>
-			<div class="flex flex-col gap-0.5">
+			<div class="flex min-w-0 flex-col gap-0.5 pt-3">
 				<span class="text-base font-semibold">{fullName}</span>
 				<span class="text-xs text-muted-foreground">{time}</span>
 			</div>
 			<Button
-				variant="ghost"
+				variant="outline"
 				size="icon-sm"
-				class="absolute top-4 right-4"
+				aria-label="Edit profile"
+				class="mt-3 ml-auto shrink-0"
 				onclick={() =>
 					isPlatformOwner ? (platformOwnerDialogOpen = true) : (editProfileOpen = true)}
 			>
@@ -81,7 +89,7 @@
 		{#if authStore.getPayloadData()?.role !== 'Platform Owner'}
 			<Tabs.List
 				variant="line"
-				class="h-auto justify-start rounded-none border-b bg-transparent px-6 pb-0"
+				class="h-auto max-w-full justify-start overflow-x-auto overflow-y-hidden rounded-none border-b bg-transparent px-6 pb-0 *:flex-none"
 			>
 				<Tabs.Trigger value="about" class="cursor-pointer px-3 pb-2 text-muted-foreground">
 					About

@@ -200,14 +200,14 @@
 
 <div class="flex flex-col">
 	<!-- Page header -->
-	<div class="flex items-center justify-between border-b px-6 py-4">
+	<div class="flex flex-wrap items-center justify-between gap-3 border-b px-4 py-4 sm:px-6">
 		<h1 class="text-base font-semibold">Booking preferences</h1>
 		<Button size="sm" onclick={handleSave} disabled={!isDirty || updateMutation.isPending}>
 			{updateMutation.isPending ? 'Saving...' : 'Save'}
 		</Button>
 	</div>
 
-	<div class="flex w-[60%] flex-col gap-6 px-6 py-4">
+	<div class="flex w-full max-w-3xl flex-col gap-6 px-4 py-4 sm:px-6">
 		<!-- Booking setup heading -->
 		<h2 class="text-sm font-semibold">Booking setup</h2>
 

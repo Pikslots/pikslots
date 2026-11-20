@@ -166,14 +166,14 @@
 
 <div class="flex flex-col">
 	<!-- Page header -->
-	<div class="flex items-center justify-between border-b px-6 py-4">
+	<div class="flex flex-wrap items-center justify-between gap-3 border-b px-4 py-4 sm:px-6">
 		<h1 class="text-base font-semibold">Booking preferences</h1>
 		<Button size="sm" onclick={handleSave} disabled={!isDirty || updateMutation.isPending}>
 			{updateMutation.isPending ? 'Saving...' : 'Save'}
 		</Button>
 	</div>
 
-	<div class="flex w-[60%] flex-col gap-6 px-6 py-4">
+	<div class="flex w-full max-w-3xl flex-col gap-6 px-4 py-4 sm:px-6">
 		<!-- Customization heading -->
 		<h2 class="text-sm font-semibold">Customization</h2>
 
@@ -188,7 +188,7 @@
 
 			<div class="flex flex-col gap-2.5">
 				<!-- Preferred language -->
-				<div class="flex items-start justify-between gap-6">
+				<div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
 					<div class="flex flex-col gap-0.5">
 						<span class="text-xs font-medium">Preferred language</span>
 						<span class="text-xs text-muted-foreground"
@@ -212,7 +212,7 @@
 				</div>
 
 				<!-- Time format -->
-				<div class="flex items-start justify-between gap-6">
+				<div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
 					<div class="flex flex-col gap-0.5">
 						<span class="text-xs font-medium">Time format</span>
 						<span class="text-xs text-muted-foreground"
@@ -236,7 +236,7 @@
 				</div>
 
 				<!-- Week starts on -->
-				<div class="flex items-start justify-between gap-6">
+				<div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
 					<div class="flex flex-col gap-0.5">
 						<span class="text-xs font-medium">Week starts on</span>
 						<span class="text-xs text-muted-foreground"

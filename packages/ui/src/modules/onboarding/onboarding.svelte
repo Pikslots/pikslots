@@ -1,4 +1,6 @@
 <script lang="ts">
+	import BrandBackdrop from '$lib/components/brand-backdrop.svelte';
+	import { brandSurfaceClass } from '$lib/brand/brand';
 	import type { OnboardingFormValues } from './utils/schema';
 	import OnboardingStep from './steps/onboarding-step.svelte';
 	import {
@@ -104,20 +106,9 @@
 <div class="grid min-h-svh lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
 	<!-- Brand panel -->
 	<aside
-		class="relative hidden overflow-hidden bg-primary text-primary-foreground lg:flex lg:flex-col lg:justify-between lg:p-12 dark:border-r dark:bg-linear-to-br dark:from-card dark:via-background dark:to-background"
+		class="{brandSurfaceClass} hidden lg:flex lg:flex-col lg:justify-between lg:p-12 dark:border-r"
 	>
-		<div
-			aria-hidden="true"
-			class="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,currentColor_1px,transparent_1px),linear-gradient(to_bottom,currentColor_1px,transparent_1px)] [mask-image:radial-gradient(ellipse_at_top_left,black_20%,transparent_75%)] bg-[size:48px_48px] opacity-[0.07]"
-		></div>
-		<div
-			aria-hidden="true"
-			class="pointer-events-none absolute -top-32 -right-32 size-96 rounded-full bg-chart-1/40 blur-3xl dark:bg-chart-3/40"
-		></div>
-		<div
-			aria-hidden="true"
-			class="pointer-events-none absolute -bottom-40 -left-24 size-96 rounded-full bg-chart-2/50 blur-3xl dark:bg-chart-2/25"
-		></div>
+		<BrandBackdrop />
 
 		<a href={resolve('/')} class="font-code relative text-2xl">Pikslots</a>
 

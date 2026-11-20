@@ -38,12 +38,12 @@
 
 <div class="flex flex-col">
 	<!-- Page header -->
-	<div class="flex items-center justify-between border-b px-6 py-4">
+	<div class="flex flex-wrap items-center justify-between gap-3 border-b px-4 py-4 sm:px-6">
 		<h1 class="text-base font-semibold">Payments</h1>
 		<Button>Save</Button>
 	</div>
 
-	<div class="flex w-[60%] flex-col gap-4 px-6 py-4">
+	<div class="flex w-full max-w-3xl flex-col gap-4 px-4 py-4 sm:px-6">
 		<h2 class="text-sm font-semibold">Payment integrations</h2>
 		<div class="grid grid-cols-3 gap-4">
 			{#each providers as provider (provider.label)}

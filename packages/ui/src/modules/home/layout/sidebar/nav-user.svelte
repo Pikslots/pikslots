@@ -2,14 +2,11 @@
 	import CreditCardIcon from '@tabler/icons-svelte/icons/credit-card';
 	import DotsVerticalIcon from '@tabler/icons-svelte/icons/dots-vertical';
 	import LogoutIcon from '@tabler/icons-svelte/icons/logout';
-	import MoonIcon from '@tabler/icons-svelte/icons/moon';
 	import UserCircleIcon from '@tabler/icons-svelte/icons/user-circle';
 	import * as Avatar from '$lib/components/ui/avatar/index.js';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
 	import { Skeleton } from '$lib/components/ui/skeleton/index.js';
-	import { Switch } from '$lib/components/ui/switch/index.js';
-	import { themeStore } from '$stores/theme.svelte.js';
 	import { authStore } from '$stores/auth.svelte';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
@@ -106,17 +103,6 @@
 							</DropdownMenu.Item>
 						{/if}
 					</DropdownMenu.Group>
-					<DropdownMenu.Separator />
-					<DropdownMenu.Item class="flex items-center justify-between" closeOnSelect={false}>
-						<div class="flex items-center gap-2">
-							<MoonIcon />
-							Dark mode
-						</div>
-						<Switch
-							checked={themeStore.current === 'dark'}
-							onCheckedChange={(checked) => themeStore.set(checked ? 'dark' : 'light')}
-						/>
-					</DropdownMenu.Item>
 					<DropdownMenu.Separator />
 					<DropdownMenu.Item onclick={logOut}>
 						<LogoutIcon />

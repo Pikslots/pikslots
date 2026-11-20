@@ -119,7 +119,7 @@
 
 <div class="flex flex-col">
 	<!-- Page header -->
-	<div class="flex items-center justify-between border-b px-6 py-4">
+	<div class="flex flex-wrap items-center justify-between gap-3 border-b px-4 py-4 sm:px-6">
 		<h1 class="text-base font-semibold">Business hours</h1>
 		<div class="flex items-center gap-2">
 			<Button
@@ -143,7 +143,7 @@
 		</p>
 
 		<!-- Days list -->
-		<div class="flex w-[60%] flex-col divide-y divide-border/90">
+		<div class="flex w-full max-w-3xl flex-col divide-y divide-border/90">
 			{#each DAYS as { key, label }, i (key)}
 				<div class="flex items-center gap-4 py-2">
 					<!-- Toggle -->

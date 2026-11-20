@@ -75,7 +75,7 @@
 	}
 </script>
 
-<div class="flex w-[70%] flex-col px-6">
+<div class="flex w-full max-w-3xl flex-col px-4 sm:px-6">
 	<p class="pt-4 pb-2 text-xs text-muted-foreground">
 		What days and hours does this member operate? This determines their availability.
 	</p>

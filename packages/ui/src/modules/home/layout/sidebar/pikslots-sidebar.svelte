@@ -9,6 +9,9 @@
 	import BusinessSwitcher from './business-switcher/business-switcher.svelte';
 	import { authStore } from '$stores/auth.svelte';
 	import type { UserRole } from '@pikslots/shared';
+	import { Switch } from '$lib/components/ui/switch/index.js';
+	import { themeStore } from '$stores/theme.svelte.js';
+	import MoonIcon from '@tabler/icons-svelte/icons/moon';
 
 	let { ...restProps }: ComponentProps<typeof Sidebar.Root> = $props();
 
@@ -27,15 +30,11 @@
 	<Sidebar.Header>
 		<Sidebar.Menu>
 			<Sidebar.MenuItem>
-				<Sidebar.MenuButton class="data-[slot=sidebar-menu-button]:!p-1.5">
+				<Sidebar.MenuButton
+					class="font-code h-auto px-2 py-1.5 text-3xl hover:bg-transparent active:bg-transparent"
+				>
 					{#snippet child({ props })}
-						<a
-							href={resolve('/home')}
-							class="font-code flex items-center gap-2 px-2 text-xl"
-							{...props}
-						>
-							Pikslots
-						</a>
+						<a href={resolve('/home')} {...props}>Pikslots</a>
 					{/snippet}
 				</Sidebar.MenuButton>
 			</Sidebar.MenuItem>
@@ -45,7 +44,23 @@
 	<Sidebar.Content>
 		<!-- <NavMain items={data.navMain} /> -->
 		<NavPrimary items={mainOptions} />
-		<NavSecondary items={navSecondary} class="mt-auto" />
+		<NavSecondary items={navSecondary} class="mt-auto">
+			<Sidebar.MenuItem>
+				<Sidebar.MenuButton
+					aria-pressed={themeStore.current === 'dark'}
+					onclick={() => themeStore.set(themeStore.current === 'dark' ? 'light' : 'dark')}
+				>
+					<MoonIcon />
+					<span>Dark mode</span>
+					<Switch
+						class="pointer-events-none ml-auto"
+						tabindex={-1}
+						aria-hidden="true"
+						checked={themeStore.current === 'dark'}
+					/>
+				</Sidebar.MenuButton>
+			</Sidebar.MenuItem>
+		</NavSecondary>
 	</Sidebar.Content>
 	<Sidebar.Footer>
 		<NavUser />

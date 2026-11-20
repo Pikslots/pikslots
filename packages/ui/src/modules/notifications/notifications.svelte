@@ -69,7 +69,7 @@
 				aria-pressed={filter === item.value}
 				class="flex items-center gap-1.5 border-b-2 px-3 pb-2 text-sm transition-colors {filter ===
 				item.value
-					? 'border-foreground font-medium text-foreground'
+					? 'border-primary font-medium text-primary dark:border-chart-1 dark:text-chart-1'
 					: 'border-transparent text-muted-foreground hover:text-foreground'}"
 				onclick={() => (filter = item.value)}
 			>
@@ -90,7 +90,9 @@
 				title={filter === 'unread' ? "You're all caught up" : 'Nothing here right now'}
 				description={filter === 'unread'
 					? 'You have no unread notifications. New updates will appear here.'
-					: 'Notifications you have already read will appear here.'}
+					: filter === 'read'
+						? 'Notifications you have already read will appear here.'
+						: 'Bookings, team changes and payments will show up here as they happen.'}
 			/>
 		</div>
 	{:else}
@@ -115,7 +117,8 @@
 							<span class="text-sm font-medium">{notification.title}</span>
 							<Badge variant="outline">{meta.label}</Badge>
 							{#if !notification.read}
-								<span class="size-2 rounded-full bg-primary" aria-label="Unread"></span>
+								<span class="size-2 rounded-full bg-primary dark:bg-chart-1" aria-label="Unread"
+								></span>
 							{/if}
 						</div>
 						<span class="text-xs text-muted-foreground">{notification.message}</span>

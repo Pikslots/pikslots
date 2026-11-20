@@ -18,6 +18,7 @@
 	import DotsVertical from '@tabler/icons-svelte/icons/dots-vertical';
 	import ChevronDown from '@tabler/icons-svelte/icons/chevron-down';
 	import Trash from '@tabler/icons-svelte/icons/trash';
+	import ArrowLeft from '@tabler/icons-svelte/icons/arrow-left';
 	import CalendarPlus from '@tabler/icons-svelte/icons/calendar-plus';
 	import { IconFileExport, IconFileImport } from '@tabler/icons-svelte';
 	import AddNewCustomer from './dialog/add-new-customer.svelte';
@@ -34,6 +35,8 @@
 
 	let search = $state('');
 	let selectedCustomerId = $state<string | null>(null);
+	// Phones show one panel at a time: the list, or the picked customer's details
+	let showDetailOnMobile = $state(false);
 	let activeTab = $state('about');
 	let addCustomerOpen = $state(false);
 	let editCustomerOpen = $state(false);
@@ -111,7 +114,11 @@
 
 <div class="flex h-full overflow-hidden">
 	<!-- ── Left panel ──────────────────────────────────────────────────────── -->
-	<div class="flex w-62.5 shrink-0 flex-col border-r">
+	<div
+		class="{showDetailOnMobile
+			? 'hidden'
+			: 'flex'} w-full shrink-0 flex-col md:flex md:w-62.5 md:border-r"
+	>
 		<!-- Header -->
 		<div class="flex items-center justify-between px-4 py-3">
 			<h2 class="text-base font-semibold">Customers</h2>
@@ -163,11 +170,12 @@
 				</div>
 			{:else}
 				{#each filteredCustomers as customer (customer.id)}
-					<div class="mx-auto w-55">
+					<div class="px-2 md:mx-auto md:w-55 md:px-0">
 						<button
 							onclick={() => {
 								selectedCustomerId = customer.id;
 								activeTab = 'about';
+								showDetailOnMobile = true;
 							}}
 							class="flex w-full items-center gap-3 px-2 py-2.5 transition-colors
 							{selectedCustomer?.id === customer.id ? 'bg-muted' : 'hover:bg-muted/50'}"
@@ -190,98 +198,113 @@
 	</div>
 
 	<!-- ── Right panel ─────────────────────────────────────────────────────── -->
-	{#if selectedCustomerId && selectedCustomerQuery.isPending}
-		<div class="flex flex-1 items-center justify-center text-sm text-muted-foreground">
-			Loading...
-		</div>
-	{:else if selectedCustomer}
-		{@const customer = selectedCustomer}
-		<div class="flex flex-1 flex-col overflow-hidden">
-			<!-- Detail header -->
-			<div class="flex items-center gap-3 px-6 py-4">
-				<Avatar.Root class="size-12 text-base">
-					{#if customer.profileImageUrl}
-						<Avatar.Image
-							src={customer.profileImageUrl}
-							alt="{customer.firstName} {customer.lastName}"
-						/>
-					{/if}
-					<Avatar.Fallback class="text-base">{getInitial(customer)}</Avatar.Fallback>
-				</Avatar.Root>
-				<span class="text-base font-semibold">{customer.firstName} {customer.lastName}</span>
-
-				<div class="ml-auto flex items-center gap-1">
-					<Button
-						variant="ghost"
-						size="icon"
-						class="size-8"
-						onclick={() => (editCustomerOpen = true)}
-					>
-						<Pencil class="size-4" />
-					</Button>
-
-					<DropdownMenu.Root>
-						<DropdownMenu.Trigger>
-							{#snippet child({ props })}
-								<Button variant="ghost" size="icon" class="size-8" {...props}>
-									<DotsVertical class="size-4" />
-								</Button>
-							{/snippet}
-						</DropdownMenu.Trigger>
-						<DropdownMenu.Content align="end">
-							<DropdownMenu.Item
-								class="text-destructive focus:text-destructive"
-								onclick={() => confirmDelete(customer)}
-							>
-								<Trash class="size-4" />
-								Delete customer
-							</DropdownMenu.Item>
-						</DropdownMenu.Content>
-					</DropdownMenu.Root>
-
-					<Button
-						variant="outline"
-						size="sm"
-						class="gap-1.5"
-						onclick={() => goto(resolve('/home/bookings?create=true'))}
-					>
-						<CalendarPlus class="size-4" />
-						Book appointment
-					</Button>
-				</div>
+	<div
+		class="{showDetailOnMobile ? 'flex' : 'hidden'} min-w-0 flex-1 flex-col overflow-hidden md:flex"
+	>
+		<button
+			type="button"
+			class="flex items-center gap-1.5 px-4 pt-3 text-sm text-muted-foreground hover:text-foreground md:hidden"
+			onclick={() => (showDetailOnMobile = false)}
+		>
+			<ArrowLeft size={16} />
+			All customers
+		</button>
+		{#if selectedCustomerId && selectedCustomerQuery.isPending}
+			<div class="flex flex-1 items-center justify-center text-sm text-muted-foreground">
+				Loading...
 			</div>
+		{:else if selectedCustomer}
+			{@const customer = selectedCustomer}
+			<div class="flex flex-1 flex-col overflow-hidden">
+				<!-- Detail header -->
+				<div class="flex items-center gap-3 px-6 py-4">
+					<Avatar.Root class="size-12 text-base">
+						{#if customer.profileImageUrl}
+							<Avatar.Image
+								src={customer.profileImageUrl}
+								alt="{customer.firstName} {customer.lastName}"
+							/>
+						{/if}
+						<Avatar.Fallback class="text-base">{getInitial(customer)}</Avatar.Fallback>
+					</Avatar.Root>
+					<span class="text-base font-semibold">{customer.firstName} {customer.lastName}</span>
 
-			<!-- Tabs -->
-			<Tabs.Root bind:value={activeTab} class="flex flex-1 flex-col overflow-hidden">
-				<Tabs.List variant="line" class="h-auto justify-start rounded-none px-6">
-					<Tabs.Trigger value="about" class="pb-2">About</Tabs.Trigger>
-					<Tabs.Trigger value="notes" class="pb-2">Notes</Tabs.Trigger>
-					<Tabs.Trigger value="appointments" class="pb-2">Appointments</Tabs.Trigger>
-					<Tabs.Trigger value="updates" class="pb-2">Updates</Tabs.Trigger>
-				</Tabs.List>
+					<div class="ml-auto flex items-center gap-1">
+						<Button
+							variant="ghost"
+							size="icon"
+							class="size-8"
+							onclick={() => (editCustomerOpen = true)}
+						>
+							<Pencil class="size-4" />
+						</Button>
 
-				<Tabs.Content value="about" class="flex-1 overflow-y-auto px-6 py-4">
-					<CustomerAboutTab {customer} />
-				</Tabs.Content>
+						<DropdownMenu.Root>
+							<DropdownMenu.Trigger>
+								{#snippet child({ props })}
+									<Button variant="ghost" size="icon" class="size-8" {...props}>
+										<DotsVertical class="size-4" />
+									</Button>
+								{/snippet}
+							</DropdownMenu.Trigger>
+							<DropdownMenu.Content align="end">
+								<DropdownMenu.Item
+									class="text-destructive focus:text-destructive"
+									onclick={() => confirmDelete(customer)}
+								>
+									<Trash class="size-4" />
+									Delete customer
+								</DropdownMenu.Item>
+							</DropdownMenu.Content>
+						</DropdownMenu.Root>
 
-				<Tabs.Content value="notes" class="flex-1 overflow-y-auto px-6 py-4">
-					<CustomerNotesTab {customer} />
-				</Tabs.Content>
+						<Button
+							variant="outline"
+							size="sm"
+							class="gap-1.5"
+							onclick={() => goto(resolve('/home/bookings?create=true'))}
+						>
+							<CalendarPlus class="size-4" />
+							Book appointment
+						</Button>
+					</div>
+				</div>
 
-				<Tabs.Content value="appointments" class="flex-1 overflow-y-auto px-6 py-4">
-					<CustomerAppointmentsTab {customer} />
-				</Tabs.Content>
+				<!-- Tabs -->
+				<Tabs.Root bind:value={activeTab} class="flex flex-1 flex-col overflow-hidden">
+					<Tabs.List
+						variant="line"
+						class="h-auto max-w-full justify-start overflow-x-auto overflow-y-hidden rounded-none px-6 *:flex-none"
+					>
+						<Tabs.Trigger value="about" class="pb-2">About</Tabs.Trigger>
+						<Tabs.Trigger value="notes" class="pb-2">Notes</Tabs.Trigger>
+						<Tabs.Trigger value="appointments" class="pb-2">Appointments</Tabs.Trigger>
+						<Tabs.Trigger value="updates" class="pb-2">Updates</Tabs.Trigger>
+					</Tabs.List>
 
-				<Tabs.Content value="updates" class="flex-1 overflow-y-auto px-6 py-4">
-					<CustomerUpdatesTab {customer} />
-				</Tabs.Content>
-			</Tabs.Root>
-		</div>
-	{:else}
-		<div class="flex flex-1 items-center justify-center text-sm text-muted-foreground">
-			Select a customer to view details
-		</div>
-	{/if}
+					<Tabs.Content value="about" class="flex-1 overflow-y-auto px-6 py-4">
+						<CustomerAboutTab {customer} />
+					</Tabs.Content>
+
+					<Tabs.Content value="notes" class="flex-1 overflow-y-auto px-6 py-4">
+						<CustomerNotesTab {customer} />
+					</Tabs.Content>
+
+					<Tabs.Content value="appointments" class="flex-1 overflow-y-auto px-6 py-4">
+						<CustomerAppointmentsTab {customer} />
+					</Tabs.Content>
+
+					<Tabs.Content value="updates" class="flex-1 overflow-y-auto px-6 py-4">
+						<CustomerUpdatesTab {customer} />
+					</Tabs.Content>
+				</Tabs.Root>
+			</div>
+		{:else}
+			<div class="flex flex-1 items-center justify-center text-sm text-muted-foreground">
+				Select a customer to view details
+			</div>
+		{/if}
+	</div>
 </div>
 
 <!-- Add customer dialog -->

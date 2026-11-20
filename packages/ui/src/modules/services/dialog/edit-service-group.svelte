@@ -6,6 +6,7 @@
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { Field, FieldError } from '$lib/components/ui/field/index.js';
 	import X from '@tabler/icons-svelte/icons/x';
+	import { FolderCog } from '@lucide/svelte';
 	import Search from '@tabler/icons-svelte/icons/search';
 	import Adjustments from '@tabler/icons-svelte/icons/adjustments';
 	import type { ServiceModel } from '../../api/service/models/service-model';
@@ -147,20 +148,33 @@
 <Dialog.Root bind:open>
 	<Dialog.Portal>
 		<Dialog.Overlay
-			class="fixed inset-0 z-50 bg-black/50 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0"
+			class="fixed inset-0 z-50 bg-black/10 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0 supports-backdrop-filter:backdrop-blur-xs"
 		/>
 		<Dialog.Content
-			class="fixed top-1/2 left-1/2 z-50 flex max-h-[85vh] w-full max-w-lg -translate-x-1/2 -translate-y-1/2 flex-col gap-5 rounded-2xl bg-background p-6 shadow-xl outline-none data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95"
+			class="fixed top-1/2 left-1/2 z-50 flex max-h-[85svh] w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 flex-col gap-0 overflow-hidden bg-popover text-popover-foreground shadow-xl ring-1 ring-foreground/10 outline-none data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95"
 		>
-			<form use:enhance class="flex flex-col gap-5">
+			<form use:enhance class="flex min-h-0 flex-1 flex-col">
 				<!-- Header -->
-				<div class="flex items-center justify-between">
-					<Dialog.Title class="text-xl font-semibold">Edit service group</Dialog.Title>
+				<div class="flex items-center justify-between gap-3 border-b px-5 py-4">
+					<div class="flex min-w-0 items-center gap-3">
+						<span
+							class="flex size-9 shrink-0 items-center justify-center bg-primary/10 text-primary dark:bg-primary/30 dark:text-chart-1"
+						>
+							<FolderCog class="size-4.5" />
+						</span>
+						<div class="min-w-0">
+							<Dialog.Title class="text-base font-semibold">Edit service group</Dialog.Title>
+							<Dialog.Description class="text-xs text-muted-foreground"
+								>Rename the group or change its services</Dialog.Description
+							>
+						</div>
+					</div>
 					<Dialog.Close>
 						{#snippet child({ props })}
 							<button
 								type="button"
-								class="rounded-md p-1 text-muted-foreground hover:text-foreground"
+								aria-label="Close"
+								class="flex size-8 items-center justify-center text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
 								{...props}
 							>
 								<X size={18} />
@@ -169,78 +183,72 @@
 					</Dialog.Close>
 				</div>
 
-				<!-- Name field -->
-				<Field>
-					<Label class="text-sm font-medium">Title <span class="text-destructive">*</span></Label>
-					<Input
-						bind:value={$form.name}
-						placeholder="Enter group title"
-						class="h-8 border-2 focus-visible:border-foreground focus-visible:ring-0"
-					/>
-					<FieldError errors={$errors.name?.map((e) => ({ message: e }))} />
-				</Field>
+				<div class="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto px-5 py-4">
+					<!-- Name field -->
+					<Field>
+						<Label class="text-sm font-medium">Title <span class="text-destructive">*</span></Label>
+						<Input bind:value={$form.name} placeholder="Enter group title" class="" />
+						<FieldError errors={$errors.name?.map((e) => ({ message: e }))} />
+					</Field>
 
-				<!-- Services section -->
-				<div class="flex min-h-0 flex-1 flex-col gap-2">
-					<Label class="text-sm font-medium">Services</Label>
+					<!-- Services section -->
+					<div class="flex min-h-0 flex-1 flex-col gap-2">
+						<Label class="text-sm font-medium">Services</Label>
 
-					<!-- Search -->
-					<div class="relative">
-						<Search
-							size={15}
-							class="absolute top-1/2 left-3 -translate-y-1/2 text-muted-foreground"
-						/>
-						<Input bind:value={serviceSearch} placeholder="Search" class="h-8 pl-9" />
-					</div>
+						<!-- Search -->
+						<div class="relative">
+							<Search
+								size={15}
+								class="absolute top-1/2 left-3 -translate-y-1/2 text-muted-foreground"
+							/>
+							<Input bind:value={serviceSearch} placeholder="Search" class="h-8 pl-9" />
+						</div>
 
-					<!-- Select all row -->
-					<div class="flex items-center justify-between px-1 py-1">
-						<button type="button" class="flex items-center gap-2.5" onclick={toggleSelectAll}>
-							<Checkbox checked={allSelected} indeterminate={someSelected} class="rounded-sm" />
-							<span class="text-sm">Select all</span>
-						</button>
-						<span class="text-sm text-muted-foreground"
-							>{selectedIds.size}/{filteredServices.length}</span
-						>
-					</div>
+						<!-- Select all row -->
+						<div class="flex items-center justify-between px-1 py-1">
+							<button type="button" class="flex items-center gap-2.5" onclick={toggleSelectAll}>
+								<Checkbox checked={allSelected} indeterminate={someSelected} class="rounded-sm" />
+								<span class="text-sm">Select all</span>
+							</button>
+							<span class="text-sm text-muted-foreground"
+								>{selectedIds.size}/{filteredServices.length}</span
+							>
+						</div>
 
-					<!-- Service list -->
-					<div class="flex flex-col gap-2 overflow-y-auto">
-						{#if servicesByGroupQuery.isPending}
-							<p class="px-1 py-2 text-xs text-muted-foreground">Loading services...</p>
-						{:else}
-							{#each filteredServices as service (service.id)}
-								<button
-									type="button"
-									onclick={() => toggleService(service.id)}
-									class="flex items-center gap-3 border px-3 py-3 text-left hover:bg-accent/40"
-								>
-									<Checkbox checked={selectedIds.has(service.id)} class="shrink-0 rounded-sm" />
-									<div
-										class="flex size-9 shrink-0 items-center justify-center rounded-full bg-muted"
+						<!-- Service list -->
+						<div class="flex flex-col gap-1.5">
+							{#if servicesByGroupQuery.isPending}
+								<p class="px-1 py-2 text-xs text-muted-foreground">Loading services...</p>
+							{:else}
+								{#each filteredServices as service (service.id)}
+									<button
+										type="button"
+										onclick={() => toggleService(service.id)}
+										class="flex items-center gap-3 border px-3 py-2.5 text-left transition-colors hover:bg-accent/40 has-data-checked:border-primary/40 has-data-checked:bg-primary/5 dark:has-data-checked:border-chart-1/40"
 									>
-										<Adjustments size={16} class="text-muted-foreground" />
-									</div>
-									<div class="flex flex-col">
-										<span class="text-sm font-medium">{service.title}</span>
-										<span class="text-xs text-muted-foreground">
-											{formatDuration(service.durationInMins)} · {formatCost(service.cost)}
-										</span>
-									</div>
-								</button>
-							{/each}
-						{/if}
+										<Checkbox checked={selectedIds.has(service.id)} class="shrink-0 rounded-sm" />
+										<div
+											class="flex size-9 shrink-0 items-center justify-center bg-primary/10 text-primary dark:bg-primary/30 dark:text-chart-1"
+										>
+											<Adjustments size={16} />
+										</div>
+										<div class="flex flex-col">
+											<span class="text-sm font-medium">{service.title}</span>
+											<span class="text-xs text-muted-foreground">
+												{formatDuration(service.durationInMins)} · {formatCost(service.cost)}
+											</span>
+										</div>
+									</button>
+								{/each}
+							{/if}
+						</div>
 					</div>
 				</div>
 
 				<!-- Footer -->
-				<div class="flex items-center justify-end gap-2 pt-1">
+				<div class="flex items-center justify-end gap-2 border-t bg-muted/30 px-5 py-3">
 					<Button type="button" variant="ghost" onclick={handleCancel}>Cancel</Button>
-					<Button
-						type="submit"
-						disabled={!$form.name.trim() || editMutation.isPending}
-						class="rounded-full px-5"
-					>
+					<Button type="submit" disabled={!$form.name.trim() || editMutation.isPending}>
 						{editMutation.isPending ? 'Saving...' : 'Save'}
 					</Button>
 				</div>

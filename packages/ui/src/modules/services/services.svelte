@@ -305,9 +305,9 @@
 		/>
 	</div>
 {:else}
-	<div class="flex h-full min-h-0 flex-1">
+	<div class="flex h-full min-h-0 flex-1 flex-col md:flex-row">
 		<!-- ── Left: groups sidebar ──────────────────────────────────────────── -->
-		<div class="flex w-64 shrink-0 flex-col border-r">
+		<div class="flex w-full shrink-0 flex-col border-b md:w-64 md:border-r md:border-b-0">
 			<div class="flex items-center justify-between border-b px-4 py-3">
 				<span class="text-sm font-semibold">Groups</span>
 			</div>
@@ -474,7 +474,7 @@
 		</div>
 
 		<!-- ── Right: content panel ────────────────────────────────────────────── -->
-		<div class="flex flex-1 flex-col overflow-hidden">
+		<div class="flex min-w-0 flex-1 flex-col overflow-hidden">
 			<!-- Header -->
 			<div class="flex items-center justify-between border-b px-5 py-3">
 				<h2 class="text-base font-semibold">
@@ -509,7 +509,7 @@
 			</div>
 
 			<!-- Toolbar -->
-			<div class="flex items-center gap-3 border-b px-5 py-2.5">
+			<div class="flex flex-wrap items-center gap-3 border-b px-5 py-2.5">
 				<!-- Staff filter dropdown (services only) -->
 				{#if rightPanelView === 'services'}
 					<DropdownMenu.Root>
@@ -557,7 +557,7 @@
 				{/if}
 
 				<!-- Search -->
-				<div class="relative flex-1">
+				<div class="relative min-w-40 flex-1">
 					<Search
 						size={13}
 						class="absolute top-1/2 left-2.5 -translate-y-1/2 text-muted-foreground"
@@ -814,7 +814,10 @@
 								<div class="flex flex-1 flex-col">
 									<span class="text-sm font-medium">{cls.title}</span>
 									<span class="text-xs text-muted-foreground">
-										{formatDuration(cls.durationInMins)} · {formatCost(cls.cost)} · {cls.seats} seats
+										{formatDuration(cls.durationInMins)} · {formatCost(
+											cls.cost / 100,
+											business?.locationDetails?.currency ?? ''
+										)} · {cls.seats} seats
 									</span>
 								</div>
 

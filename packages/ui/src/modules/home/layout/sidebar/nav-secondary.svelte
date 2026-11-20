@@ -2,7 +2,7 @@
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
 	import { Badge } from '$lib/components/ui/badge/index.js';
 	import type { WithoutChildren } from '$lib/utils.js';
-	import type { ComponentProps } from 'svelte';
+	import type { ComponentProps, Snippet } from 'svelte';
 	import type { Icon } from '@tabler/icons-svelte';
 	import type { ResolvedPathname } from '$app/types';
 	import { page } from '$app/stores';
@@ -10,6 +10,7 @@
 
 	let {
 		items,
+		children,
 		...restProps
 	}: {
 		items: {
@@ -20,6 +21,8 @@
 			shortcut?: boolean;
 			badge?: () => number;
 		}[];
+		// Extra rows rendered after the items, inside the same menu
+		children?: Snippet;
 	} & WithoutChildren<ComponentProps<typeof Sidebar.Group>> = $props();
 
 	const isMac = $derived(browser && /Mac|iPhone|iPad|iPod/.test(navigator.platform));
@@ -34,8 +37,7 @@
 		<Sidebar.Menu>
 			{#each items as item (item.title)}
 				<Sidebar.MenuItem>
-					<Sidebar.MenuButton isActive={isActive(item.url)}
-						>>
+					<Sidebar.MenuButton isActive={isActive(item.url)}>
 						{#snippet child({ props })}
 							{#if item.url !== '#'}
 								<a href={item.url} {...props} onclick={item.onclick}>
@@ -78,6 +80,7 @@
 					</Sidebar.MenuButton>
 				</Sidebar.MenuItem>
 			{/each}
+			{@render children?.()}
 		</Sidebar.Menu>
 	</Sidebar.GroupContent>
 </Sidebar.Group>

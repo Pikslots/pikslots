@@ -15,6 +15,7 @@
 	import { businessStore } from '$stores/business.svelte';
 	import { registerCustomerMutationOptions } from '../../api/customer/register.customer.mutation';
 	import XIcon from '@lucide/svelte/icons/x';
+	import { UserRoundPlus } from '@lucide/svelte';
 	import UserIcon from '@tabler/icons-svelte/icons/user';
 	import { IconFileImport } from '@tabler/icons-svelte';
 	import Plus from '@tabler/icons-svelte/icons/plus';
@@ -291,7 +292,7 @@
 	}}
 >
 	<Dialog.Content
-		class="flex max-h-[90vh] w-full flex-col gap-0 overflow-hidden p-0 sm:max-w-3xl"
+		class="flex max-h-[92svh] w-full flex-col gap-0 overflow-hidden p-0 sm:max-w-3xl"
 		showCloseButton={false}
 	>
 		<!-- Add profile image dialog -->
@@ -302,8 +303,20 @@
 			onSave={(file) => (imageFile = file)}
 		/>
 		<!-- Header -->
-		<div class="flex items-center justify-between px-6 py-4">
-			<span class="text-base font-semibold">Add customer</span>
+		<div class="flex items-center justify-between gap-3 px-5 py-4 sm:px-6">
+			<div class="flex min-w-0 items-center gap-3">
+				<span
+					class="flex size-9 shrink-0 items-center justify-center bg-primary/10 text-primary dark:bg-primary/30 dark:text-chart-1"
+				>
+					<UserRoundPlus class="size-4.5" />
+				</span>
+				<div class="min-w-0">
+					<Dialog.Title class="text-base font-semibold">Add customer</Dialog.Title>
+					<Dialog.Description class="text-xs text-muted-foreground"
+						>Save their details once, book them in seconds</Dialog.Description
+					>
+				</div>
+			</div>
 			<Dialog.Close>
 				{#snippet child({ props })}
 					<Button variant="ghost" size="icon-sm" {...props}>
@@ -317,9 +330,11 @@
 		<Separator />
 
 		<!-- Body -->
-		<div class="flex flex-1 overflow-hidden">
+		<div class="flex min-h-0 flex-1 flex-col overflow-y-auto sm:flex-row sm:overflow-hidden">
 			<!-- Left panel -->
-			<div class="flex w-52 shrink-0 flex-col border-r pt-6">
+			<div
+				class="flex shrink-0 flex-col border-b bg-muted/20 py-4 sm:w-52 sm:border-r sm:border-b-0 sm:pt-6"
+			>
 				<div class="flex justify-center px-4 pb-4">
 					{#if imageFile}
 						<Button
@@ -363,7 +378,8 @@
 					{/if}
 				</div>
 
-				<div class="mt-2 px-2">
+				<p class="-mt-1 text-center text-xs text-muted-foreground">Tap to add a photo</p>
+				<div class="mt-4 hidden px-2 sm:block">
 					<div class="flex items-center gap-2 rounded-none bg-muted px-3 py-2 text-sm font-medium">
 						<UserIcon class="size-4" />
 						Profile
@@ -372,11 +388,11 @@
 			</div>
 
 			<!-- Right panel (form) -->
-			<form use:enhance class="flex flex-1 flex-col overflow-hidden">
-				<div class="flex-1 overflow-y-auto px-6 py-5">
+			<form use:enhance class="flex flex-1 flex-col sm:min-h-0 sm:overflow-hidden">
+				<div class="flex-1 px-4 py-5 sm:overflow-y-auto sm:px-6">
 					<FieldGroup>
 						<!-- First / Last name -->
-						<div class="grid grid-cols-2 gap-4">
+						<div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
 							<Field>
 								<FieldLabel>First name</FieldLabel>
 								<Input bind:value={$form.firstName} placeholder="Enter first name" />
@@ -465,7 +481,7 @@
 						</Field>
 
 						<!-- State + Zip -->
-						<div class="grid grid-cols-2 gap-4">
+						<div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
 							<Field>
 								<FieldLabel>State</FieldLabel>
 								<Input bind:value={$form.state} placeholder="Select state" />
@@ -542,11 +558,18 @@
 				</div>
 
 				<!-- Footer -->
-				<Separator />
-				<div class="flex items-center px-6 py-3">
-					<Button variant="ghost" size="sm" type="button" class="gap-1.5 text-muted-foreground">
+				<div
+					class="sticky bottom-0 flex flex-wrap items-center gap-y-2 border-t bg-popover px-4 py-3 sm:px-6"
+				>
+					<Button
+						variant="ghost"
+						size="sm"
+						type="button"
+						aria-label="Import customers"
+						class="gap-1.5 text-muted-foreground"
+					>
 						<IconFileImport class="size-4" />
-						Import customers
+						<span class="hidden sm:inline">Import customers</span>
 					</Button>
 					<DropdownMenu.Root>
 						<DropdownMenu.Trigger>

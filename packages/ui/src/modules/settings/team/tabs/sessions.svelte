@@ -39,7 +39,7 @@
 	}
 </script>
 
-<div class="flex w-[70%] flex-col gap-3 px-6 py-4">
+<div class="flex w-full max-w-3xl flex-col gap-3 px-4 py-4 sm:px-6">
 	{#if sessionsQuery.isPending}
 		<p class="text-xs text-muted-foreground">Loading...</p>
 	{:else if sessionsQuery.isError}

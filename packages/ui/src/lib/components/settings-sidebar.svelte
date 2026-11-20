@@ -19,6 +19,8 @@
 	import { ScrollArea } from '$lib/components/ui/scroll-area/index.js';
 	import { authStore } from '$stores/auth.svelte';
 
+	let { inSheet = false }: { inSheet?: boolean } = $props();
+
 	type SubItem = { roles?: UserRole[]; label: string; href: ResolvedPathname };
 
 	type MenuItem = {
@@ -213,18 +215,22 @@
 </script>
 
 <aside
-	class="flex h-svh w-64 shrink-0 flex-col border-r border-l bg-sidebar text-sidebar-foreground"
+	class="flex shrink-0 flex-col bg-sidebar text-sidebar-foreground {inSheet
+		? 'h-full w-full'
+		: 'h-svh w-64 border-r border-l'}"
 >
 	<div
 		class="flex shrink-0 items-center gap-2 border-b px-4 py-3"
 		style="height: var(--header-height)"
 	>
-		<button
-			onclick={() => settingsStore.toggle()}
-			class="-ms-1 inline-flex size-7 items-center justify-center rounded-md text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-		>
-			<LayoutSidebarLeftCollapse size={18} />
-		</button>
+		{#if !inSheet}
+			<button
+				onclick={() => settingsStore.toggle()}
+				class="-ms-1 inline-flex size-7 items-center justify-center rounded-md text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+			>
+				<LayoutSidebarLeftCollapse size={18} />
+			</button>
+		{/if}
 		<span class="text-sm font-semibold">Settings</span>
 	</div>
 

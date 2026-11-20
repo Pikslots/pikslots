@@ -241,18 +241,26 @@
 	onClose={() => (imageFile = null)}
 />
 
-<form use:enhance class="mx-auto flex h-full min-h-0 w-[70%] flex-1 flex-col">
+<form use:enhance class="mx-auto flex h-full min-h-0 w-full max-w-6xl flex-1 flex-col">
 	<!-- ── Top bar ──────────────────────────────────────────────────────────────── -->
-	<div class="flex items-center justify-between border-b px-6 py-3">
+	<div
+		class="sticky top-0 z-10 flex items-center justify-between gap-3 border-b bg-background/80 px-4 py-3 backdrop-blur-md md:px-6"
+	>
 		<div class="flex items-center gap-3">
 			<button
 				type="button"
 				onclick={onBack}
-				class="text-muted-foreground transition-colors hover:text-foreground"
+				aria-label="Back"
+				class="flex size-8 shrink-0 items-center justify-center border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
 			>
 				<ArrowLeft size={18} />
 			</button>
-			<span class="text-base font-semibold">New service</span>
+			<div class="min-w-0">
+				<h1 class="truncate text-base leading-tight font-semibold">New service</h1>
+				<p class="hidden truncate text-xs text-muted-foreground sm:block">
+					Add something customers can book in a few clicks
+				</p>
+			</div>
 		</div>
 		<Button type="submit" size="sm" disabled={!canCreate || isSaving}>
 			{registerMutation.isPending ? 'Creating...' : 'Create'}
@@ -260,18 +268,19 @@
 	</div>
 
 	<!-- ── Body ─────────────────────────────────────────────────────────────────── -->
-	<div class="flex flex-1 overflow-hidden">
+	<div class="flex min-h-0 flex-1 flex-col overflow-y-auto lg:flex-row lg:overflow-hidden">
 		<!-- Left column -->
-		<div class="flex flex-1 flex-col gap-6 overflow-y-auto px-6 py-6">
+		<div class="flex flex-1 flex-col gap-6 px-4 py-6 md:px-6 lg:overflow-y-auto">
 			<!-- Service details heading -->
 			<div>
-				<h3 class="text-sm font-semibold">Service details</h3>
+				<h3 class="text-base font-semibold">Service details</h3>
+				<p class="text-xs text-muted-foreground">What customers see when they book</p>
 			</div>
 
 			<!-- Image upload -->
 			<div class="flex items-start gap-4">
 				<div
-					class="flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-lg border bg-muted"
+					class="flex size-24 shrink-0 items-center justify-center overflow-hidden border border-dashed bg-muted/50"
 				>
 					{#if imagePreview}
 						<img src={imagePreview} alt="Service" class="h-full w-full object-cover" />
@@ -319,14 +328,14 @@
 
 						<!-- color code -->
 						<Select.Root type="single" bind:value={$form.colorCode}>
-							<Select.Trigger class="rounded-xl">
+							<Select.Trigger aria-label="Calendar color">
 								<div
 									class="h-5 min-w-5 rounded-full"
 									style:background-color={$form.colorCode}
 								></div>
 							</Select.Trigger>
-							<Select.Content class="rounded-xl">
-								<div class="grid grid-cols-5">
+							<Select.Content>
+								<div class="grid grid-cols-5 gap-1 p-1">
 									{#each color as code, index (index)}
 										<Select.Item
 											id={code}
@@ -353,12 +362,12 @@
 						id="description"
 						bind:value={$form.description}
 						placeholder="Describe your service to Booking Page visitors"
-						class="flex min-h-24 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+						class="flex min-h-24 w-full border border-input bg-transparent px-2.5 py-2 text-xs transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-1 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-input/30"
 					></textarea>
 				</Field>
 
 				<!-- Duration / Buffer / Cost -->
-				<div class="flex items-start gap-3">
+				<div class="grid grid-cols-1 items-start gap-3 sm:grid-cols-3">
 					<!-- Duration -->
 					<Field class="flex-1">
 						<Label for="duration">Duration <span class="text-destructive">*</span></Label>
@@ -433,7 +442,7 @@
 							<button
 								type="button"
 								{...props}
-								class="flex h-9 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+								class="flex h-8 w-full items-center justify-between gap-2 border border-input bg-transparent px-2.5 text-xs transition-colors outline-none focus-visible:border-ring focus-visible:ring-1 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-input/30"
 							>
 								<span
 									class="truncate text-left {selectedGroupIds.size === 0
@@ -478,7 +487,7 @@
 			</div>
 
 			<!-- Set to hidden toggle -->
-			<div class="flex items-center gap-3">
+			<div class="flex items-center gap-3 border bg-muted/30 p-4">
 				<Switch id="hidden" bind:checked={$form.isHiddenFromBookingPage} />
 				<div class="flex flex-col">
 					<Label for="hidden" class="cursor-pointer text-sm font-medium">Set to hidden</Label>
@@ -490,12 +499,14 @@
 		</div>
 
 		<!-- Divider -->
-		<Separator orientation="vertical" />
+		<Separator orientation="vertical" class="hidden lg:block" />
 
 		<!-- Right column — Team -->
-		<div class="flex w-80 shrink-0 flex-col gap-3 overflow-y-auto px-6 py-6">
+		<div
+			class="flex w-full shrink-0 flex-col gap-3 border-t bg-muted/20 px-4 py-6 md:px-6 lg:w-80 lg:overflow-y-auto lg:border-t-0"
+		>
 			<div>
-				<h3 class="text-sm font-semibold">
+				<h3 class="text-base font-semibold">
 					Team <span class="text-destructive">*</span>
 				</h3>
 				<p class="mt-0.5 text-xs text-muted-foreground">Who will provide this service?</p>
@@ -539,7 +550,7 @@
 			<!-- Team member list -->
 			<div class="flex flex-col gap-1">
 				{#each filteredTeam as member (member.id)}
-					<div class="flex items-center gap-2.5 rounded-md px-1 py-1.5 hover:bg-accent">
+					<div class="flex items-center gap-2.5 px-2 py-1.5 transition-colors hover:bg-accent">
 						<Checkbox
 							id="member-{member.id}"
 							checked={selectedMemberIds.has(member.id)}

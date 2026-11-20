@@ -123,7 +123,7 @@
 
 <div class="flex flex-col">
 	<!-- Page header -->
-	<div class="flex items-center justify-between border-b px-6 py-4">
+	<div class="flex flex-wrap items-center justify-between gap-3 border-b px-4 py-4 sm:px-6">
 		<h1 class="text-base font-semibold">Notifications</h1>
 		<div class="flex items-center gap-2">
 			<Button
@@ -140,7 +140,7 @@
 		</div>
 	</div>
 
-	<div class="flex w-[60%] flex-col gap-6 px-6 py-4">
+	<div class="flex w-full max-w-3xl flex-col gap-6 px-4 py-4 sm:px-6">
 		<!-- Team notifications -->
 		<div class="flex flex-col gap-0.5">
 			<h2 class="text-sm font-semibold">Team notifications</h2>
@@ -200,7 +200,7 @@
 				>
 			</div>
 
-			<div class="flex items-start justify-between gap-6">
+			<div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
 				<div class="flex items-start gap-3">
 					<Checkbox bind:checked={emailReminder} class="mt-0.5" />
 					<div class="flex flex-col gap-0.5">

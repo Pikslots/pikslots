@@ -26,7 +26,7 @@
 
 	const queryClient = useQueryClient();
 
-	const breaksQuery = createQuery(() => getBreaksByUserQueryOptions(userId));
+	const breaksQuery = createQuery(() => getBreaksByUserQueryOptions(userId, businessId));
 	const createMut = createMutation(() => createBreakMutationOptions());
 	const updateMut = createMutation(() => updateBreakMutationOptions());
 	const deleteMut = createMutation(() => deleteBreakMutationOptions());
@@ -157,7 +157,7 @@
 	}
 </script>
 
-<div class="flex w-[70%] flex-col px-6">
+<div class="flex w-full max-w-3xl flex-col px-4 sm:px-6">
 	<div class="flex flex-col divide-y divide-border/90 pt-4 pb-2">
 		{#each breakDays as day, di (day.label)}
 			<div class="flex flex-col py-2">

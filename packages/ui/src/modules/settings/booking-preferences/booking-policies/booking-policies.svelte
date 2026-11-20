@@ -125,20 +125,22 @@
 
 <div class="flex flex-col">
 	<!-- Page header -->
-	<div class="flex items-center justify-between border-b px-6 py-4">
+	<div class="flex flex-wrap items-center justify-between gap-3 border-b px-4 py-4 sm:px-6">
 		<h1 class="text-base font-semibold">Booking preferences</h1>
 		<Button size="sm" onclick={handleSave} disabled={!isDirty || updateMutation.isPending}>
 			{updateMutation.isPending ? 'Saving...' : 'Save'}
 		</Button>
 	</div>
 
-	<div class="flex w-[60%] flex-col gap-2 px-6 py-4">
+	<div class="flex w-full max-w-3xl flex-col gap-2 px-4 py-4 sm:px-6">
 		<!-- Booking policies section -->
 		<h2 class="mb-1 text-sm font-semibold">Booking policies</h2>
 
 		<div class="flex flex-col gap-0">
 			<!-- Lead time -->
-			<div class="flex items-start justify-between gap-6 py-2.5">
+			<div
+				class="flex flex-col gap-3 py-2.5 sm:flex-row sm:items-start sm:justify-between sm:gap-6"
+			>
 				<div class="flex flex-col gap-0.5">
 					<span class="text-xs font-medium">Lead time</span>
 					<span class="text-xs text-muted-foreground"
@@ -166,7 +168,9 @@
 			</div>
 
 			<!-- Scheduling window -->
-			<div class="flex items-start justify-between gap-6 py-2.5">
+			<div
+				class="flex flex-col gap-3 py-2.5 sm:flex-row sm:items-start sm:justify-between sm:gap-6"
+			>
 				<div class="flex flex-col gap-0.5">
 					<span class="text-xs font-medium">Scheduling window</span>
 					<span class="text-xs text-muted-foreground"
@@ -195,7 +199,7 @@
 			</div>
 
 			<!-- Booking slot size (local only) -->
-			<!-- <div class="flex items-start justify-between gap-6 py-2.5"> -->
+			<!-- <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-6 py-2.5"> -->
 			<!-- 	<div class="flex flex-col gap-0.5"> -->
 			<!-- 		<div class="flex items-center gap-1.5"> -->
 			<!-- 			<span class="text-xs font-medium">Booking slot size</span> -->
@@ -221,7 +225,9 @@
 			<!-- </div> -->
 
 			<!-- Cancellation policy -->
-			<div class="flex items-start justify-between gap-6 py-2.5">
+			<div
+				class="flex flex-col gap-3 py-2.5 sm:flex-row sm:items-start sm:justify-between sm:gap-6"
+			>
 				<div class="flex flex-col gap-0.5">
 					<span class="text-xs font-medium">Cancellation policy</span>
 					<span class="text-xs text-muted-foreground"

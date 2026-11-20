@@ -18,7 +18,7 @@
 
 <div class="flex flex-col">
 	<!-- Page header -->
-	<div class="flex items-center justify-between border-b px-6 py-4">
+	<div class="flex flex-wrap items-center justify-between gap-3 border-b px-4 py-4 sm:px-6">
 		<h1 class="text-base font-semibold">Reviews</h1>
 	</div>
 
@@ -55,7 +55,7 @@
 
 			<!-- Preferences tab -->
 			<Tabs.Content value="preferences" class="mt-0">
-				<div class="flex w-[60%] flex-col gap-6 py-4">
+				<div class="flex w-full max-w-3xl flex-col gap-6 py-4">
 					<!-- Review source cards -->
 					<div class="grid grid-cols-2 gap-3">
 						<!-- Google Reviews -->

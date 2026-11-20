@@ -16,6 +16,7 @@
 	import ViewBookingDialog from './dialogs/view.booking.svelte';
 	import CreateBookingDialog from './dialogs/create.booking.svelte';
 	import type { BookingEvent } from './dialogs/view.booking.svelte';
+	import { LABEL_COLORS } from './components/labels';
 	import type { BookingItemResponse } from '@pikslots/shared';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
@@ -168,10 +169,12 @@
 	$effect(() => {
 		untrack(() => {
 			calendarEl = document.getElementById('calendar');
+			// A month grid is unreadable at phone width, so phones start on the weekly list
+			const isPhone = window.matchMedia('(max-width: 767px)').matches;
 
 			fullCalendar = new Calendar(calendarEl!, {
 				plugins: [dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin],
-				initialView: 'dayGridMonth',
+				initialView: isPhone ? 'listWeek' : 'dayGridMonth',
 				headerToolbar: {
 					left: 'prev,next today',
 					center: 'title',
@@ -199,14 +202,6 @@
 					const label = (info.event.extendedProps as Record<string, unknown>).label as
 						| string
 						| undefined;
-
-					const LABEL_COLORS: Record<string, string> = {
-						Confirmed: '#22c55e',
-						Pending: '#f59e0b',
-						Cancelled: '#ef4444',
-						Completed: '#3b82f6',
-						'No Show': '#a855f7'
-					};
 
 					const seg = (el: string, cls: string, text: string): HTMLElement => {
 						const node = document.createElement(el);
@@ -311,7 +306,7 @@
 
 <div class="flex h-full min-h-0 flex-1">
 	<!-- ── Left: sidebar ──────────────────────────────────────────────────── -->
-	<div class=" flex w-56 shrink-0 flex-col gap-5 px-3 pb-4">
+	<div class="hidden w-56 shrink-0 flex-col gap-5 px-3 pb-4 md:flex">
 		<!-- <div class="-mb-2 flex items-center justify-end">
 			<Button
 				class="rounded-full px-2 py-3"
@@ -420,7 +415,7 @@
 	</div>
 
 	<!-- ── Right: calendar ───────────────────────────────────────────────── -->
-	<div class="flex flex-1 flex-col overflow-hidden">
+	<div class="flex min-w-0 flex-1 flex-col overflow-hidden px-2 md:px-0">
 		<!-- <div class="min-w-0">
 				<h2 class="truncate text-sm font-medium">
 					{#if selectedUser?.id === currentUser?.id}
@@ -455,6 +450,17 @@
 
 	:global(.calendar-wrapper .fc) {
 		font-family: 'Roboto Variable', sans-serif;
+	}
+
+	@media (max-width: 767px) {
+		:global(.calendar-wrapper .fc-header-toolbar) {
+			flex-wrap: wrap;
+			gap: 0.5rem;
+		}
+
+		:global(.calendar-wrapper .fc-toolbar-title) {
+			font-size: 1rem;
+		}
 	}
 
 	:global(.calendar-wrapper .fc-scrollgrid),

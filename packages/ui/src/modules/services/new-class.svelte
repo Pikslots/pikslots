@@ -132,18 +132,26 @@
 	}
 </script>
 
-<form use:enhance class="mx-auto flex h-full min-h-0 w-[70%] flex-1 flex-col">
+<form use:enhance class="mx-auto flex h-full min-h-0 w-full max-w-6xl flex-1 flex-col">
 	<!-- ── Top bar ──────────────────────────────────────────────────────────────── -->
-	<div class="flex items-center justify-between border-b px-6 py-3">
+	<div
+		class="sticky top-0 z-10 flex items-center justify-between gap-3 border-b bg-background/80 px-4 py-3 backdrop-blur-md md:px-6"
+	>
 		<div class="flex items-center gap-3">
 			<button
 				type="button"
 				onclick={onBack}
-				class="text-muted-foreground transition-colors hover:text-foreground"
+				aria-label="Back"
+				class="flex size-8 shrink-0 items-center justify-center border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
 			>
 				<ArrowLeft size={18} />
 			</button>
-			<span class="text-base font-semibold">New class</span>
+			<div class="min-w-0">
+				<h1 class="truncate text-base leading-tight font-semibold">New class</h1>
+				<p class="hidden truncate text-xs text-muted-foreground sm:block">
+					Set up a group session customers can join
+				</p>
+			</div>
 		</div>
 		<Button type="submit" size="sm" disabled={!canCreate || registerMutation.isPending}>
 			{registerMutation.isPending ? 'Creating...' : 'Create'}
@@ -151,17 +159,18 @@
 	</div>
 
 	<!-- ── Body ─────────────────────────────────────────────────────────────────── -->
-	<div class="flex flex-1 overflow-y-auto px-6 py-6">
-		<div class="flex w-full flex-col gap-6">
+	<div class="flex flex-1 overflow-y-auto px-4 py-6 md:px-6">
+		<div class="mx-auto flex w-full max-w-3xl flex-col gap-6">
 			<!-- Class details heading -->
 			<div>
-				<h3 class="text-sm font-semibold">Class details</h3>
+				<h3 class="text-base font-semibold">Class details</h3>
+				<p class="text-xs text-muted-foreground">What customers see when they join</p>
 			</div>
 
 			<!-- Image upload -->
 			<div class="flex items-start gap-4">
 				<div
-					class="flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-lg border bg-muted"
+					class="flex size-24 shrink-0 items-center justify-center overflow-hidden border border-dashed bg-muted/50"
 				>
 					{#if imagePreview}
 						<img src={imagePreview} alt="Class" class="h-full w-full object-cover" />
@@ -202,12 +211,12 @@
 						id="description"
 						bind:value={$form.description}
 						placeholder="Describe your class to Booking Page visitors"
-						class="flex min-h-24 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+						class="flex min-h-24 w-full border border-input bg-transparent px-2.5 py-2 text-xs transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-1 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-input/30"
 					></textarea>
 				</Field>
 
 				<!-- Duration / Seats / Cost -->
-				<div class="flex items-start gap-3">
+				<div class="grid grid-cols-1 items-start gap-3 sm:grid-cols-3">
 					<!-- Duration -->
 					<Field class="flex-1">
 						<Label for="duration">Duration <span class="text-destructive">*</span></Label>
@@ -273,7 +282,7 @@
 							<button
 								type="button"
 								{...props}
-								class="flex h-9 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+								class="flex h-8 w-full items-center justify-between gap-2 border border-input bg-transparent px-2.5 text-xs transition-colors outline-none focus-visible:border-ring focus-visible:ring-1 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-input/30"
 							>
 								<span
 									class="truncate text-left {selectedGroupIds.size === 0
@@ -318,7 +327,7 @@
 			</div>
 
 			<!-- Set to hidden toggle -->
-			<div class="flex items-center gap-3">
+			<div class="flex items-center gap-3 border bg-muted/30 p-4">
 				<Switch id="hidden" bind:checked={$form.isHiddenFromBookingPage} />
 				<div class="flex flex-col">
 					<Label for="hidden" class="cursor-pointer text-sm font-medium">Set to hidden</Label>

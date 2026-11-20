@@ -20,11 +20,19 @@
 </script>
 
 <div class="px-4 lg:px-6">
-	<Empty.Root>
+	<Empty.Root class="border border-dashed bg-muted/20 py-12">
 		<Empty.Header>
-			<IconComponent size={48} />
-			<Empty.Title>{title}</Empty.Title>
-			<Empty.Description>{description}</Empty.Description>
+			<div class="relative mb-2 flex items-center justify-center">
+				<span class="absolute size-24 bg-primary/5 dark:bg-chart-1/5" aria-hidden="true"></span>
+				<span class="absolute size-18 bg-primary/10 dark:bg-chart-1/10" aria-hidden="true"></span>
+				<span
+					class="relative flex size-12 items-center justify-center bg-primary text-primary-foreground shadow-lg shadow-primary/25"
+				>
+					<IconComponent size={24} />
+				</span>
+			</div>
+			<Empty.Title class="mt-6 text-base font-semibold">{title}</Empty.Title>
+			<Empty.Description class="max-w-sm">{description}</Empty.Description>
 		</Empty.Header>
 		{#if buttonLabel}
 			<Empty.Content>

@@ -1,4 +1,6 @@
 <script lang="ts">
+	import BrandBackdrop from '$lib/components/brand-backdrop.svelte';
+	import { brandSurfaceClass } from '$lib/brand/brand';
 	import * as Avatar from '$lib/components/ui/avatar/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
@@ -6,6 +8,7 @@
 	import * as Tabs from '$lib/components/ui/tabs/index.js';
 	import Pencil from '@tabler/icons-svelte/icons/pencil';
 	import Plus from '@tabler/icons-svelte/icons/plus';
+	import ArrowLeft from '@tabler/icons-svelte/icons/arrow-left';
 	import Search from '@tabler/icons-svelte/icons/search';
 	import InviteTeamMemberDialog from './dialog/invite-team-member-dialog.svelte';
 	import EditTeamMemberDialog from './dialog/edit-team-member-dialog.svelte';
@@ -45,6 +48,8 @@
 
 	let search = $state('');
 	let selectedId = $state<string | null>(null);
+	// Phones show one panel at a time: the list, or the picked member's details
+	let showDetailOnMobile = $state(false);
 
 	const selected = $derived(members.find((m) => m.id === selectedId) ?? members[0] ?? null);
 
@@ -74,7 +79,11 @@
 
 <div class="flex h-full min-h-0 flex-1 overflow-hidden">
 	<!-- Left: team list -->
-	<div class="flex w-64 shrink-0 flex-col overflow-hidden border-r">
+	<div
+		class="{showDetailOnMobile
+			? 'hidden'
+			: 'flex'} w-full shrink-0 flex-col overflow-hidden md:flex md:w-64 md:border-r"
+	>
 		<div class="flex items-center justify-between border-b px-4 py-3">
 			<span class="text-sm font-semibold">Your team</span>
 			<Button
@@ -105,7 +114,10 @@
 				{#each filtered as member (member.id)}
 					<button
 						type="button"
-						onclick={() => (selectedId = member.id)}
+						onclick={() => {
+							selectedId = member.id;
+							showDetailOnMobile = true;
+						}}
 						class="flex items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-accent
 							{selectedId === member.id ? 'bg-accent' : ''}"
 					>
@@ -142,21 +154,38 @@
 	</div>
 
 	<!-- Right: member detail -->
-	<div class="flex min-h-0 flex-1 flex-col overflow-hidden">
+	<div
+		class="{showDetailOnMobile
+			? 'flex'
+			: 'hidden'} min-h-0 min-w-0 flex-1 flex-col overflow-hidden md:flex"
+	>
+		<button
+			type="button"
+			class="flex items-center gap-1.5 px-4 pt-3 text-sm text-muted-foreground hover:text-foreground md:hidden"
+			onclick={() => (showDetailOnMobile = false)}
+		>
+			<ArrowLeft size={16} />
+			All members
+		</button>
 		{#if selected}
-			<div class="relative flex items-center gap-4 px-6 py-5">
-				<Avatar.Root class="size-16 text-lg">
+			<div class="{brandSurfaceClass} h-20 sm:h-24" aria-hidden="true">
+				<BrandBackdrop />
+			</div>
+			<div class="relative flex items-start gap-4 px-4 pb-5 sm:px-6">
+				<Avatar.Root class="-mt-10 size-20 shrink-0 bg-background text-xl ring-4 ring-background">
 					{#if selected.avatarUrl}
 						<Avatar.Image
 							src={selected.avatarUrl}
 							alt="{selected.name.firstName} {selected.name.lastName}"
 						/>
 					{/if}
-					<Avatar.Fallback class="bg-muted font-semibold text-foreground">
+					<Avatar.Fallback
+						class="bg-primary/10 font-semibold text-primary dark:bg-primary/30 dark:text-chart-1"
+					>
 						{selected.name.firstName[0].toUpperCase()}
 					</Avatar.Fallback>
 				</Avatar.Root>
-				<div class="flex flex-col gap-0.5">
+				<div class="flex min-w-0 flex-col gap-0.5 pt-3">
 					<span class="text-base font-semibold">
 						{selected.name.firstName}
 						{selected.name.lastName}
@@ -164,9 +193,10 @@
 					<span class="text-xs text-muted-foreground">@{selected.username}</span>
 				</div>
 				<Button
-					variant="ghost"
+					variant="outline"
 					size="icon-sm"
-					class="absolute top-4 right-4"
+					aria-label="Edit profile"
+					class="mt-3 ml-auto shrink-0"
 					onclick={() => (editMemberOpen = true)}
 				>
 					<Pencil size={16} />
@@ -176,7 +206,7 @@
 			<Tabs.Root value="about" class="flex flex-col">
 				<Tabs.List
 					variant="line"
-					class="h-auto justify-start rounded-none bg-transparent px-6 pb-0"
+					class="h-auto max-w-full justify-start overflow-x-auto overflow-y-hidden rounded-none bg-transparent px-6 pb-0 *:flex-none"
 				>
 					<Tabs.Trigger
 						value="about"

@@ -10,12 +10,12 @@
 
 <div class="flex flex-col">
 	<!-- Page header -->
-	<div class="flex items-center justify-between border-b px-6 py-4">
+	<div class="flex flex-wrap items-center justify-between gap-3 border-b px-4 py-4 sm:px-6">
 		<h1 class="text-base font-semibold">Payments</h1>
 		<Button>Save</Button>
 	</div>
 
-	<div class="flex w-[60%] flex-col gap-6 px-6 py-4">
+	<div class="flex w-full max-w-3xl flex-col gap-6 px-4 py-4 sm:px-6">
 		<!-- Booking Page payments -->
 		<div class="flex flex-col gap-3">
 			<div class="flex flex-col gap-0.5">
