@@ -20,9 +20,6 @@ const DEFAULT_WORKING_HOURS: UserWorkingHours = {
 };
 
 export interface RegisterPayloadOverrides {
-  ownerId?: string;
-  ownerName?: string;
-  ownerEmail?: string;
   slug?: string;
   name?: string;
   industry?: string;
@@ -45,7 +42,7 @@ export async function createOwnerUser(
     .insertInto('users')
     .values({
       id,
-      business_id: randomUUID(), // placeholder until the real USER_ASSIGN_TO_BUSINESS job sets it
+      business_id: randomUUID(), // placeholder; registering a business doesn't reassign its owner
       username: `e2e${suffix}`,
       password: 'e2e-unused-password-hash',
       first_name: 'E2E',
@@ -80,15 +77,9 @@ export async function createOwnerUser(
   return id;
 }
 
-export async function registerPayload(
-  ctx: BusinessTestContext,
-  overrides: RegisterPayloadOverrides = {},
-) {
+export function registerPayload(overrides: RegisterPayloadOverrides = {}) {
   const slug = overrides.slug ?? unique('e2e-biz');
   return {
-    ownerId: overrides.ownerId ?? (await createOwnerUser(ctx)),
-    ownerName: overrides.ownerName ?? 'E2E Test Owner',
-    ownerEmail: overrides.ownerEmail ?? `${unique('owner')}@example.com`,
     slug,
     name: overrides.name ?? `E2E Business ${slug}`,
     industry: overrides.industry ?? 'fitness',
@@ -96,15 +87,35 @@ export async function registerPayload(
   };
 }
 
+/**
+ * The register endpoint takes the owner from the caller's session, so this
+ * creates a real owning user (businesses.owner_id is a real FK) and signs a
+ * Platform Owner session as them.
+ */
+export async function ownerSession(
+  ctx: BusinessTestContext,
+): Promise<{ ownerId: string; headers: Record<string, string> }> {
+  const ownerId = await createOwnerUser(ctx);
+  const sessionId = await tokenFor(
+    ctx.sessionCacheService,
+    'Platform Owner',
+    null,
+    ownerId,
+  );
+  return { ownerId, headers: authHeader(sessionId) };
+}
+
 /** Registers a real business through the real HTTP endpoint and tracks it for cleanup. */
 export async function createBusiness(
   ctx: BusinessTestContext,
   overrides: RegisterPayloadOverrides = {},
-): Promise<{ id: string; slug: string; ownerEmail: string }> {
-  const payload = await registerPayload(ctx, overrides);
+): Promise<{ id: string; slug: string; ownerId: string }> {
+  const payload = registerPayload(overrides);
+  const { ownerId, headers } = await ownerSession(ctx);
 
   await request(ctx.app.getHttpServer())
     .post(BUSINESS_ENDPOINTS.REGISTER)
+    .set(headers)
     .send(payload)
     .expect(201);
 
@@ -115,7 +126,7 @@ export async function createBusiness(
     .executeTakeFirstOrThrow();
 
   ctx.createdBusinessIds.push(row.id);
-  return { id: row.id, slug: payload.slug, ownerEmail: payload.ownerEmail };
+  return { id: row.id, slug: payload.slug, ownerId };
 }
 
 export async function getBusiness(

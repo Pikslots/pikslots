@@ -89,10 +89,18 @@ export async function createBusiness(
 
   await request(ctx.app.getHttpServer())
     .post(BUSINESS_ENDPOINTS.REGISTER)
+    // The caller becomes the owner, so register as that (real) user with Platform Owner rights
+    .set(
+      authHeader(
+        await tokenFor(
+          ctx.sessionCacheService,
+          'Platform Owner',
+          null,
+          owner.id,
+        ),
+      ),
+    )
     .send({
-      ownerId: owner.id,
-      ownerName: 'E2E Test Owner',
-      ownerEmail: `${unique('owner')}@example.com`,
       slug,
       name: `E2E Business ${slug}`,
       industry: 'fitness',

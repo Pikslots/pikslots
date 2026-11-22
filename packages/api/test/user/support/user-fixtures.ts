@@ -11,7 +11,6 @@ import {
 import { unique } from '../../common/unique-id';
 import { endpointForParams } from '../../common/endpoint-path';
 import { authHeader, tokenFor } from '../../common/auth';
-import { waitFor } from '../../common/wait-for';
 import type { SupertestResponse } from '../../common/http-envelope';
 import type {
   EmailTemplateContextMap,
@@ -85,16 +84,24 @@ export async function createStaffUser(
 export async function createBusiness(
   ctx: UserTestContext,
 ): Promise<{ id: string; ownerId: string }> {
-  // Placeholder until the real USER_ASSIGN_TO_BUSINESS job sets the registered business's id
+  // Placeholder until it's linked to the registered business below
   const owner = await createStaffUser(ctx, randomUUID(), 'Business Owner');
   const slug = unique('e2e-user-biz');
 
   await request(ctx.app.getHttpServer())
     .post(BUSINESS_ENDPOINTS.REGISTER)
+    // The caller becomes the owner, so register as that (real) user with Platform Owner rights
+    .set(
+      authHeader(
+        await tokenFor(
+          ctx.sessionCacheService,
+          'Platform Owner',
+          null,
+          owner.id,
+        ),
+      ),
+    )
     .send({
-      ownerId: owner.id,
-      ownerName: 'E2E Test Owner',
-      ownerEmail: `${unique('owner')}@example.com`,
       slug,
       name: `E2E Business ${slug}`,
       industry: 'fitness',
@@ -110,31 +117,14 @@ export async function createBusiness(
 
   ctx.createdBusinessIds.push(row.id);
 
-  // Registering a business only enqueues a real BUSINESS_REGISTRATION_INVITE
-  // job; that job sends the owner's welcome email and THEN enqueues a
-  // second real job (USER_ASSIGN_TO_BUSINESS) which is what actually
-  // updates the owner's own users.business_id column (see
-  // business.registration.invite.ts -> user.assigned.to.business.event.ts).
-  // Until that second job runs, the owner's business_id in Postgres is
-  // still null even though businesses.owner_id already points at them.
-  // Callers that only need a businessId to embed in a JWT (most of this
-  // suite) don't care about this ordering, but anything that reads the
-  // owner back out of the real `users` table (e.g. getBusinessUsers) does.
-  await waitFor(
-    async () => {
-      const ownerRow = await ctx.db
-        .selectFrom('users')
-        .select('business_id')
-        .where('id', '=', owner.id)
-        .executeTakeFirstOrThrow();
-      return ownerRow.business_id === row.id;
-    },
-    // Two sequential real BullMQ jobs (not one), so this needs more
-    // headroom than a typical single-hop wait, especially under a full
-    // test-suite run where the shared worker is processing jobs for many
-    // suites concurrently.
-    { timeoutMs: 20000 },
-  );
+  // Registering a business no longer assigns the owner to it, but things that
+  // read the owner back out of `users` (e.g. getBusinessUsers) expect them to
+  // belong to it, so link them directly as setup.
+  await ctx.db
+    .updateTable('users')
+    .set({ business_id: row.id })
+    .where('id', '=', owner.id)
+    .execute();
 
   return { id: row.id, ownerId: owner.id };
 }

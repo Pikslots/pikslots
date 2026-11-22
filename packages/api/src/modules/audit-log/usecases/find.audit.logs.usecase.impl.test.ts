@@ -130,10 +130,10 @@ describe('FindAuditLogsUseCaseImpl', () => {
         for (const { user } of result.value) {
           expect(user).toEqual({
             id: 'user-standard-1',
-            firstName: expect.any(String),
-            lastName: expect.any(String),
-            email: expect.any(String),
-            username: expect.any(String),
+            firstName: 'Eve',
+            lastName: 'Davis',
+            email: 'eve@acme.com',
+            username: 'standard_user',
           });
         }
       }

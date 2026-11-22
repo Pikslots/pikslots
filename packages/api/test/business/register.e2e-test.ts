@@ -2,18 +2,24 @@ import request from 'supertest';
 import { BUSINESS_ENDPOINTS } from '@pikslots/shared';
 
 import { successBody, errorBody } from '../common/http-envelope';
-import { waitFor } from '../common/wait-for';
+import { authHeader, tokenFor } from '../common/auth';
 import { setupBusinessTestContext } from './support/business-test-context';
-import { createBusiness, registerPayload } from './support/business-fixtures';
+import {
+  createBusiness,
+  ownerSession,
+  registerPayload,
+} from './support/business-fixtures';
 
 describe(`POST ${BUSINESS_ENDPOINTS.REGISTER}`, () => {
   const ctx = setupBusinessTestContext();
 
-  it('persists a real row in Postgres and processes the invite job through the real BullMQ worker', async () => {
-    const payload = await registerPayload(ctx);
+  it('persists a real row in Postgres owned by the calling user', async () => {
+    const payload = registerPayload();
+    const { ownerId, headers } = await ownerSession(ctx);
 
     const response = await request(ctx.app.getHttpServer())
       .post(BUSINESS_ENDPOINTS.REGISTER)
+      .set(headers)
       .send(payload)
       .expect(201);
 
@@ -26,39 +32,60 @@ describe(`POST ${BUSINESS_ENDPOINTS.REGISTER}`, () => {
       .executeTakeFirstOrThrow();
     ctx.createdBusinessIds.push(row.id);
 
-    expect(row.owner_id).toBe(payload.ownerId);
+    expect(row.owner_id).toBe(ownerId);
+    expect(row.created_by).toBe(ownerId);
     expect(row.name).toBe(payload.name);
     expect(row.status).toBe('pending_setup');
 
-    // Real Redis -> real BullMQ worker -> real BusinessRegistrationInvite
-    // processor, asynchronously. Only the final email send is mocked.
-    await waitFor(() => ctx.sentEmails.mock.calls.length > 0);
-    const [emailCall] = ctx.sentEmails.mock.calls as [
-      [{ to: string; template: string; context: { businessName: string } }],
-    ];
-    expect(emailCall[0].to).toBe(payload.ownerEmail);
-    expect(emailCall[0].template).toBe('user-invite');
-    expect(emailCall[0].context.businessName).toBe(payload.name);
+    // No invite is sent anymore
+    expect(ctx.sentEmails).not.toHaveBeenCalled();
   });
 
   it('returns 409 when the slug is already taken', async () => {
     const existing = await createBusiness(ctx);
+    const { headers } = await ownerSession(ctx);
 
     const response = await request(ctx.app.getHttpServer())
       .post(BUSINESS_ENDPOINTS.REGISTER)
-      .send(await registerPayload(ctx, { slug: existing.slug }))
+      .set(headers)
+      .send(registerPayload({ slug: existing.slug }))
       .expect(409);
 
     expect(errorBody(response).statusCode).toBe(409);
   });
 
   it('returns 400 for an invalid payload', async () => {
+    const { headers } = await ownerSession(ctx);
+
     const response = await request(ctx.app.getHttpServer())
       .post(BUSINESS_ENDPOINTS.REGISTER)
+      .set(headers)
       .send({})
       .expect(400);
 
     expect(errorBody(response).statusCode).toBe(400);
     expect(typeof errorBody(response).message).toBe('string');
   });
+
+  it('returns 401 without a session', async () => {
+    const response = await request(ctx.app.getHttpServer())
+      .post(BUSINESS_ENDPOINTS.REGISTER)
+      .send(registerPayload())
+      .expect(401);
+
+    expect(errorBody(response).statusCode).toBe(401);
+  });
+
+  it.each(['Business Owner', 'Admin', 'Enhanced', 'Standard'] as const)(
+    'returns 403 for a %s',
+    async (role) => {
+      const response = await request(ctx.app.getHttpServer())
+        .post(BUSINESS_ENDPOINTS.REGISTER)
+        .set(authHeader(await tokenFor(ctx.sessionCacheService, role)))
+        .send(registerPayload())
+        .expect(403);
+
+      expect(errorBody(response).statusCode).toBe(403);
+    },
+  );
 });

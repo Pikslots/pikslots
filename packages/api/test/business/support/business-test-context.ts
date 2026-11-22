@@ -63,12 +63,10 @@ export function setupBusinessTestContext(): BusinessTestContext {
   });
 
   afterAll(async () => {
-    // Every createBusiness() call enqueues a real registration-invite job
-    // that the real worker processes asynchronously; after sending the
-    // (mocked) email it still enqueues a trailing user.assign.to.business
-    // job. Closing the app right after a test resolves can race that
-    // trailing enqueue, failing it with "Connection is closed". A short
-    // grace period lets any in-flight processing settle first.
+    // Business endpoints enqueue real audit-log jobs that the real worker
+    // processes asynchronously. Closing the app right after a test resolves
+    // can race that processing, failing it with "Connection is closed". A
+    // short grace period lets any in-flight processing settle first.
     await new Promise((resolve) => setTimeout(resolve, 300));
 
     if (ctx.createdBusinessIds.length > 0) {
