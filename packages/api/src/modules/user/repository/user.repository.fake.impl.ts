@@ -69,6 +69,13 @@ export class UserRepositoryTestImpl implements UserRepository {
     return ok(USER_TEST_DATA.filter((item) => item.businessId === businessId));
   }
 
+  async findAllByIds(
+    ids: string[],
+  ): Promise<Result<User[], InfrastructureError>> {
+    await Promise.resolve('');
+    return ok(USER_TEST_DATA.filter((item) => ids.includes(item.id)));
+  }
+
   async findByUsername(
     username: string,
   ): Promise<Result<User | null, UserNotFoundError | InfrastructureError>> {

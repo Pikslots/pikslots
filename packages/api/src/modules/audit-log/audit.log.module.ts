@@ -5,9 +5,10 @@ import { AUDIT_LOG_USECASES } from './usecases';
 import { AUDIT_LOG_EVENTS } from './events';
 import { AuditLogController } from './audit.log.controller';
 import { AuditLogUsecasesFactory } from './factory/audit.log.usecases.factory';
+import { UserModule } from '../user/user.module';
 
 @Module({
-  imports: [],
+  imports: [UserModule],
   controllers: [AuditLogController],
   providers: [
     { useClass: AuditLogRepositoryImpl, provide: IAuditLogRepository },

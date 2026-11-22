@@ -53,7 +53,7 @@ export class AuditLogController {
 
     res.status(HttpStatus.OK);
     return new PikslotsBaseResponse<FindAllAuditLogsResponse>(
-      result.value.map((log) => ({
+      result.value.map(({ auditLog: log, user }) => ({
         id: log.id,
         businessId: log.businessId,
         userId: log.userId,
@@ -66,6 +66,7 @@ export class AuditLogController {
         ipAddress: log.ipAddress,
         metadata: log.metadata,
         createdAt: log.createdAt,
+        user,
       })),
       HttpStatus.OK,
     );

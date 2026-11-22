@@ -153,6 +153,27 @@ export class UserRepositoryImpl implements UserRepository {
     }
   }
 
+  async findAllByIds(
+    ids: string[],
+  ): Promise<Result<User[], InfrastructureError>> {
+    if (ids.length === 0) return ok([]);
+    try {
+      const rows = await this.db
+        .selectFrom('users')
+        .selectAll()
+        .where('id', 'in', ids)
+        .execute();
+      return ok(rows.map((row) => this.mapper.persistenceToDomain(row)));
+    } catch (cause) {
+      return err<InfrastructureError>({
+        kind: 'infrastructure',
+        message: 'Failed to find users by ids',
+        timestamp: new Date(),
+        cause,
+      });
+    }
+  }
+
   async findAllByRole(
     role: UserRole,
   ): Promise<Result<User[], InfrastructureError>> {

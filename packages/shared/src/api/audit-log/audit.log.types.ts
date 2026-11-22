@@ -14,6 +14,14 @@ export interface FindAllAuditLogsQuery {
 
 // --- Responses ---
 
+export interface AuditLogUserResponse {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  username: string;
+}
+
 export interface AuditLogResponse {
   id: string;
   businessId: string | null;
@@ -27,6 +35,7 @@ export interface AuditLogResponse {
   ipAddress: string | null;
   metadata: Record<string, unknown> | null;
   createdAt: Date;
+  user: AuditLogUserResponse | null; // null for system actions or users that no longer exist
 }
 
 export type FindAllAuditLogsResponse = AuditLogResponse[];

@@ -1,13 +1,11 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { RegisterBusinessInput, type BusinessIndustry } from '@pikslots/shared';
 import {
-  PikSlotsEmailValidation,
   PikSlotsEnumValidation,
   PikSlotsOptionalTimezoneValidation,
   PikSlotsSlugValidation,
   PikSlotsStringValidation,
 } from 'src/shared/decorators/validations';
-import { IsString } from 'class-validator';
 
 const INDUSTRIES: BusinessIndustry[] = [
   'salon_and_beauty',
@@ -23,18 +21,6 @@ const INDUSTRIES: BusinessIndustry[] = [
 ];
 
 export class RegisterBusinessDto implements RegisterBusinessInput {
-  @ApiProperty({ example: 'usr_01j...' })
-  @IsString()
-  ownerId: string;
-
-  @ApiProperty({ example: 'John Doe' })
-  @PikSlotsStringValidation(1, 100)
-  ownerName: string;
-
-  @ApiProperty({ example: 'john@example.com' })
-  @PikSlotsEmailValidation()
-  ownerEmail: string;
-
   @ApiProperty({ example: 'joes-barbershop', minLength: 3, maxLength: 60 })
   @PikSlotsSlugValidation()
   slug: string;

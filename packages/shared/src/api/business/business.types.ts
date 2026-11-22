@@ -32,9 +32,6 @@ import type {
 // ── Requests ──────────────────────────────────────────────────────────────────
 
 export interface RegisterBusinessInput {
-  ownerId: string;
-  ownerName: string;
-  ownerEmail: string;
   slug: string;
   name: string;
   industry: BusinessIndustry;

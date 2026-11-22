@@ -9,6 +9,8 @@ export interface UserRepository {
   findById(id: string): Promise<Result<User | null, UserNotFoundError | InfrastructureError>>;
   findByEmail(email: string): Promise<Result<User | null, UserNotFoundError | InfrastructureError>>;
   findAllByBusiness(businessId: string): Promise<Result<User[], InfrastructureError>>;
+  // includes soft-deleted users so historical records (e.g. audit logs) can still resolve them
+  findAllByIds(ids: string[]): Promise<Result<User[], InfrastructureError>>;
   findByUsername(
     username: string,
   ): Promise<Result<User | null, UserNotFoundError | InfrastructureError>>;

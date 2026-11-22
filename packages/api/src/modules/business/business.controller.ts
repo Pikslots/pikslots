@@ -97,8 +97,9 @@ export class BusinessController {
   ) {}
 
   @RegisterBusinessDocs()
-  @Post(BUSINESS_ENDPOINTS.REGISTER)
+  @UseGuards(RolesGuard)
   @Roles('Platform Owner')
+  @Post(BUSINESS_ENDPOINTS.REGISTER)
   async registerBusiness(
     @Res({ passthrough: true }) res: Response,
     @Body() registerBusinessDto: RegisterBusinessDto,

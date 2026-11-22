@@ -61,9 +61,13 @@
 
 	$effect(() => {
 		void businessStore.selectedBusiness?.id;
+		// ?userId= preselects a member, e.g. when linked from the activity log
+		const requestedId = $page.url.searchParams.get('userId');
 		selectedId = null;
 		if (usersQuery.data && usersQuery.data.length > 0) {
-			selectedId = usersQuery.data[0].id;
+			const requested = usersQuery.data.find((m) => m.id === requestedId);
+			selectedId = requested?.id ?? usersQuery.data[0].id;
+			if (requested) showDetailOnMobile = true;
 		}
 	});
 </script>

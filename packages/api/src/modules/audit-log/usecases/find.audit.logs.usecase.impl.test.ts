@@ -1,7 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { IAuditLogRepository, UnauthorizedError } from '@pikslots/domain';
+import {
+  AuditLog,
+  IAuditLogRepository,
+  IUserRepository,
+  UnauthorizedError,
+} from '@pikslots/domain';
 import { AUDIT_LOG_TEST_DATA } from '../repository/audit.log.test.data';
 import { AuditLogRepositoryTestImpl } from '../repository/audit.log.repository.fake.impl';
+import { UserRepositoryTestImpl } from 'src/modules/user/repository/user.repository.fake.impl';
 import { FindAuditLogsUseCaseImpl } from './find.audit.logs.usecase.impl';
 import { SecurityContext } from 'src/shared/security/context/security.context';
 
@@ -26,6 +32,7 @@ describe('FindAuditLogsUseCaseImpl', () => {
       providers: [
         FindAuditLogsUseCaseImpl,
         { provide: IAuditLogRepository, useClass: AuditLogRepositoryTestImpl },
+        { provide: IUserRepository, useClass: UserRepositoryTestImpl },
         { provide: SecurityContext, useValue: securityContext },
       ],
     }).compile();
@@ -98,9 +105,9 @@ describe('FindAuditLogsUseCaseImpl', () => {
       expect(result.ok).toBe(true);
       if (result.ok) {
         expect(result.value).toHaveLength(2);
-        expect(result.value.every((a) => a.userId === 'user-standard-1')).toBe(
-          true,
-        );
+        expect(
+          result.value.every((a) => a.auditLog.userId === 'user-standard-1'),
+        ).toBe(true);
       }
     });
 
@@ -110,6 +117,52 @@ describe('FindAuditLogsUseCaseImpl', () => {
       expect(result.ok).toBe(true);
       if (result.ok) {
         expect(result.value).toHaveLength(AUDIT_LOG_TEST_DATA.length);
+      }
+    });
+  });
+
+  describe('user details', () => {
+    it('attaches the acting user to each audit log', async () => {
+      const result = await useCase.execute({ userId: 'user-standard-1' });
+
+      expect(result.ok).toBe(true);
+      if (result.ok) {
+        for (const { user } of result.value) {
+          expect(user).toEqual({
+            id: 'user-standard-1',
+            firstName: expect.any(String),
+            lastName: expect.any(String),
+            email: expect.any(String),
+            username: expect.any(String),
+          });
+        }
+      }
+    });
+
+    it('returns a null user when the actor cannot be found', async () => {
+      AUDIT_LOG_TEST_DATA.push(
+        AuditLog.reconstitute({
+          id: 'audit-log-unknown-user',
+          businessId: 'business-1',
+          userId: 'user-does-not-exist',
+          userType: 'user',
+          action: 'audit.log.user.login',
+          description: 'Deleted user logged in',
+          entityType: 'user',
+          entityId: 'user-does-not-exist',
+          occurredAt: new Date('2024-06-01T09:00:00Z'),
+          ipAddress: null,
+          metadata: null,
+          createdAt: new Date('2024-06-01T09:00:00Z'),
+        }),
+      );
+
+      const result = await useCase.execute({ userId: 'user-does-not-exist' });
+
+      expect(result.ok).toBe(true);
+      if (result.ok) {
+        expect(result.value).toHaveLength(1);
+        expect(result.value[0].user).toBeNull();
       }
     });
   });

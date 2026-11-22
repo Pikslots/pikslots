@@ -2,10 +2,8 @@ import type { InfrastructureError, Result } from '../../shared';
 import type { BusinessAlreadyExistsError } from '../errors';
 import type { BusinessIndustry } from '../types/';
 
+// The owner is the authenticated caller, resolved from the security context in the use case
 export interface CreateBusinessCommand {
-  ownerId: string;
-  ownerName: string;
-  ownerEmail: string;
   slug: string;
   name: string;
   industry: BusinessIndustry;

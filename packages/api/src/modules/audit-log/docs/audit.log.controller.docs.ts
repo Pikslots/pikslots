@@ -58,6 +58,13 @@ export const FindAllAuditLogsDocs = () =>
               ipAddress: '10.0.0.1',
               metadata: null,
               createdAt: '2026-01-01T09:00:00.000Z',
+              user: {
+                id: '01932b4a-5f3c-7e1d-b2a8-3c9d4e5f6a7c',
+                firstName: 'John',
+                lastName: 'Doe',
+                email: 'john@example.com',
+                username: 'johndoe',
+              },
             },
           ],
           statusCode: 200,

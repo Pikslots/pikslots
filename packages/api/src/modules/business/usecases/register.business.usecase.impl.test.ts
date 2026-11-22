@@ -1,5 +1,4 @@
 import { getQueueToken } from '@nestjs/bullmq';
-import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Queue } from 'bullmq';
 import {
@@ -12,7 +11,7 @@ import {
 } from '@pikslots/domain';
 import { RegisterBusinessUseCaseImpl } from './register.business.usecase.impl';
 import { BusinessRepositoryTestImpl } from '../repository/business.repository.fake.impl';
-import { JwtInviteService } from 'src/shared/security/jwt/jwt.invite.service';
+import { SecurityContext } from 'src/shared/security/context/security.context';
 import {
   AUDIT_LOG_QUEUE,
   PIKSLOT_EVENTS,
@@ -27,9 +26,6 @@ function buildCommand(
   overrides: Partial<CreateBusinessCommand> = {},
 ): CreateBusinessCommand {
   return {
-    ownerId: 'user-new-owner-1',
-    ownerName: 'Jordan Smith',
-    ownerEmail: 'jordan.smith@example.com',
     slug: 'jordans-new-studio',
     name: "Jordan's New Studio",
     industry: 'fitness',
@@ -41,16 +37,21 @@ function buildCommand(
 describe('RegisterBusinessUseCaseImpl', () => {
   let useCase: RegisterBusinessUseCaseImpl;
   let repository: BusinessRepositoryTestImpl;
-  let queue: jest.Mocked<Queue>;
-  let addSpy: jest.SpyInstance;
-  let configService: jest.Mocked<ConfigService>;
-  let jwtInviteService: jest.Mocked<JwtInviteService>;
+  let auditLogQueue: jest.Mocked<Queue>;
+  let auditLogAddSpy: jest.SpyInstance;
+  let securityContext: SecurityContext;
   let originalData: Business[];
 
   beforeEach(async () => {
     if (!originalData) originalData = [...BUSINESS_TEST_DATA];
     BUSINESS_TEST_DATA.length = 0;
     BUSINESS_TEST_DATA.push(...originalData);
+
+    securityContext = {
+      userId: 'user-platform-owner-1',
+      role: 'Platform Owner',
+      businessId: null,
+    };
 
     const moduleRef: TestingModule = await Test.createTestingModule({
       providers: [
@@ -59,26 +60,7 @@ describe('RegisterBusinessUseCaseImpl', () => {
           provide: IBusinessRepository,
           useClass: BusinessRepositoryTestImpl,
         },
-        {
-          provide: getQueueToken(
-            PIKSLOT_EVENTS.BUSINESS.BUSINESS_REGISTRATION_INVITE,
-          ),
-          useValue: { add: jest.fn().mockResolvedValue(undefined) },
-        },
-        {
-          provide: ConfigService,
-          useValue: {
-            getOrThrow: jest
-              .fn()
-              .mockReturnValue('https://app.pikslots.example.com'),
-          },
-        },
-        {
-          provide: JwtInviteService,
-          useValue: {
-            signInviteToken: jest.fn().mockReturnValue('mock-invite-jwt'),
-          },
-        },
+        { provide: SecurityContext, useValue: securityContext },
         {
           provide: getQueueToken(AUDIT_LOG_QUEUE),
           useValue: { add: jest.fn().mockResolvedValue(undefined) },
@@ -88,15 +70,11 @@ describe('RegisterBusinessUseCaseImpl', () => {
 
     useCase = moduleRef.get(RegisterBusinessUseCaseImpl);
     repository = moduleRef.get(IBusinessRepository);
-    queue = moduleRef.get(
-      getQueueToken(PIKSLOT_EVENTS.BUSINESS.BUSINESS_REGISTRATION_INVITE),
-    );
-    configService = moduleRef.get(ConfigService);
-    jwtInviteService = moduleRef.get(JwtInviteService);
+    auditLogQueue = moduleRef.get(getQueueToken(AUDIT_LOG_QUEUE));
     // Captured once here so assertions reference plain variables instead of
     // bare `queue.add` property access, which trips
     // @typescript-eslint/unbound-method on jest mocks.
-    addSpy = jest.spyOn(queue, 'add');
+    auditLogAddSpy = jest.spyOn(auditLogQueue, 'add');
   });
 
   describe('repository failures', () => {
@@ -112,7 +90,7 @@ describe('RegisterBusinessUseCaseImpl', () => {
           'business_already_exists',
         );
       }
-      expect(addSpy).not.toHaveBeenCalled();
+      expect(auditLogAddSpy).not.toHaveBeenCalled();
     });
 
     it('propagates an InfrastructureError from save', async () => {
@@ -130,19 +108,13 @@ describe('RegisterBusinessUseCaseImpl', () => {
       if (!result.ok) {
         expect(result.error).toEqual(infraError);
       }
-      expect(addSpy).not.toHaveBeenCalled();
+      expect(auditLogAddSpy).not.toHaveBeenCalled();
     });
   });
 
   describe('successful registration', () => {
-    it('builds and saves a Business entity matching the command', async () => {
-      const command = buildCommand({
-        ownerId: 'user-new-owner-1',
-        slug: 'jordans-new-studio',
-        name: "Jordan's New Studio",
-        industry: 'fitness',
-        defaultTimeZone: 'America/New_York',
-      });
+    it('saves a Business owned and created by the caller from the security context', async () => {
+      const command = buildCommand();
 
       const result = await useCase.execute(command);
 
@@ -155,62 +127,28 @@ describe('RegisterBusinessUseCaseImpl', () => {
         (b) => b.id === 'mock-generated-id',
       );
       expect(persisted).toBeDefined();
-      expect(persisted?.ownerId).toBe(command.ownerId);
+      expect(persisted?.ownerId).toBe(securityContext.userId);
+      expect(persisted?.createdBy).toBe(securityContext.userId);
       expect(persisted?.slug).toBe(command.slug);
       expect(persisted?.name).toBe(command.name);
       expect(persisted?.industry).toBe(command.industry);
-      expect(persisted?.createdBy).toBe(command.ownerId);
       // Business.create() defaults
       expect(persisted?.status).toBe('pending_setup');
       expect(persisted?.subscriptionStatus).toBe('trialing');
       expect(persisted?.isDeleted).toBe(false);
     });
 
-    it('builds the invite URL from the JWT invite token and configured frontend URL', async () => {
-      const command = buildCommand({ ownerId: 'user-new-owner-1' });
+    it('only enqueues the business registered audit log (no invite event)', async () => {
+      await useCase.execute(buildCommand());
 
-      await useCase.execute(command);
-
-      expect(jwtInviteService.signInviteToken).toHaveBeenCalledWith({
-        userId: command.ownerId,
-        businessId: 'mock-generated-id',
-      });
-      expect(configService.getOrThrow).toHaveBeenCalledWith(
-        'FRONTEND_PUBLIC_URL',
-        { infer: true },
-      );
-
-      const [, payload] = addSpy.mock.calls[0] as [
-        string,
-        { inviteURL: string },
-      ];
-      expect(payload.inviteURL).toBe(
-        'https://app.pikslots.example.com/user-invite?jid=mock-invite-jwt',
-      );
-    });
-
-    it('enqueues a registration invite job with the correct payload', async () => {
-      const command = buildCommand({
-        ownerId: 'user-new-owner-1',
-        ownerName: 'Jordan Smith',
-        ownerEmail: 'jordan.smith@example.com',
-        name: "Jordan's New Studio",
-      });
-
-      await useCase.execute(command);
-
-      expect(addSpy).toHaveBeenCalledTimes(1);
-      expect(addSpy).toHaveBeenCalledWith(
-        PIKSLOT_EVENTS.BUSINESS.BUSINESS_REGISTRATION_INVITE,
-        {
+      expect(auditLogAddSpy).toHaveBeenCalledTimes(1);
+      expect(auditLogAddSpy).toHaveBeenCalledWith(
+        PIKSLOT_EVENTS.AUDIT_LOG.BUSINESS_REGISTERED,
+        expect.objectContaining({
           businessId: 'mock-generated-id',
-          businessOwnerId: command.ownerId,
-          businessName: command.name,
-          businessOnwerName: command.ownerName,
-          businessOwnerEmail: command.ownerEmail,
-          inviteURL:
-            'https://app.pikslots.example.com/user-invite?jid=mock-invite-jwt',
-        },
+          userId: securityContext.userId,
+          action: PIKSLOT_EVENTS.AUDIT_LOG.BUSINESS_REGISTERED,
+        }),
       );
     });
   });

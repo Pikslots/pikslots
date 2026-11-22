@@ -21,9 +21,6 @@ export const QUEUE_CONFIG = BullModule.forRootAsync({
 
 export const REGISTERED_QUEUES = BullModule.registerQueue(
   {
-    name: PIKSLOT_EVENTS.BUSINESS.BUSINESS_REGISTRATION_INVITE,
-  },
-  {
     name: PIKSLOT_EVENTS.USER.USER_ASSIGN_TO_BUSINESS,
   },
   {

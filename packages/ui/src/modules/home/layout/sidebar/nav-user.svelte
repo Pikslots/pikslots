@@ -15,6 +15,7 @@
 	import { logoutUser } from '../../../api/user/logout.user.mutation';
 	import { disconnectSocket } from '$lib/realtime/socket';
 	import type { UserRole } from '@pikslots/shared';
+	import { toast } from 'svelte-sonner';
 
 	const userProfileQuery = createQuery(() => getUserProfileQueryOptions());
 	const currentUserRole = $derived(authStore.getPayloadData());
@@ -26,8 +27,11 @@
 			authStore.clearSession();
 			disconnectSocket();
 			goto(resolve('/login'));
+		} else {
+			toast.error('Failed to logout');
 		}
-		goto(resolve('/login'));
+
+		// goto(resolve('/login'));
 	};
 
 	const isItemAllowed = (role: UserRole | null) => {

@@ -12,7 +12,6 @@ const PUBLIC_ROUTES: string[] = [
   '/users/refresh',
   '/users/invite/request-otp',
   '/users/invite/accept',
-  '/businesses/register',
   '/api/*', // swagger docs
   '/users/free-slots/*', // get free slots for the user
   '/users/available-dates/*', // get available dates
