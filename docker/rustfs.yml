@@ -1,6 +1,6 @@
 services:
   rustfs:
-    image: rustfs/rustfs:latest
+    image: rustfs/rustfs:1.0.1
     container_name: rustfs
     restart: unless-stopped
     ports:
@@ -9,9 +9,9 @@ services:
     volumes:
       - rustfs_data:/data
     environment:
-      RUSTFS_ACCESS_KEY: admin
-      RUSTFS_SECRET_KEY: admin
-    command: --access-key admin --secret-key admin /data
+      RUSTFS_ACCESS_KEY: rustfsadmin
+      RUSTFS_SECRET_KEY: rustfsadmin
+    command: --access-key rustfsadmin --secret-key rustfsadmin /data
 
 volumes:
   rustfs_data:
