@@ -70,4 +70,15 @@ export class SessionRepositoryTestImpl implements SessionRepository {
     SESSION_TEST_DATA.splice(index, 1);
     return ok(undefined);
   }
+
+  async deleteAllByUserId(
+    userId: string,
+  ): Promise<Result<void, InfrastructureError>> {
+    await Promise.resolve('');
+    for (let i = SESSION_TEST_DATA.length - 1; i >= 0; i--) {
+      if (SESSION_TEST_DATA[i].userId === userId)
+        SESSION_TEST_DATA.splice(i, 1);
+    }
+    return ok(undefined);
+  }
 }

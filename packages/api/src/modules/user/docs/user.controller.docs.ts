@@ -12,6 +12,7 @@ import { InviteUserDto } from '../dto/invite.user.dto';
 import { UpdateUserWorkingHoursDto } from '../dto/update.user.working.hours.dto';
 import { UpdateUserAvatarDto } from '../dto/update.user.avatar.dto';
 import { UpdateUserProfileDto } from '../dto/update.user.profile.dto';
+import { SwitchBusinessDto } from '../dto/switch.business.dto';
 
 export const InviteUserDocs = () =>
   applyDecorators(
@@ -217,6 +218,47 @@ export const LogoutUserDocs = () =>
           timestamp: '2026-01-01T00:00:00.000Z',
         },
       },
+    }),
+  );
+
+export const SwitchBusinessDocs = () =>
+  applyDecorators(
+    ApiOperation({
+      summary:
+        'Switch the platform owner to another business, revoke all their sessions and issue a new session cookie',
+    }),
+    ApiBody({ type: SwitchBusinessDto }),
+    ApiResponse({
+      status: HttpStatus.OK,
+      description: 'Business switched, new session returned',
+      schema: {
+        example: {
+          data: {
+            id: 'uuid',
+            userId: 'uuid',
+            role: 'Platform Owner',
+            os: 'macOS',
+            browser: 'Chrome',
+            country: 'PK',
+            businessId: 'uuid',
+            issuedAt: '2026-01-01T00:00:00.000Z',
+            expiresAt: '2026-01-08T00:00:00.000Z',
+            isExpired: false,
+          },
+          statusCode: 200,
+          timestamp: '2026-01-01T00:00:00.000Z',
+        },
+      },
+    }),
+    ApiResponse({
+      status: HttpStatus.UNAUTHORIZED,
+      description: 'Session expired or caller is not the platform owner',
+      type: PikslotsBaseErrorResponse,
+    }),
+    ApiResponse({
+      status: HttpStatus.NOT_FOUND,
+      description: 'Business not found',
+      type: PikslotsBaseErrorResponse,
     }),
   );
 

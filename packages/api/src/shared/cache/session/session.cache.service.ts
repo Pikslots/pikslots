@@ -65,6 +65,10 @@ export class SessionCacheService {
     }
   }
 
+  async removeMany(sessionIds: string[]): Promise<void> {
+    await Promise.all(sessionIds.map((id) => this.remove(id)));
+  }
+
   async get(sessionId: string): Promise<Session | null> {
     try {
       const record = await this.cache.get<SessionCacheRecord>(

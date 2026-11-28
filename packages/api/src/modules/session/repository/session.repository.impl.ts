@@ -119,4 +119,24 @@ export class SessionRepositoryImpl implements SessionRepository {
       });
     }
   }
+
+  async deleteAllByUserId(
+    userId: string,
+  ): Promise<Result<void, InfrastructureError>> {
+    try {
+      await this.db
+        .deleteFrom('sessions')
+        .where('user_id', '=', userId)
+        .execute();
+
+      return ok(undefined);
+    } catch (cause) {
+      return err<InfrastructureError>({
+        kind: 'infrastructure',
+        message: 'Failed to delete sessions by user id',
+        timestamp: new Date(),
+        cause,
+      });
+    }
+  }
 }

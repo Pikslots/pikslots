@@ -24,7 +24,7 @@ import {
 } from 'src/shared/queue/jobs/pikslot.events';
 import type { AuditLogJobName } from 'src/shared/queue/jobs';
 import { mapUserError } from './errors/user.errors.map';
-import { USER_ENDPOINTS } from '@pikslots/shared';
+import { SESSION_EXPIRED_MESSAGE, USER_ENDPOINTS } from '@pikslots/shared';
 import { LoginUserDto } from './dto/login.user.dto';
 import { InviteUserDto } from './dto/invite.user.dto';
 import { UserUsecasesFactory } from './factory/user.usecases.factory';
@@ -40,6 +40,7 @@ import {
   GetFreeSlotsForUserDocs,
   UpdateUserAvatarDocs,
   UpdateUserProfileDocs,
+  SwitchBusinessDocs,
 } from './docs/user.controller.docs';
 import { GetUsersByRoleDto } from './dto/get.users.by.role.dto';
 import { PikslotsBaseErrorResponse } from 'src/shared/types/base.error.response';
@@ -56,6 +57,7 @@ import type {
   UpdateUserProfileResponse,
   UpdateUserWorkingHoursResponse,
   UserSummary,
+  GetSessionResponse,
 } from '@pikslots/shared';
 import { UserResponseMapper } from './mappers/user.response.mapper';
 import { UpdateUserWorkingHoursDto } from './dto/update.user.working.hours.dto';
@@ -76,6 +78,9 @@ import {
   type PikslotS3Service,
 } from 'src/shared/s3/s3.service';
 import { GetAvailableDatesDto } from './dto/get.available.dates.for.booking.dto';
+import { SwitchBusinessDto } from './dto/switch.business.dto';
+import { jidCookieOptions } from 'src/shared/security/session.constants';
+import { SessionResponseMapper } from '../session/mappers/session.response.mapper';
 
 @ApiTags('Users')
 @Controller('')
@@ -278,12 +283,11 @@ export class UserController {
       return errorResponse;
     }
 
-    res.cookie('jid', result.value.sessionId, {
-      httpOnly: true,
-      secure: this.configService.get('NODE_ENV') === 'production',
-      sameSite: 'strict',
-      path: '/',
-    });
+    res.cookie(
+      'jid',
+      result.value.sessionId,
+      jidCookieOptions(this.configService.get('NODE_ENV') === 'production'),
+    );
 
     res.status(HttpStatus.OK);
 
@@ -506,6 +510,53 @@ export class UserController {
 
     return new PikslotsBaseResponse<LogoutUserResponse>(
       { message: 'success' },
+      HttpStatus.OK,
+    );
+  }
+
+  @SwitchBusinessDocs()
+  @UseGuards(RolesGuard)
+  @Roles('Platform Owner')
+  @HttpCode(HttpStatus.OK)
+  @Post(USER_ENDPOINTS.SWITCH_BUSINESS)
+  async switchBusiness(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+    @Body() switchBusinessDto: SwitchBusinessDto,
+  ): Promise<
+    PikslotsBaseErrorResponse | PikslotsBaseResponse<GetSessionResponse>
+  > {
+    const jidCookie: unknown = req.cookies?.jid;
+    const sessionId = typeof jidCookie === 'string' ? jidCookie : undefined;
+
+    if (!sessionId) {
+      res.status(HttpStatus.UNAUTHORIZED);
+      return new PikslotsBaseErrorResponse(
+        SESSION_EXPIRED_MESSAGE,
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    const result = await this.userUseCaseFactory.switchBusinessUseCase.execute({
+      sessionId,
+      businessId: switchBusinessDto.businessId,
+    });
+
+    if (!result.ok) {
+      const errorResponse = mapUserError(result.error);
+      res.status(errorResponse.statusCode);
+      return errorResponse;
+    }
+
+    res.cookie(
+      'jid',
+      result.value.id,
+      jidCookieOptions(this.configService.get('NODE_ENV') === 'production'),
+    );
+
+    res.status(HttpStatus.OK);
+    return new PikslotsBaseResponse<GetSessionResponse>(
+      SessionResponseMapper.toResponse(result.value),
       HttpStatus.OK,
     );
   }

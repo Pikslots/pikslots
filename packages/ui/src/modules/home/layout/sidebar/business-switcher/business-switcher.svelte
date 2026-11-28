@@ -4,23 +4,47 @@
 	import { useSidebar } from '$lib/components/ui/sidebar/index.js';
 	import ChevronsUpDownIcon from '@lucide/svelte/icons/chevrons-up-down';
 	import PlusIcon from '@lucide/svelte/icons/plus';
-	import type { BusinessResponse } from '@pikslots/shared';
+	import type { BaseErrorResponse, BusinessResponse } from '@pikslots/shared';
+	import type { AxiosError } from 'axios';
+	import { toast } from 'svelte-sonner';
 	import { authStore } from '$stores/auth.svelte';
 	import { businessStore } from '$stores/business.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import NewBusinessDialog from './new-business-dialog.svelte';
-	import { createQuery } from '@tanstack/svelte-query';
+	import { createMutation, createQuery, useQueryClient } from '@tanstack/svelte-query';
 	import { getAllBusinessesQueryOptions } from '../../../../api/business/get.all.businesses.query';
+	import { switchBusiness } from '../../../../api/user/switch.business.mutation';
+	import type { SessionModel } from '../../../../api/session/models/session-model';
 
 	let newBusinessDialogOpen = $state(false);
 	let callToGetAllBusinesses = $state(false);
 
 	const businessesQuery = createQuery(() => getAllBusinessesQueryOptions(callToGetAllBusinesses));
 	const sidebar = useSidebar();
+	const queryClient = useQueryClient();
 	let activeBusiness = $derived(businessStore.selectedBusiness);
 
+	// Switching rotates the session server-side: every session of the platform owner is revoked
+	// and a new one bound to the selected business is returned (and set as the jid cookie)
+	const switchBusinessMutation = createMutation<
+		SessionModel,
+		AxiosError<BaseErrorResponse>,
+		BusinessResponse
+	>(() => ({
+		mutationFn: (business) => switchBusiness({ businessId: business.id }),
+		onSuccess: (session, business) => {
+			authStore.setSession(session);
+			businessStore.setSelectedBusiness(business);
+			queryClient.invalidateQueries();
+		},
+		onError: (error) => {
+			toast.error(error.response?.data?.message ?? 'Failed to switch business. Please try again.');
+		}
+	}));
+
 	const onBusinessChange = (business: BusinessResponse) => {
-		businessStore.setSelectedBusiness(business);
+		if (business.id === activeBusiness?.id || switchBusinessMutation.isPending) return;
+		switchBusinessMutation.mutate(business);
 	};
 
 	const newBusinessDialog = () => {
@@ -72,6 +96,7 @@
 					{#each businessesQuery.data as business (business.name)}
 						<DropdownMenu.Item
 							onSelect={() => onBusinessChange(business)}
+							disabled={switchBusinessMutation.isPending}
 							class="cursor-pointer gap-2 p-2"
 						>
 							<div

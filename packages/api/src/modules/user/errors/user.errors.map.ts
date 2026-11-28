@@ -14,6 +14,8 @@ import {
   type ValidationError,
   type WorkingHoursUpdateNotAuthorizedError,
   UserInvitedError,
+  type BusinessNotFoundError,
+  type SessionNotFound,
 } from '@pikslots/domain';
 import { PikslotsBaseErrorResponse } from 'src/shared/types/base.error.response';
 
@@ -31,7 +33,9 @@ type UserError =
   | InvalidOtpError
   | InviteAlreadyAcceptedError
   | InfrastructureError
-  | ValidationError;
+  | ValidationError
+  | BusinessNotFoundError
+  | SessionNotFound;
 
 const userErrorMap: Record<
   UserError['kind'],
@@ -66,6 +70,10 @@ const userErrorMap: Record<
     ),
   invite_already_accepted: (error) =>
     new PikslotsBaseErrorResponse(error.message, HttpStatus.CONFLICT),
+  business_not_found: (error) =>
+    new PikslotsBaseErrorResponse(error.message, HttpStatus.NOT_FOUND),
+  session_not_found: (error) =>
+    new PikslotsBaseErrorResponse(error.message, HttpStatus.UNAUTHORIZED),
   infrastructure: () =>
     new PikslotsBaseErrorResponse(
       'Something went wrong. Please try again later.',
