@@ -1,6 +1,7 @@
 <script lang="ts">
 	import './layout.css';
 	import favicon from '$lib/assets/favicon.svg';
+	import appIcon from '$lib/assets/app-icon.svg';
 	import { themeStore } from '$stores/theme.svelte.js';
 	import { authStore } from '$stores/auth.svelte.js';
 	import { QueryClient, QueryClientProvider } from '@tanstack/svelte-query';
@@ -39,7 +40,12 @@
 	});
 </script>
 
-<svelte:head><link rel="icon" href={favicon} /></svelte:head>
+<svelte:head>
+	<title>Pikslots</title>
+	<link rel="icon" href={favicon} />
+	<link rel="apple-touch-icon" href={appIcon} />
+	<meta name="theme-color" content="#432dd7" />
+</svelte:head>
 <Toaster position="top-right" title="Notification" theme={themeStore.current} richColors={true} />
 <QueryClientProvider client={query}
 	>{@render children()}

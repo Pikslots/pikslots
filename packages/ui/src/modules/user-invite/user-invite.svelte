@@ -1,4 +1,5 @@
 <script lang="ts">
+	import PikslotsLogo from '$lib/components/pikslots-logo.svelte';
 	import {
 		FieldGroup,
 		Field,
@@ -175,7 +176,7 @@
 <div class="flex min-h-svh flex-col items-center justify-center p-6 md:p-10">
 	<div class="flex w-full max-w-xs flex-col gap-6">
 		<div class="flex justify-center">
-			<a href="##" class="font-code flex items-center gap-2 text-2xl">Pikslots</a>
+			<a href="##" class="flex items-center text-2xl"><PikslotsLogo /></a>
 		</div>
 
 		<div class="w-full">

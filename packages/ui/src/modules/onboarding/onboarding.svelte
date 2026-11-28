@@ -1,5 +1,6 @@
 <script lang="ts">
 	import BrandBackdrop from '$lib/components/brand-backdrop.svelte';
+	import PikslotsLogo from '$lib/components/pikslots-logo.svelte';
 	import { brandSurfaceClass } from '$lib/brand/brand';
 	import type { OnboardingFormValues } from './utils/schema';
 	import OnboardingStep from './steps/onboarding-step.svelte';
@@ -110,7 +111,7 @@
 	>
 		<BrandBackdrop />
 
-		<a href={resolve('/')} class="font-code relative text-2xl">Pikslots</a>
+		<a href={resolve('/')} class="relative w-fit text-2xl"><PikslotsLogo tone="inherit" /></a>
 
 		<div class="relative space-y-10">
 			<div class="space-y-4">
@@ -146,7 +147,7 @@
 
 	<!-- Form panel -->
 	<main class="flex flex-col p-6 md:p-10">
-		<a href={resolve('/')} class="font-code text-center text-2xl lg:hidden">Pikslots</a>
+		<a href={resolve('/')} class="flex justify-center text-2xl lg:hidden"><PikslotsLogo /></a>
 
 		<div class="flex flex-1 items-center justify-center py-8">
 			<div class="w-full max-w-xl">

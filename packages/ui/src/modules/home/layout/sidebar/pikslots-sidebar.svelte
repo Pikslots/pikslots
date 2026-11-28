@@ -1,4 +1,5 @@
 <script lang="ts">
+	import PikslotsLogo from '$lib/components/pikslots-logo.svelte';
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
 	import type { ComponentProps } from 'svelte';
 	import { resolve } from '$app/paths';
@@ -31,10 +32,10 @@
 		<Sidebar.Menu>
 			<Sidebar.MenuItem>
 				<Sidebar.MenuButton
-					class="font-code h-auto px-2 py-1.5 text-3xl hover:bg-transparent active:bg-transparent"
+					class="h-auto px-2 py-1.5 text-2xl hover:bg-transparent active:bg-transparent"
 				>
 					{#snippet child({ props })}
-						<a href={resolve('/home')} {...props}>Pikslots</a>
+						<a href={resolve('/home')} {...props}><PikslotsLogo /></a>
 					{/snippet}
 				</Sidebar.MenuButton>
 			</Sidebar.MenuItem>
