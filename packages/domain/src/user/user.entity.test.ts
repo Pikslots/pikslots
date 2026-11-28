@@ -218,3 +218,16 @@ describe('User.canUpdateProfile', () => {
     });
   });
 });
+
+describe('User.canSwitchBusiness', () => {
+  it('allows the Platform Owner', () => {
+    expect(User.canSwitchBusiness('Platform Owner')).toBe(true);
+  });
+
+  it.each(['Business Owner', 'Admin', 'Enhanced', 'Standard', 'No Access'] as const)(
+    'rejects %s',
+    (role) => {
+      expect(User.canSwitchBusiness(role)).toBe(false);
+    },
+  );
+});

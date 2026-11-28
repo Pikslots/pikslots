@@ -31,8 +31,7 @@ import {
   PIKSLOT_EVENTS,
 } from 'src/shared/queue/jobs/pikslot.events';
 import type { AuditLogJobName } from 'src/shared/queue/jobs';
-
-const SESSION_TTL_SECONDS = 604800;
+import { SESSION_TTL_SECONDS } from 'src/shared/security/session.constants';
 
 type LoginError =
   | UnauthorizedError

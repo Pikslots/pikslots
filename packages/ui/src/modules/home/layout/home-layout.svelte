@@ -12,34 +12,21 @@
 	import PikslotsSidebar from './sidebar/pikslots-sidebar.svelte';
 	import PageSearch from '../search/page-search.svelte';
 	import { getBusinessByIdQueryOptions } from '../../api/business/get.business.by.id.query';
-	import { getAllBusinessesQueryOptions } from '../../api/business/get.all.businesses.query';
 	import { createQuery } from '@tanstack/svelte-query';
 	import { businessStore } from '$stores/business.svelte';
 
 	let { children } = $props();
-	let callGetBusinessById = $state<boolean>(false);
+	// The session carries the active business for every role; for platform owners it is the
+	// business they last switched to, so it is restored here even where the switcher is hidden
 	const businessFindByIdQuery = createQuery(() =>
-		getBusinessByIdQueryOptions(callGetBusinessById, authStore.getPayloadData()?.businessId ?? '')
+		getBusinessByIdQueryOptions(
+			authStore.isAuthenticated,
+			authStore.getPayloadData()?.businessId ?? ''
+		)
 	);
-
-	// Platform owners pick a business in the sidebar switcher, but that is hidden on phones,
-	// so the default choice lives here where it always runs
-	const isPlatformOwner = $derived(authStore.getPayloadData()?.role === 'Platform Owner');
-	const allBusinessesQuery = createQuery(() => getAllBusinessesQueryOptions(isPlatformOwner));
-
-	$effect(() => {
-		if (!businessStore.hasSelectedBusiness && allBusinessesQuery.data.length > 0)
-			businessStore.setSelectedBusiness(allBusinessesQuery.data[0]);
-	});
 
 	$effect(() => {
 		if (!authStore.isInitializing && !authStore.isAuthenticated) goto(resolve('/login'));
-
-		if (
-			authStore.getPayloadData()?.role !== 'Platform Owner' ||
-			authStore.getPayloadData()?.role === 'No Access'
-		)
-			callGetBusinessById = true;
 
 		if (businessFindByIdQuery.data) businessStore.setSelectedBusiness(businessFindByIdQuery.data);
 	});

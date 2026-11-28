@@ -23,7 +23,7 @@ export interface UserProps {
   readonly lastLoginAt: Date | null;
   readonly suspendedReason: string | null;
 
-  readonly businessId: string; // platform owner -> businessid is null
+  readonly businessId: string; // platform owner -> last business they switched to
   // audit
   readonly createdAt: Date;
   readonly createdBy: string;
@@ -146,6 +146,10 @@ export class User {
 
   static canQueryRole(callerRole: UserRole, targetRole: UserRole): boolean {
     return User.QUERY_PERMISSIONS[callerRole].includes(targetRole);
+  }
+
+  static canSwitchBusiness(role: UserRole): boolean {
+    return role === 'Platform Owner';
   }
 
   static canUpdateWorkingHours(

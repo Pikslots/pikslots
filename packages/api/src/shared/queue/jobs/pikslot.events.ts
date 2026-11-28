@@ -20,6 +20,7 @@ export const PIKSLOT_EVENTS = {
   AUDIT_LOG: {
     USER_LOGIN: 'audit.log.user.login',
     USER_LOGOUT: 'audit.log.user.logout',
+    USER_SWITCH_BUSINESS: 'audit.log.user.switch.business',
     USER_INVITED: 'audit.log.user.invited',
     USER_INVITE_ACCEPTED: 'audit.log.user.invite.accepted',
     USER_INVITE_OTP_REQUESTED: 'audit.log.user.invite.otp.requested',

@@ -7,6 +7,7 @@ export interface SessionRepository {
   findById(id: string): Promise<Result<Session, SessionNotFound | InfrastructureError>>;
   findAllByUserId(userId: string): Promise<Result<Session[], InfrastructureError>>;
   delete(id: string): Promise<Result<void, SessionNotFound | InfrastructureError>>;
+  deleteAllByUserId(userId: string): Promise<Result<void, InfrastructureError>>;
 }
 
 export const ISessionRepository = Symbol('ISessionRepository');

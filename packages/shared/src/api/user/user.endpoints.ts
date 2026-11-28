@@ -1,6 +1,7 @@
 export const USER_ENDPOINTS = {
   LOGIN: '/users/login',
   LOGOUT: '/users/logout',
+  SWITCH_BUSINESS: '/users/switch-business',
   ME: '/users/me',
   INVITE: '/users/invite',
   BUSINESS_OWNERS: '/users/business-owners',

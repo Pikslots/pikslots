@@ -30,6 +30,10 @@ export interface LoginUserInput extends SessionDeviceContext {
   password: string;
 }
 
+export interface SwitchBusinessInput {
+  businessId: string;
+}
+
 // --- Responses ---
 
 export interface InviteUserResponse {
