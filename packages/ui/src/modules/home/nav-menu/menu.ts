@@ -5,7 +5,7 @@ import Briefcase from '@tabler/icons-svelte/icons/briefcase';
 import UserHeart from '@tabler/icons-svelte/icons/user-heart';
 import Cash from '@tabler/icons-svelte/icons/cash';
 import Puzzle from '@tabler/icons-svelte/icons/puzzle';
-import { IconCalendarCheck } from '@tabler/icons-svelte';
+import { IconCalendarCheck, IconHome } from '@tabler/icons-svelte';
 import type { Icon } from '@tabler/icons-svelte';
 import { settingsStore } from '$stores/settings.svelte.js';
 import { searchStore } from '$stores/search.svelte.js';
@@ -21,6 +21,7 @@ export const navPrimary: {
 	icon: Icon;
 	roles?: UserRole[];
 }[] = [
+	{ name: 'Home', url: resolve('/home'), icon: IconHome },
 	{ name: 'Bookings', url: resolve('/home/bookings'), icon: IconCalendarCheck },
 	{ name: 'Services', url: resolve('/home/services'), icon: Briefcase },
 	{ name: 'Customers', url: resolve('/home/customers'), icon: UserHeart, roles: customerAccess },

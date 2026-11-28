@@ -10,8 +10,20 @@
 
 	// const sidebar = Sidebar.useSidebar();
 
-	function isActive(url: string): boolean {
+	function matches(url: string): boolean {
 		return $page.url.pathname === url || $page.url.pathname.startsWith(url + '/');
+	}
+
+	// Only the most specific match is active, so /home doesn't light up on /home/bookings
+	const activeUrl = $derived(
+		items
+			.map((item) => item.url)
+			.filter(matches)
+			.sort((a, b) => b.length - a.length)[0]
+	);
+
+	function isActive(url: string): boolean {
+		return url === activeUrl;
 	}
 </script>
 
@@ -28,46 +40,7 @@
 						</a>
 					{/snippet}
 				</Sidebar.MenuButton>
-				<!-- <DropdownMenu.Root> -->
-				<!-- 	<DropdownMenu.Trigger> -->
-				<!-- 		{#snippet child({ props })} -->
-				<!-- 			<Sidebar.MenuAction -->
-				<!-- 				{...props} -->
-				<!-- 				showOnHover -->
-				<!-- 				class="rounded-sm data-[state=open]:bg-accent" -->
-				<!-- 			> -->
-				<!-- 				<DotsIcon /> -->
-				<!-- 				<span class="sr-only">More</span> -->
-				<!-- 			</Sidebar.MenuAction> -->
-				<!-- 		{/snippet} -->
-				<!-- 	</DropdownMenu.Trigger> -->
-				<!-- 	<DropdownMenu.Content -->
-				<!-- 		class="w-24 rounded-lg" -->
-				<!-- 		side={sidebar.isMobile ? 'bottom' : 'right'} -->
-				<!-- 		align={sidebar.isMobile ? 'end' : 'start'} -->
-				<!-- 	> -->
-				<!-- 		<DropdownMenu.Item> -->
-				<!-- <FolderIcon /> -->
-				<!-- 			<span>Open</span> -->
-				<!-- 		</DropdownMenu.Item> -->
-				<!-- 		<DropdownMenu.Item> -->
-				<!-- 			<Share3Icon /> -->
-				<!-- 			<span>Share</span> -->
-				<!-- 		</DropdownMenu.Item> -->
-				<!-- 		<DropdownMenu.Separator /> -->
-				<!-- 		<DropdownMenu.Item variant="destructive"> -->
-				<!-- 			<TrashIcon /> -->
-				<!-- 			<span>Delete</span> -->
-				<!-- 		</DropdownMenu.Item> -->
-				<!-- 	</DropdownMenu.Content> -->
-				<!-- </DropdownMenu.Root> -->
 			</Sidebar.MenuItem>
 		{/each}
-		<!-- <Sidebar.MenuItem> -->
-		<!-- 	<Sidebar.MenuButton class="text-sidebar-foreground/70"> -->
-		<!-- 		<DotsIcon class="text-sidebar-foreground/70" /> -->
-		<!-- 		<span>More</span> -->
-		<!-- 	</Sidebar.MenuButton> -->
-		<!-- </Sidebar.MenuItem> -->
 	</Sidebar.Menu>
 </Sidebar.Group>

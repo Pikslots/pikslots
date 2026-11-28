@@ -2,14 +2,7 @@
 	import BrandBackdrop from '$lib/components/brand-backdrop.svelte';
 	import PikslotsLogo from '$lib/components/pikslots-logo.svelte';
 	import { brandSurfaceClass, timeQuotes } from '$lib/brand/brand';
-	import {
-		FieldGroup,
-		Field,
-		FieldLabel,
-		FieldDescription,
-		FieldError,
-		FieldSeparator
-	} from '$lib/components/ui/field/index.js';
+	import { FieldGroup, Field, FieldLabel, FieldError } from '$lib/components/ui/field/index.js';
 	import * as InputGroup from '$lib/components/ui/input-group/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { cn } from '$lib/utils.js';
@@ -246,14 +239,14 @@
 							</Button>
 						</Field>
 
-						<FieldSeparator>Or no account 👇🏻</FieldSeparator>
+						<!-- <FieldSeparator>Or no account 👇🏻</FieldSeparator> -->
 
-						<Field>
-							<FieldDescription class="text-center">
-								Don't have an account?
-								<a href="##" class="underline underline-offset-4">Sign up</a>
-							</FieldDescription>
-						</Field>
+						<!-- <Field> -->
+						<!-- 	<FieldDescription class="text-center"> -->
+						<!-- 		Don't have an account? -->
+						<!-- 		<a href="##" class="underline underline-offset-4">Sign up</a> -->
+						<!-- 	</FieldDescription> -->
+						<!-- </Field> -->
 					</FieldGroup>
 				</form>
 			</div>

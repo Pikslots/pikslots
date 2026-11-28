@@ -101,10 +101,10 @@
 							Profile
 						</DropdownMenu.Item>
 						{#if isItemAllowed(currentUserRole?.role ?? null)}
-							<DropdownMenu.Item>
-								<CreditCardIcon />
-								Billing
-							</DropdownMenu.Item>
+							<!-- <DropdownMenu.Item> -->
+							<!-- 	<CreditCardIcon /> -->
+							<!-- 	Billing -->
+							<!-- </DropdownMenu.Item> -->
 						{/if}
 					</DropdownMenu.Group>
 					<DropdownMenu.Separator />
